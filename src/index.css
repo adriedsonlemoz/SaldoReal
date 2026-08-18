@@ -1,0 +1,35 @@
+/* ── Base: garante 16px em todos os browsers e bloqueia auto-ajuste
+   de fonte do Android/iOS WebView e Capacitor ─────────────────────*/
+html {
+  font-size: 16px !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F5F7FA;
+  color: #1E293B;
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  font-size: 1rem;        /* 16px */
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Impede que qualquer elemento fique abaixo de 12px no WebView */
+* {
+  -webkit-text-size-adjust: inherit;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #F5F7FA; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+@media print {
+  .d-print-none { display: none !important; }
+  body { background: white !important; color: black !important; }
+}

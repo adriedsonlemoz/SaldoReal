@@ -1,0 +1,359 @@
+import React, { useMemo, useState } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import LinearProgress from '@mui/material/LinearProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import InputAdornment from '@mui/material/InputAdornment';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
+import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
+import ItemRow from './ItemRow';
+import ModalAdicionarItem from './ModalAdicionarItem';
+import { money } from './constants';
+
+const SummaryBox = ({ label, value, tone = 'neutral', caption }) => {
+  const tones = {
+    teal: { bg: 'rgba(13,148,136,.08)', color: '#0D9488' },
+    cyan: { bg: 'rgba(6,182,212,.08)', color: '#0891B2' },
+    neutral: { bg: '#F8FAFC', color: '#334155' },
+  };
+  const c = tones[tone] || tones.neutral;
+  return (
+    <Box sx={{ flex: 1, minWidth: 0, p: 1.15, borderRadius: '14px', bgcolor: c.bg }}>
+      <Typography sx={{ fontSize: '.56rem', fontWeight: 900, color: c.color, textTransform: 'uppercase', letterSpacing: '.45px' }}>{label}</Typography>
+      <Typography sx={{ fontWeight: 900, fontSize: '.95rem', color: c.color, mt: .15 }}>{money(value)}</Typography>
+      {caption && <Typography sx={{ fontSize: '.56rem', color: 'text.secondary', mt: .15 }}>{caption}</Typography>}
+    </Box>
+  );
+};
+
+const SectionTitle = ({ title, count, paid }) => (
+  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+    <Typography sx={{ fontSize: '.66rem', fontWeight: 900, letterSpacing: '.8px', textTransform: 'uppercase', color: paid ? '#0D9488' : '#475569' }}>
+      {title}
+    </Typography>
+    <Box sx={{ px: .8, py: .15, borderRadius: '8px', bgcolor: paid ? 'rgba(13,148,136,.1)' : '#EEF2F7', color: paid ? '#0D9488' : '#64748B', fontSize: '.6rem', fontWeight: 900 }}>
+      {count}
+    </Box>
+  </Box>
+);
+
+const TelaListaAtiva = ({
+  lista, itens, onVoltar, onPagar, onDesfazerPagamento, onRemove,
+  onAdicionar, onConcluir, onEditarLista, setRoute,
+}) => {
+  const [modalAdd, setModalAdd] = useState(false);
+  const [itemPagamento, setItemPagamento] = useState(null);
+  const [valorPagamento, setValorPagamento] = useState('');
+  const [itemDesfazer, setItemDesfazer] = useState(null);
+  const [itemRemover, setItemRemover] = useState(null);
+  const [modalOrc, setModalOrc] = useState(false);
+  const [orcInput, setOrcInput] = useState('');
+  const [modalFinalizar, setModalFinalizar] = useState(false);
+  const [processando, setProcessando] = useState(false);
+  const [toast, setToast] = useState({ open: false, msg: '', sev: 'success', verGastos: false });
+
+  const dados = useMemo(() => {
+    const pendentes = itens.filter(i => i.status !== 'comprado');
+    const pagos = itens.filter(i => i.status === 'comprado');
+    const planejado = itens.reduce((s, i) => s + Number(i.valorTotal || 0), 0);
+    const totalPago = pagos.reduce((s, i) => s + Number(i.valorTotalReal ?? i.valorTotal ?? 0), 0);
+    const restantePlanejado = Math.max(0, planejado - pagos.reduce((s, i) => s + Number(i.valorTotal || 0), 0));
+    return { pendentes, pagos, planejado, totalPago, restantePlanejado };
+  }, [itens]);
+
+  const orcamento = Number(lista.orcamento || 0);
+  const pctOrcamento = orcamento > 0 ? Math.min(100, (dados.totalPago / orcamento) * 100) : 0;
+  const acima = orcamento > 0 && dados.totalPago > orcamento;
+
+  const abrirPagamento = (item) => {
+    setItemPagamento(item);
+    setValorPagamento(String(Number(item.valorTotal || 0).toFixed(2)));
+  };
+
+  const confirmarPagamento = async () => {
+    if (!itemPagamento) return;
+    const valor = Number(String(valorPagamento).replace(',', '.'));
+    if (!Number.isFinite(valor) || valor < 0) return;
+    setProcessando(true);
+    try {
+      await onPagar(itemPagamento.id, valor);
+      setItemPagamento(null);
+      setToast({ open: true, msg: `${money(valor)} lançado como despesa paga.`, sev: 'success', verGastos: true });
+    } catch {
+      setToast({ open: true, msg: 'Não foi possível registrar o pagamento.', sev: 'error', verGastos: false });
+    } finally {
+      setProcessando(false);
+    }
+  };
+
+  const salvarOrcamento = async () => {
+    await onEditarLista(lista.id, { orcamento: Number(String(orcInput).replace(',', '.')) || 0 });
+    setModalOrc(false);
+  };
+
+  const finalizar = async () => {
+    setProcessando(true);
+    try {
+      await onConcluir(lista.id);
+      setModalFinalizar(false);
+      await onVoltar();
+    } finally {
+      setProcessando(false);
+    }
+  };
+
+  return (
+    <Box sx={{ maxWidth: 620, mx: 'auto', px: 2, pt: 1.2, pb: 13, minHeight: '100vh' }}>
+      <Snackbar
+        open={toast.open} autoHideDuration={4500}
+        onClose={() => setToast(t => ({ ...t, open: false }))}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          severity={toast.sev} variant="filled" sx={{ borderRadius: '13px', fontWeight: 700, alignItems: 'center' }}
+          action={toast.verGastos && setRoute ? (
+            <Button color="inherit" size="small" onClick={() => setRoute('gastos')} sx={{ fontSize: '.65rem' }}>
+              Ver fluxo
+            </Button>
+          ) : undefined}
+        >
+          {toast.msg}
+        </Alert>
+      </Snackbar>
+
+      <Box sx={{
+        borderRadius: '24px', p: 2, color: '#fff', mb: 1.5, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(135deg,#0F766E 0%,#06B6D4 55%,#7B2CBF 115%)',
+        boxShadow: '0 12px 30px rgba(13,148,136,.16)',
+      }}>
+        <Box sx={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.08)', right: -45, top: -60 }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Button onClick={onVoltar} sx={{ minWidth: 0, p: .45, color: '#fff', bgcolor: 'rgba(255,255,255,.10)', '&:hover': { bgcolor: 'rgba(255,255,255,.16)' } }}>
+            <ArrowBackRoundedIcon />
+          </Button>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography sx={{ fontSize: '.6rem', fontWeight: 900, opacity: .75, textTransform: 'uppercase', letterSpacing: '.8px' }}>Compra em andamento</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+              {lista.nome}
+            </Typography>
+          </Box>
+          <Button
+            size="small" onClick={() => { setOrcInput(orcamento ? String(orcamento) : ''); setModalOrc(true); }}
+            startIcon={<EditRoundedIcon />}
+            sx={{ color: '#fff', bgcolor: 'rgba(255,255,255,.11)', fontSize: '.62rem', px: .9 }}
+          >
+            Orçamento
+          </Button>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 1, mt: 1.8 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Itens</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{dados.pagos.length}/{itens.length}</Typography>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pago</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{money(dados.totalPago)}</Typography>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pendente</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{dados.pendentes.length}</Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      <Box sx={{ bgcolor: 'background.paper', borderRadius: '18px', p: 1.4, mb: 1.4, border: '1px solid rgba(15,23,42,.06)' }}>
+        <Box sx={{ display: 'flex', gap: .8 }}>
+          <SummaryBox label="Planejado" value={dados.planejado} tone="cyan" caption="todos os itens" />
+          <SummaryBox label="Pago" value={dados.totalPago} tone="teal" caption="já no financeiro" />
+          <SummaryBox label="A comprar" value={dados.restantePlanejado} caption="estimativa restante" />
+        </Box>
+
+        {orcamento > 0 && (
+          <Box sx={{ mt: 1.3, px: .2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: .55 }}>
+              <Typography sx={{ fontSize: '.62rem', color: 'text.secondary', fontWeight: 800 }}>
+                Orçamento {money(orcamento)}
+              </Typography>
+              <Typography sx={{ fontSize: '.62rem', color: acima ? '#EF4444' : '#0D9488', fontWeight: 900 }}>
+                {pctOrcamento.toFixed(0)}% pago
+              </Typography>
+            </Box>
+            <LinearProgress
+              variant="determinate" value={pctOrcamento}
+              sx={{ height: 7, bgcolor: '#EEF2F7', '& .MuiLinearProgress-bar': { bgcolor: acima ? '#EF4444' : '#0D9488' } }}
+            />
+            {dados.planejado > orcamento && (
+              <Typography sx={{ fontSize: '.62rem', color: '#F59E0B', mt: .55, fontWeight: 700 }}>
+                ⚠️ O total planejado está {money(dados.planejado - orcamento)} acima do orçamento.
+              </Typography>
+            )}
+          </Box>
+        )}
+      </Box>
+
+      <Button
+        fullWidth variant="outlined" startIcon={<AddRoundedIcon />} onClick={() => setModalAdd(true)}
+        sx={{ mb: 2, py: 1.15, borderRadius: '14px', color: '#0D9488', borderColor: 'rgba(13,148,136,.28)', bgcolor: 'rgba(13,148,136,.035)', fontWeight: 900 }}
+      >
+        Adicionar item
+      </Button>
+
+      {itens.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 5, border: '1px dashed #CBD5E1', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.55)' }}>
+          <Typography sx={{ fontSize: '2.1rem' }}>🧺</Typography>
+          <Typography sx={{ fontWeight: 900, mt: .7 }}>Sua lista está vazia</Typography>
+          <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mt: .3 }}>Adicione o primeiro produto para começar.</Typography>
+        </Box>
+      )}
+
+      {dados.pendentes.length > 0 && (
+        <Box sx={{ mb: 2.4 }}>
+          <SectionTitle title="A comprar" count={dados.pendentes.length} />
+          {dados.pendentes.map(item => (
+            <ItemRow key={item.id} item={item} onPagar={abrirPagamento} onDesfazer={() => {}} onRemove={setItemRemover} />
+          ))}
+        </Box>
+      )}
+
+      {dados.pagos.length > 0 && (
+        <Box sx={{ mb: 2.4 }}>
+          <SectionTitle title="Pago e lançado" count={dados.pagos.length} paid />
+          <Typography sx={{ fontSize: '.66rem', color: 'text.secondary', mb: 1, mt: -.5 }}>
+            Estes valores já fazem parte da Home, Fluxo, Relatório e gráficos do SaldoReal.
+          </Typography>
+          {dados.pagos.map(item => (
+            <ItemRow key={item.id} item={item} onPagar={() => {}} onDesfazer={setItemDesfazer} onRemove={setItemRemover} />
+          ))}
+        </Box>
+      )}
+
+      {itens.length > 0 && (
+        <Box sx={{ mt: 2.5, p: 1.5, borderRadius: '18px', bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <ReceiptLongRoundedIcon sx={{ color: '#64748B' }} />
+            <Box sx={{ flex: 1 }}>
+              <Typography sx={{ fontWeight: 900, fontSize: '.82rem' }}>Terminou a compra?</Typography>
+              <Typography sx={{ fontSize: '.67rem', color: 'text.secondary' }}>Finalizar só arquiva a lista. Os itens pagos já estão no financeiro.</Typography>
+            </Box>
+            <Button size="small" variant="outlined" onClick={() => setModalFinalizar(true)} startIcon={<ArchiveRoundedIcon />} sx={{ fontSize: '.63rem' }}>
+              Finalizar
+            </Button>
+          </Box>
+        </Box>
+      )}
+
+      <ModalAdicionarItem open={modalAdd} onClose={() => setModalAdd(false)} onAdicionar={onAdicionar} />
+
+      <Dialog open={!!itemPagamento} onClose={() => !processando && setItemPagamento(null)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>💳 Registrar pagamento</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontWeight: 800, mb: .3 }}>{itemPagamento?.nome}</Typography>
+          <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mb: 2 }}>
+            Confirme o valor realmente pago. Ao confirmar, a despesa entra imediatamente no fluxo financeiro.
+          </Typography>
+          <TextField
+            fullWidth autoFocus label="Valor pago" value={valorPagamento}
+            onChange={(e) => setValorPagamento(e.target.value)} type="number"
+            inputProps={{ min: 0, step: '.01', inputMode: 'decimal' }}
+            InputProps={{ startAdornment: <InputAdornment position="start">R$</InputAdornment> }}
+            onKeyDown={(e) => e.key === 'Enter' && confirmarPagamento()}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button color="inherit" onClick={() => setItemPagamento(null)}>Cancelar</Button>
+          <Button
+            variant="contained" onClick={confirmarPagamento} disabled={processando}
+            startIcon={<PaymentsRoundedIcon />}
+            sx={{ background: 'linear-gradient(135deg,#0D9488 0%,#06B6D4 100%)' }}
+          >
+            {processando ? 'Registrando…' : 'Pagar e lançar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!itemDesfazer} onClose={() => setItemDesfazer(null)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>Desfazer pagamento?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '.82rem', color: 'text.secondary' }}>
+            Isso volta <strong>{itemDesfazer?.nome}</strong> para “A comprar” e remove o lançamento correspondente do fluxo financeiro.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button color="inherit" onClick={() => setItemDesfazer(null)}>Cancelar</Button>
+          <Button variant="contained" color="warning" onClick={async () => {
+            const item = itemDesfazer;
+            setItemDesfazer(null);
+            await onDesfazerPagamento(item.id);
+          }}>Desfazer</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!itemRemover} onClose={() => setItemRemover(null)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>Remover item?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '.82rem', color: 'text.secondary' }}>
+            {itemRemover?.status === 'comprado'
+              ? <>Este item já está pago. Removê-lo também excluirá <strong>o lançamento financeiro deste item</strong>.</>
+              : 'O item será retirado da lista.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button color="inherit" onClick={() => setItemRemover(null)}>Cancelar</Button>
+          <Button variant="contained" color="error" onClick={async () => {
+            const item = itemRemover;
+            setItemRemover(null);
+            await onRemove(item.id);
+          }}>Remover</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={modalOrc} onClose={() => setModalOrc(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>Orçamento da compra</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mb: 1.6 }}>Use como limite de referência. Ele não cria nenhuma movimentação financeira.</Typography>
+          <TextField
+            fullWidth autoFocus label="Limite" value={orcInput} onChange={(e) => setOrcInput(e.target.value)} type="number"
+            inputProps={{ min: 0, step: '.01', inputMode: 'decimal' }}
+            InputProps={{ startAdornment: <InputAdornment position="start">R$</InputAdornment> }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button color="inherit" onClick={() => setModalOrc(false)}>Cancelar</Button>
+          <Button variant="contained" onClick={salvarOrcamento}>Salvar</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={modalFinalizar} onClose={() => setModalFinalizar(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>Finalizar esta compra?</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: '.82rem', color: 'text.secondary' }}>
+            A lista será arquivada no histórico. <strong>{dados.pagos.length} item(ns) pagos, total de {money(dados.totalPago)}, já estão registrados no financeiro.</strong>
+          </Typography>
+          {dados.pendentes.length > 0 && (
+            <Typography sx={{ fontSize: '.74rem', color: '#F59E0B', fontWeight: 700, mt: 1.2 }}>
+              ⚠️ {dados.pendentes.length} item(ns) ainda estão em “A comprar” e não entram nas finanças.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 0 }}>
+          <Button color="inherit" onClick={() => setModalFinalizar(false)}>Cancelar</Button>
+          <Button variant="contained" onClick={finalizar} disabled={processando}>Finalizar lista</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default TelaListaAtiva;

@@ -1,0 +1,321 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+
+// ── LOG PERSISTENTE ──────────────────────────────────────────────────────────
+const LOG_KEY  = 'saldoReal_ErrorLog';
+const MAX_LOGS = 50;
+const lerLogs   = () => { try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; } };
+const gravarLog = (entrada) => {
+  try {
+    const logs = lerLogs();
+    logs.unshift(entrada);
+    localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0, MAX_LOGS)));
+  } catch { /* localStorage cheio */ }
+};
+
+const Sobre = ({ setRoute }) => {
+  const [openApoio,   setOpenApoio]   = useState(false);
+  const [openContato, setOpenContato] = useState(false);
+  const [toast, setToast]             = useState({ open: false, message: '', severity: 'success' });
+  const [logErros, setLogErros]       = useState([]);
+
+  const recarregarLogs = useCallback(() => setLogErros(lerLogs()), []);
+
+  useEffect(() => {
+    recarregarLogs();
+
+    const onError = (msg, src, linha, col, erro) => {
+      gravarLog({ tipo: 'JS_ERROR', data: new Date().toLocaleString('pt-BR'), mensagem: String(msg), fonte: src ? `${src.split('/').pop()}:${linha}:${col}` : 'desconhecido', stack: erro?.stack || null });
+      recarregarLogs();
+      return false;
+    };
+    const onUnhandled = (e) => {
+      const erro = e.reason;
+      gravarLog({ tipo: 'PROMISE_REJECTION', data: new Date().toLocaleString('pt-BR'), mensagem: erro?.message || String(erro) || 'Promise rejeitada', fonte: 'async/promise', stack: erro?.stack || null });
+      recarregarLogs();
+    };
+    const onDexieError = (e) => {
+      if (e.target instanceof IDBRequest || e.target instanceof IDBTransaction) {
+        gravarLog({ tipo: 'DEXIE_ERROR', data: new Date().toLocaleString('pt-BR'), mensagem: e.target?.error?.message || 'Erro IndexedDB', fonte: 'IndexedDB/Dexie', stack: null });
+        recarregarLogs();
+      }
+    };
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onUnhandled);
+    window.addEventListener('error', onDexieError, true);
+    return () => {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onUnhandled);
+      window.removeEventListener('error', onDexieError, true);
+    };
+  }, [recarregarLogs]);
+
+  const showToast  = (message, severity = 'success') => setToast({ open: true, message, severity });
+  const closeToast = () => setToast({ ...toast, open: false });
+
+  const handleClearLog = () => { localStorage.removeItem(LOG_KEY); setLogErros([]); showToast('Log de diagnóstico limpo!', 'success'); };
+  const handleCopyLog  = () => {
+    if (logErros.length === 0) return showToast('Nenhum erro para copiar.', 'warning');
+    const texto = logErros.map((e, i) =>
+      `── ERRO ${i + 1} ──────────────\nTipo:    ${e.tipo}\nData:    ${e.data}\nMensagem: ${e.mensagem}\nFonte:   ${e.fonte || 'N/A'}\n${e.stack ? `Stack:\n${e.stack}\n` : ''}`
+    ).join('\n');
+    navigator.clipboard.writeText(texto)
+      .then(() => showToast('📋 Log copiado!', 'success'))
+      .catch(() => showToast('Erro ao copiar. Tente manualmente.', 'error'));
+  };
+
+  const changelog = [
+    {
+      v: 'beta.4',
+      icon: '📒',
+      title: 'Razão financeiro unificado',
+      desc: 'Dinheiro efetivamente recebido ou pago agora passa por um único fluxo, com origem visível para lançamentos manuais, compras, acordos e renda.',
+    },
+    {
+      v: 'beta.4',
+      icon: '↩️',
+      title: 'Estorno individual de acordos',
+      desc: 'Cada pagamento tem identidade própria: é possível estornar uma parcela sem alterar as demais, preservando competência e histórico.',
+    },
+    {
+      v: 'beta.3',
+      icon: '🛒',
+      title: 'Compras com fluxo financeiro imediato',
+      desc: 'A Lista de Compras ganhou identidade própria. Cada item pago entra imediatamente no financeiro e finalizar ou reabrir a lista não duplica nem apaga o histórico.',
+    },
+    {
+      v: 'beta.3',
+      icon: '🤝',
+      title: 'Acordos consolidados no fluxo',
+      desc: 'Parcelas atrasadas acumulam corretamente e relatórios usam o valor realmente pago, inclusive múltiplos pagamentos no mesmo mês.',
+    },
+    {
+      v: 'beta.2',
+      icon: '📅',
+      title: 'Vencimentos por data real',
+      desc: 'Acordos respeitam o mês do primeiro vencimento, parcelas atrasadas são identificadas corretamente e dias 29/30/31 se ajustam aos meses curtos.',
+    },
+    {
+      v: 'beta.2',
+      icon: '🛡️',
+      title: 'Backup completo e restauração segura',
+      desc: 'O backup agora inclui gastos, acordos, configurações, listas e itens. A restauração usa uma única transação para evitar dados pela metade.',
+    },
+    {
+      v: 'beta.2',
+      icon: '💰',
+      title: 'Saldo mais claro',
+      desc: 'A tela inicial separa saldo disponível, pendências e saldo projetado, evitando contar a renda mensal duas vezes.',
+    },
+    {
+      v: 'beta.2',
+      icon: '🛒',
+      title: 'Lista de compras consolidada',
+      desc: 'Uma única regra de negócio controla listas e itens, com proteção contra lançamentos duplicados ao concluir uma compra.',
+    },
+    {
+      v: 'beta.1',
+      icon: '🤝',
+      title: 'Finanças, acordos e compras',
+      desc: 'Base do SaldoReal com lançamentos, acordos parcelados, relatórios, alertas, lista de compras e funcionamento offline.',
+    },
+  ];
+
+  return (
+    <Box sx={{ maxWidth: 600, margin: 'auto', pb: 4, pt: 2, px: { xs: 2, sm: 0 } }}>
+      <Box sx={{ mb: 2 }}>
+        <Button variant="outlined" onClick={() => setRoute('home')} sx={{ fontWeight: 700 }}>
+          ← Voltar
+        </Button>
+      </Box>
+
+      <Snackbar open={toast.open} autoHideDuration={3000} onClose={closeToast} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} sx={{ mt: 7 }}>
+        <Alert onClose={closeToast} severity={toast.severity} variant="filled" sx={{ width: '100%', fontWeight: 'bold' }}>{toast.message}</Alert>
+      </Snackbar>
+
+      {/* Modais de apoio */}
+      <Dialog open={openApoio} onClose={() => setOpenApoio(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 700, color: '#D97706' }}>💎 Apoiar o Projeto</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 2 }}>
+            Este app é mantido de forma independente e 100% gratuita. Se ele te ajuda, considere apoiar!
+          </Typography>
+          <Box sx={{ p: 2, bgcolor: '#FFFBEB', borderRadius: '12px', border: '1.5px dashed #FCD34D', textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#92400E', mb: 0.5 }}>Chave PIX</Typography>
+            <Typography sx={{ color: '#D97706', fontSize: '1.2rem', fontWeight: 800, fontFamily: 'monospace' }}>[INSERIR PIX AQUI]</Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+          <Button onClick={() => setOpenApoio(false)} color="inherit">Fechar</Button>
+          <Button variant="contained" color="warning" onClick={() => { navigator.clipboard.writeText('[INSERIR PIX AQUI]'); showToast('Chave PIX copiada!'); }}>
+            Copiar PIX
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openContato} onClose={() => setOpenContato(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 700 }}>📬 Fale Conosco</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 2 }}>
+            Encontrou algum bug ou tem uma sugestão? Manda mensagem!
+          </Typography>
+          <Box sx={{ p: 2, bgcolor: '#EFF6FF', borderRadius: '12px', border: '1.5px dashed #93C5FD', textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E40AF', mb: 0.5 }}>E-mail de suporte</Typography>
+            <Typography sx={{ color: '#3B82F6', fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace' }}>suporte@saldoreal.app</Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+          <Button onClick={() => setOpenContato(false)} color="inherit">Fechar</Button>
+          <Button variant="contained" color="info" onClick={() => { navigator.clipboard.writeText('suporte@saldoreal.app'); showToast('E-mail copiado!'); }}>
+            Copiar e-mail
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Cabeçalho do app */}
+      <Card sx={{ mb: 3, overflow: 'hidden' }}>
+        <Box sx={{ background: 'linear-gradient(135deg, #E91E8C 0%, #7B2FBE 100%)', p: 3, textAlign: 'center' }}>
+          <Typography sx={{ fontSize: '3.5rem', lineHeight: 1, mb: 1 }}>💜</Typography>
+          <Typography sx={{ fontWeight: 800, color: '#fff', fontSize: '1.5rem' }}>SaldoReal</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
+        </Box>
+        <Box sx={{ p: 2.5, textAlign: 'center' }}>
+          <Chip label="Beta 4" sx={{ bgcolor: 'rgba(0,212,255,0.15)', color: '#00D4FF', border: '1px solid rgba(0,212,255,0.30)', fontWeight: 700, mb: 1.5 }} />
+          <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
+            Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
+          </Typography>
+        </Box>
+      </Card>
+
+      {/* Changelog */}
+      <Card sx={{ mb: 3, overflow: 'hidden' }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '1rem' }}>📋 O que há de novo</Typography>
+        </Box>
+        <Box sx={{ p: 2 }}>
+          <List disablePadding>
+            {changelog.map((item, idx) => (
+              <React.Fragment key={idx}>
+                <ListItem sx={{ alignItems: 'flex-start', px: 0, pb: 2 }}>
+                  <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
+                    <Typography sx={{ fontSize: '1.4rem' }}>{item.icon}</Typography>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                        <Chip label={item.v} size="small" sx={{ bgcolor: 'rgba(0,212,255,0.15)', color: '#00D4FF', border: '1px solid rgba(0,212,255,0.30)', fontWeight: 700, height: 20, fontSize: '0.65rem' }} />
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: 'text.primary' }}>{item.title}</Typography>
+                      </Box>
+                    }
+                    secondary={
+                      <Typography component="span" sx={{ fontSize: '0.8rem', color: 'text.secondary', lineHeight: 1.5 }}>
+                        {item.desc}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+                {idx < changelog.length - 1 && <Divider sx={{ mb: 2 }} />}
+              </React.Fragment>
+            ))}
+          </List>
+        </Box>
+      </Card>
+
+      {/* Console de Diagnóstico */}
+      <Card sx={{ mb: 3, overflow: 'hidden', border: '1.5px solid #FCA5A5' }}>
+        <Box sx={{ bgcolor: '#FEF2F2', borderBottom: '1px solid #FCA5A5', p: 1.5, px: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#991B1B' }}>⚠️ Console de Diagnóstico</Typography>
+          <Chip
+            label={`${logErros.length} evento${logErros.length !== 1 ? 's' : ''}`}
+            size="small"
+            sx={{ bgcolor: logErros.length === 0 ? '#F0FDF4' : '#FEF2F2', color: logErros.length === 0 ? '#166534' : '#991B1B', fontWeight: 700, fontSize: '0.7rem' }}
+          />
+        </Box>
+        <Box sx={{ p: 2, bgcolor: '#0F172A', minHeight: '80px' }}>
+          {logErros.length === 0 ? (
+            <Typography sx={{ color: '#22C55E', fontFamily: 'monospace', fontSize: '0.82rem', textAlign: 'center', py: 1.5 }}>
+              ✔ Sistema estável. Nenhum erro registrado.
+            </Typography>
+          ) : (
+            <>
+              <Box sx={{ maxHeight: '240px', overflowY: 'auto', mb: 2 }}>
+                {logErros.map((erro, index) => (
+                  <Box key={index} sx={{ mb: 1.5, pb: 1.5, borderBottom: '1px solid #1E293B' }}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 0.5, flexWrap: 'wrap' }}>
+                      <Chip label={erro.tipo || 'ERRO'} size="small" sx={{ bgcolor: '#1E293B', color: '#F59E0B', fontWeight: 700, fontFamily: 'monospace', fontSize: '0.6rem', height: 18 }} />
+                      <Typography sx={{ color: '#64748B', fontFamily: 'monospace', fontSize: '0.65rem' }}>{erro.data}</Typography>
+                      {erro.fonte && <Typography sx={{ color: '#F59E0B', fontFamily: 'monospace', fontSize: '0.65rem' }}>@ {erro.fonte}</Typography>}
+                    </Box>
+                    <Typography sx={{ color: '#F87171', fontFamily: 'monospace', fontSize: '0.75rem', fontWeight: 600, wordBreak: 'break-all' }}>{erro.mensagem}</Typography>
+                    {erro.stack && <Typography sx={{ color: '#475569', fontFamily: 'monospace', fontSize: '0.65rem', mt: 0.5, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>{erro.stack.substring(0, 200)}{erro.stack.length > 200 ? '…' : ''}</Typography>}
+                  </Box>
+                ))}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button variant="contained" size="small" onClick={handleCopyLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', bgcolor: '#3B82F6' }}>
+                  📋 Copiar log
+                </Button>
+                <Button variant="outlined" size="small" onClick={handleClearLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', color: '#EF4444', borderColor: '#EF4444' }}>
+                  🗑️ Limpar
+                </Button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Card>
+
+      {/* Suporte */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6}>
+          <Card
+            sx={{ height: '100%', cursor: 'pointer', '&:active': { transform: 'scale(0.95)' }, '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }, transition: 'all 0.15s' }}
+            onClick={() => setOpenApoio(true)}
+          >
+            <Box sx={{ p: 2, textAlign: 'center' }}>
+              <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>💎</Typography>
+              <Typography sx={{ color: '#D97706', fontWeight: 700, fontSize: '0.9rem' }}>Apoiar</Typography>
+            </Box>
+          </Card>
+        </Grid>
+        <Grid item xs={6}>
+          <Card
+            sx={{ height: '100%', cursor: 'pointer', '&:active': { transform: 'scale(0.95)' }, '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }, transition: 'all 0.15s' }}
+            onClick={() => setOpenContato(true)}
+          >
+            <Box sx={{ p: 2, textAlign: 'center' }}>
+              <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>📬</Typography>
+              <Typography sx={{ color: '#3B82F6', fontWeight: 700, fontSize: '0.9rem' }}>Contato</Typography>
+            </Box>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Box sx={{ p: 2, bgcolor: '#F8FAFC', border: '1.5px dashed #CBD5E1', borderRadius: '12px', textAlign: 'center' }}>
+        <Typography sx={{ fontWeight: 700, fontSize: '0.82rem', color: 'text.primary', mb: 0.5 }}>
+          Desenvolvimento Independente
+        </Typography>
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.75rem', lineHeight: 1.5 }}>
+          Este app não tem vínculo com o Serasa, SPC ou qualquer banco. Todos os dados ficam salvos localmente no seu dispositivo.
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
+
+export default Sobre;
