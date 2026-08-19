@@ -27,35 +27,35 @@ import ListaCompras from './components/listaCompras';
 const IcoHome = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H15v-6H9v6H4a1 1 0 01-1-1V9.5z"
-      stroke={active ? '#7B2CBF' : '#9CA3AF'} strokeWidth="2" strokeLinejoin="round"
+      stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2" strokeLinejoin="round"
       fill={active ? 'rgba(123,44,191,0.12)' : 'none'} />
   </svg>
 );
 const IcoGastos = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <rect x="3" y="6" width="18" height="14" rx="2"
-      stroke={active ? '#F72585' : '#9CA3AF'} strokeWidth="2"
-      fill={active ? 'rgba(247,37,133,0.1)' : 'none'} />
-    <path d="M3 10h18M8 3v3M16 3v3" stroke={active ? '#F72585' : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
-    <circle cx="8" cy="15" r="1.2" fill={active ? '#F72585' : '#9CA3AF'} />
-    <circle cx="12" cy="15" r="1.2" fill={active ? '#F72585' : '#9CA3AF'} />
-    <circle cx="16" cy="15" r="1.2" fill={active ? '#F72585' : '#9CA3AF'} />
+      stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2"
+      fill={active ? 'rgba(123,44,191,0.10)' : 'none'} />
+    <path d="M3 10h18M8 3v3M16 3v3" stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2" strokeLinecap="round" />
+    <circle cx="8" cy="15" r="1.2" fill={active ? '#7B2CBF' : '#A59DAB'} />
+    <circle cx="12" cy="15" r="1.2" fill={active ? '#7B2CBF' : '#A59DAB'} />
+    <circle cx="16" cy="15" r="1.2" fill={active ? '#7B2CBF' : '#A59DAB'} />
   </svg>
 );
 const IcoRelatorio = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <rect x="3" y="3" width="18" height="18" rx="2"
-      stroke={active ? '#00B4D8' : '#9CA3AF'} strokeWidth="2"
-      fill={active ? 'rgba(0,180,216,0.08)' : 'none'} />
-    <path d="M7 17l3-4 3 2 4-6" stroke={active ? '#00B4D8' : '#9CA3AF'}
+      stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2"
+      fill={active ? 'rgba(123,44,191,0.09)' : 'none'} />
+    <path d="M7 17l3-4 3 2 4-6" stroke={active ? '#7B2CBF' : '#A59DAB'}
       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 const IcoConfig = ({ active }) => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="3" stroke={active ? '#7B2CBF' : '#9CA3AF'} strokeWidth="2" />
+    <circle cx="12" cy="12" r="3" stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2" />
     <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-      stroke={active ? '#7B2CBF' : '#9CA3AF'} strokeWidth="2" strokeLinecap="round" />
+      stroke={active ? '#7B2CBF' : '#A59DAB'} strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 const IcoAdd = () => (
@@ -82,11 +82,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
   ];
 
   // Quais itens laterais ficam "ativos"
-  const activeColor = (id) => {
-    if (id === 'gastos')    return '#F72585';
-    if (id === 'relatorio') return '#00B4D8';
-    return '#7B2CBF';
-  };
+  const activeColor = () => '#7B2CBF';
 
   const NavItem = ({ id, label, Icon }) => {
     const active = route === id || (id === 'config' && (route === 'sobre' || route === 'backup'));
@@ -103,8 +99,8 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       >
         <Icon active={active} />
         <Typography sx={{
-          fontSize: '0.57rem', fontWeight: active ? 800 : 600,
-          color: active ? activeColor(id) : '#9CA3AF',
+          fontSize: '0.66rem', fontWeight: active ? 800 : 600,
+          color: active ? activeColor(id) : '#9A92A1',
           letterSpacing: '0.1px', lineHeight: 1,
         }}>
           {label}
@@ -112,7 +108,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
         {active && (
           <Box sx={{
             position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-            width: 20, height: 2.5, borderRadius: '2px 2px 0 0',
+            width: 22, height: 3, borderRadius: '2px 2px 0 0',
             bgcolor: activeColor(id),
           }} />
         )}
@@ -125,8 +121,8 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 300,
       bgcolor: 'background.paper',
       borderTop: '1px solid rgba(0,0,0,0.07)',
-      boxShadow: '0 -4px 24px rgba(0,0,0,0.09)',
-      display: 'flex', alignItems: 'center',
+      boxShadow: '0 -6px 24px rgba(45,11,94,0.08)',
+      display: 'flex', alignItems: 'center', minHeight: 62,
       pb: 'env(safe-area-inset-bottom, 0px)',
     }}>
       {LEFT.map(item => <NavItem key={item.id} {...item} />)}
@@ -136,10 +132,10 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
         <Box
           onClick={onAddPress}
           sx={{
-            width: 52, height: 52, borderRadius: '16px',
+            width: 50, height: 50, borderRadius: '16px',
             background: 'linear-gradient(135deg, #7B2CBF 0%, #F72585 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 6px 22px rgba(123,44,191,0.45)',
+            boxShadow: '0 7px 24px rgba(123,44,191,0.34)',
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
             transition: 'all 0.18s ease',
@@ -161,9 +157,9 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const ModalAddOpcoes = ({ open, onClose, setRoute }) => {
   const OPCOES = [
-    { icon: '💸', label: 'Novo Gasto',            sub: 'Registrar despesa ou entrada',   route: 'novaConta', cor: '#F72585' },
+    { icon: '💸', label: 'Novo Gasto',            sub: 'Registrar despesa ou entrada',   route: 'novaConta', cor: '#7B2CBF' },
     { icon: '🤝', label: 'Novo Acordo',            sub: 'Parcelamento ou dívida',          route: 'acordos',   cor: '#7B2CBF' },
-    { icon: '🛒', label: 'Nova Lista de Compras',  sub: 'Criar lista para ir ao mercado',  route: 'lista',     cor: '#00B4D8' },
+    { icon: '🛒', label: 'Nova Lista de Compras',  sub: 'Criar lista para ir ao mercado',  route: 'lista',     cor: '#8B5CF6' },
   ];
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs"
@@ -225,7 +221,7 @@ const ModalConfig = ({ open, onClose, setRoute }) => (
     <DialogContent sx={{ pt: 0.5, pb: 0 }}>
       {[
         { icon: '📖', label: 'Sobre o App',    sub: 'Versão, créditos e informações',  route: 'sobre',  cor: '#7B2CBF' },
-        { icon: '🛡️', label: 'Backup & Dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#00B4D8' },
+        { icon: '🛡️', label: 'Backup & Dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#8B5CF6' },
       ].map(op => (
         <Box key={op.route}
           onClick={() => { onClose(); setRoute(op.route); }}
@@ -293,9 +289,9 @@ const App = () => {
 
   return (
     <>
-      <Container maxWidth={false} disableGutters sx={{ minHeight: '100vh' }}>
+      <Container maxWidth={false} disableGutters sx={{ minHeight: '100dvh' }}>
         {/* Wrapper com pb para não ficar atrás da navbar */}
-        <Box sx={{ pb: showNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 0 }}>
+        <Box sx={{ pb: showNav ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : 0 }}>
           {renderComponent()}
         </Box>
       </Container>

@@ -27,7 +27,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         bgcolor: pago ? 'rgba(13,148,136,.10)' : `${cat.cor}12`, fontSize: '1.15rem',
       }}>
-        {pago ? <CheckCircleRoundedIcon sx={{ color: '#0D9488', fontSize: '1.25rem' }} /> : cat.emoji}
+        {pago ? <CheckCircleRoundedIcon sx={{ color: '#087A58', fontSize: '1.25rem' }} /> : cat.emoji}
       </Box>
 
       <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -37,7 +37,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
         }}>
           {item.nome}
         </Typography>
-        <Typography sx={{ fontSize: '.68rem', color: 'text.secondary', mt: .35, fontWeight: 600 }}>
+        <Typography sx={{ fontSize: '.72rem', color: 'text.secondary', mt: .35, fontWeight: 600 }}>
           {item.quantidade} {item.unidade || 'un'}
           {item.precoPorMedida > 0 ? ` · ${money(item.precoPorMedida)}/${item.unidade || 'un'}` : ''}
           {pago ? ' · lançado no financeiro' : ` · ${cat.label}`}
@@ -45,7 +45,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
       </Box>
 
       <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-        <Typography sx={{ fontWeight: 900, fontSize: '.9rem', color: pago ? '#0D9488' : 'text.primary' }}>
+        <Typography sx={{ fontWeight: 900, fontSize: '.92rem', color: pago ? '#087A58' : 'text.primary' }}>
           {money(valor)}
         </Typography>
         {!pago ? (
@@ -55,8 +55,8 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
             onClick={() => onPagar(item)}
             startIcon={<PaymentsRoundedIcon sx={{ fontSize: '14px !important' }} />}
             sx={{
-              mt: .45, minWidth: 0, px: 1.1, py: .35, borderRadius: '9px', fontSize: '.65rem',
-              background: 'linear-gradient(135deg,#0D9488 0%,#06B6D4 100%)',
+              mt: .45, minWidth: 0, px: 1.1, py: .35, borderRadius: '9px', fontSize: '.7rem',
+              background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)',
               boxShadow: 'none', '&:hover': { boxShadow: 'none' },
             }}
           >
@@ -68,7 +68,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
             variant="text"
             onClick={() => onDesfazer(item)}
             startIcon={<UndoRoundedIcon sx={{ fontSize: '13px !important' }} />}
-            sx={{ mt: .25, color: '#64748B', fontSize: '.62rem', p: .2, minWidth: 0 }}
+            sx={{ mt: .25, color: '#64748B', fontSize: '.68rem', p: .2, minWidth: 0 }}
           >
             Desfazer
           </Button>

@@ -15,13 +15,13 @@ const InsightStrip = ({ insight }) => {
       sx={{
         display: 'flex',
         alignItems: 'center',
-        gap: 1.2,
-        px: 1.5,
-        py: 1,
-        mb: 1.5,
+        gap: .9,
+        px: 1.15,
+        py: .72,
+        mb: 1,
         bgcolor: c.bg,
         border: `1px solid ${c.border}`,
-        borderRadius: '14px',
+        borderRadius: '13px',
         position: 'relative',
         overflow: 'hidden',
         transition: 'all 0.2s',
@@ -31,18 +31,18 @@ const InsightStrip = ({ insight }) => {
       {/* Pill emoji */}
       <Box sx={{
         flexShrink: 0,
-        width: 32, height: 32,
+        width: 29, height: 29,
         borderRadius: '10px',
         bgcolor: `${c.border}25`,
         border: `1px solid ${c.border}40`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '0.95rem',
+        fontSize: '0.88rem',
       }}>
         {insight.emoji}
       </Box>
 
       <Typography sx={{
-        fontSize: '0.76rem', fontWeight: 600, color: c.text,
+        fontSize: '0.74rem', fontWeight: 600, color: c.text,
         lineHeight: 1.45, flex: 1,
         overflow: 'hidden', display: '-webkit-box',
         WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',

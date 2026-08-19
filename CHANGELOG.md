@@ -1,5 +1,14 @@
 # Changelog — SaldoReal
 
+## 1.0.0-beta.5 — UI/UX e Android
+- Revisão visual responsiva com identidade roxa unificada.
+- Home compactada para remover rolagem criada por alturas/paddings redundantes.
+- Componente de próximo pagamento com hierarquia mais clara.
+- Seletor de unidades da Lista de Compras reformulado para uso em telas pequenas.
+- Tipografia, espaçamentos, contraste, cards e estados ativos ajustados.
+- Ícone aprovado incorporado como fonte oficial dos assets Android.
+- Pipeline Android ajustado para gerar densidades do launcher icon e aplicar barras do sistema em roxo escuro com ícones claros.
+
 ## 1.0.0-beta.4
 
 - Novo Razão financeiro (`movimentacoes`) como fonte única das entradas e saídas efetivadas.

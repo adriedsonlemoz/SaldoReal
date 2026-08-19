@@ -28,7 +28,7 @@ const GraficoBarras = ({ dados }) => {
                 <Box title={`Entradas: ${money(d.entradas)}`} sx={{ width: { xs: '10px', sm: '14px' }, height: `${hEnt}px`, bgcolor: '#22C55E', borderRadius: '3px 3px 0 0', minHeight: d.entradas > 0 ? 3 : 0 }} />
                 <Box title={`Saídas: ${money(d.saidas)}`}     sx={{ width: { xs: '10px', sm: '14px' }, height: `${hSai}px`, bgcolor: '#EF4444', borderRadius: '3px 3px 0 0', minHeight: d.saidas  > 0 ? 3 : 0 }} />
               </Box>
-              <Typography sx={{ fontSize: { xs: '0.55rem', sm: '0.65rem' }, fontWeight: 700, color: 'text.secondary', mt: 0.5 }}>{d.label}</Typography>
+              <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.68rem' }, fontWeight: 700, color: 'text.secondary', mt: 0.5 }}>{d.label}</Typography>
             </Box>
           );
         })}
@@ -119,10 +119,10 @@ const Relatorio = ({ setRoute }) => {
                       {item.nome || item.empresa}
                     </Typography>
                     {item.origem && ORIGENS[item.origem] && (
-                      <Chip label={ORIGENS[item.origem]} size="small" sx={{ height: 17, fontSize: '0.55rem', fontWeight: 800 }} />
+                      <Chip label={ORIGENS[item.origem]} size="small" sx={{ height: 20, fontSize: '0.62rem', fontWeight: 800 }} />
                     )}
                   </Box>
-                  <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+                  <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
                     {item.empresa
                       ? `Dia ${item.vencimentoDia} · ${item._pago ? `${item.pagamentosMes || 1} pagamento(s) no mês` : `${item.parcelasDevidas || 1} parcela(s) devida(s)`}`
                       : `Dia ${item.dia} · ${item.categoria}`}
@@ -142,7 +142,7 @@ const Relatorio = ({ setRoute }) => {
   return (
     <Box sx={{ maxWidth: 620, margin: 'auto', pb: 6, px: 2 }}>
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Box sx={{ bgcolor: '#1E293B', color: '#fff', px: 3, py: 1.5, borderRadius: '12px', fontWeight: 600 }}>{toast.texto}</Box>
+        <Box sx={{ background: 'linear-gradient(135deg,#2D0B5E,#5A189A)', color: '#fff', px: 3, py: 1.5, borderRadius: '12px', fontWeight: 600 }}>{toast.texto}</Box>
       </Snackbar>
 
       {/* Gráfico */}
@@ -172,7 +172,7 @@ const Relatorio = ({ setRoute }) => {
         <>
           {/* Resumo */}
           <Card sx={{ mb: 2, overflow: 'hidden' }}>
-            <Box sx={{ bgcolor: '#1E293B', p: 1.2, px: 2 }}>
+            <Box sx={{ background: 'linear-gradient(135deg,#2D0B5E,#5A189A)', p: 1.2, px: 2 }}>
               <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>💰 Resumo do mês</Typography>
             </Box>
             <Grid container>
@@ -183,7 +183,7 @@ const Relatorio = ({ setRoute }) => {
                 { label: 'Saldo Pago',      val: saldoPago,       cor: saldoPago >= 0 ? 'primary.main' : '#EF4444', border: false, bg: true },
               ].map((c, i) => (
                 <Grid item xs={6} key={i} sx={{ p: 1.5, textAlign: 'center', borderRight: c.border ? '1px solid' : 'none', borderTop: c.bg ? '1px solid' : 'none', borderColor: 'divider', bgcolor: c.bg ? '#F8FAFC' : 'transparent' }}>
-                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: c.cor, textTransform: 'uppercase', mb: 0.3 }}>{c.label}</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: c.cor, textTransform: 'uppercase', mb: 0.3 }}>{c.label}</Typography>
                   <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: c.cor }}>{money(c.val)}</Typography>
                 </Grid>
               ))}
@@ -203,7 +203,7 @@ const Relatorio = ({ setRoute }) => {
           <SecaoLista
             titulo="🤝 Acordos"
             itens={[...dados.acordosPagos.map(a => ({...a, _pago: true})), ...dados.acordosPendentes.map(a => ({...a, _pago: false}))]}
-            cor="#118a8b"
+            cor="#7B2CBF"
           />
 
           {dados.totalEnt === 0 && dados.totalSai === 0 && dados.acordosPendentes.length === 0 && dados.acordosPagos.length === 0 && (

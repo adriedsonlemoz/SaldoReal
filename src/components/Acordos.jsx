@@ -28,7 +28,7 @@ const TabBtn = ({ label, icon, active, onClick, accent = '#7B2CBF' }) => (
   }}>
     <Typography sx={{ fontSize: '1.1rem', lineHeight: 1 }}>{icon}</Typography>
     <Typography sx={{
-      fontSize: '0.62rem', fontWeight: active ? 800 : 600,
+      fontSize: '0.66rem', fontWeight: active ? 800 : 600,
       color: active ? accent : 'text.secondary',
       letterSpacing: '0.2px',
     }}>
@@ -112,7 +112,7 @@ const Acordos = ({ setRoute }) => {
         }} />
         <Box sx={{
           position: 'absolute', bottom: -10, left: 20, width: 60, height: 60,
-          borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,180,216,0.3), transparent 70%)',
+          borderRadius: '50%', background: 'radial-gradient(circle, rgba(157,78,221,0.28), transparent 70%)',
           filter: 'blur(10px)', pointerEvents: 'none',
         }} />
 
@@ -144,7 +144,7 @@ const Acordos = ({ setRoute }) => {
                 <Typography sx={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
                   {s.valor}
                 </Typography>
-                <Typography sx={{ fontSize: '0.57rem', fontWeight: 700, color: s.cor, textTransform: 'uppercase', letterSpacing: '0.5px', mt: 0.2 }}>
+                <Typography sx={{ fontSize: '0.66rem', fontWeight: 700, color: s.cor, textTransform: 'uppercase', letterSpacing: '0.5px', mt: 0.2 }}>
                   {s.label}
                 </Typography>
               </Box>
@@ -179,7 +179,7 @@ const Acordos = ({ setRoute }) => {
       }}>
         <TabBtn label="Carteira"   icon="💼" active={abaGeral === 'carteira'}  onClick={() => setAbaGeral('carteira')}  accent="#7B2CBF" />
         <TabBtn label="Novo"       icon="➕" active={false}                    onClick={abrirNovo}                      accent="#F72585" />
-        <TabBtn label="Simulador"  icon="📊" active={abaGeral === 'simulador'} onClick={() => setAbaGeral('simulador')} accent="#00B4D8" />
+        <TabBtn label="Simulador"  icon="📊" active={abaGeral === 'simulador'} onClick={() => setAbaGeral('simulador')} accent="#8B5CF6" />
       </Box>
 
       {/* ── CONTEÚDO ─────────────────────────────────────────────────── */}

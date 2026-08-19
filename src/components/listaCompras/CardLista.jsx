@@ -21,7 +21,7 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
     <Box
       onClick={aberta ? onClick : undefined}
       sx={{
-        p: 1.7, mb: 1.2, borderRadius: '18px', bgcolor: 'background.paper',
+        p: 1.45, mb: 1, borderRadius: '18px', bgcolor: 'background.paper',
         border: '1px solid rgba(15,23,42,.07)', cursor: aberta ? 'pointer' : 'default',
         boxShadow: '0 5px 18px rgba(15,23,42,.045)', transition: 'all .16s',
         '&:active': aberta ? { transform: 'scale(.985)' } : undefined,
@@ -32,7 +32,7 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
           width: 42, height: 42, borderRadius: '14px', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
           background: aberta
-            ? 'linear-gradient(135deg,rgba(13,148,136,.12),rgba(6,182,212,.12))'
+            ? 'linear-gradient(135deg,rgba(123,44,191,.11),rgba(157,78,221,.10))'
             : 'rgba(100,116,139,.09)',
         }}>
           {aberta ? '🛒' : '✓'}
@@ -45,24 +45,24 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
             </Typography>
             <Box sx={{
               px: .7, py: .15, borderRadius: '7px', flexShrink: 0,
-              bgcolor: aberta ? 'rgba(13,148,136,.10)' : 'rgba(100,116,139,.10)',
-              color: aberta ? '#0D9488' : '#64748B', fontSize: '.56rem', fontWeight: 900,
+              bgcolor: aberta ? 'rgba(123,44,191,.09)' : 'rgba(100,116,139,.10)',
+              color: aberta ? '#7B2CBF' : '#64748B', fontSize: '.68rem', fontWeight: 900,
             }}>
               {aberta ? 'EM ANDAMENTO' : 'FINALIZADA'}
             </Box>
           </Box>
-          <Typography sx={{ fontSize: '.68rem', color: 'text.secondary', mt: .3, fontWeight: 600 }}>
+          <Typography sx={{ fontSize: '.72rem', color: 'text.secondary', mt: .3, fontWeight: 600 }}>
             Planejado {money(planejado)} · Pago {money(pago)}
           </Typography>
         </Box>
 
         {aberta ? (
-          <ChevronRightRoundedIcon sx={{ color: '#67E8F9' }} />
+          <ChevronRightRoundedIcon sx={{ color: '#9D4EDD' }} />
         ) : (
           <Button
             size="small" variant="outlined" onClick={(e) => { e.stopPropagation(); onReabrir(); }}
             startIcon={<RestoreRoundedIcon />}
-            sx={{ color: '#0D9488', borderColor: 'rgba(13,148,136,.3)', fontSize: '.64rem', px: .8 }}
+            sx={{ color: '#7B2CBF', borderColor: 'rgba(123,44,191,.25)', fontSize: '.68rem', px: .8 }}
           >
             Reabrir
           </Button>
@@ -83,7 +83,7 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
             variant="determinate" value={pctPago}
             sx={{
               height: 5, bgcolor: '#F1F5F9',
-              '& .MuiLinearProgress-bar': { bgcolor: acima ? '#EF4444' : '#0D9488' },
+              '& .MuiLinearProgress-bar': { bgcolor: acima ? '#E54862' : '#7B2CBF' },
             }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: .45 }}>

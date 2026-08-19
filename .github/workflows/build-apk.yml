@@ -41,7 +41,10 @@ jobs:
       - name: Gerar ícones Android (Capacitor Assets)
         run: |
           npm install -D @capacitor/assets --legacy-peer-deps
-          npx @capacitor/assets generate --android
+          npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#2D0B5E' --iconBackgroundColorDark '#160B2A'
+
+      - name: Aplicar identidade visual Android
+        run: node scripts/configure-android.mjs
 
       - name: Dar permissão ao Gradlew
         run: chmod +x android/gradlew

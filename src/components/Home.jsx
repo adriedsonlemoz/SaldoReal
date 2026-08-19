@@ -204,7 +204,7 @@ const Home = ({ setRoute }) => {
   }, [usuario, renda, carregando]);
 
   if (carregando) return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
       <Box sx={{ textAlign: 'center' }}>
         <Typography sx={{ fontSize: '2.5rem', mb: 1 }}>💜</Typography>
         <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem', fontWeight: 600 }}>Carregando...</Typography>
@@ -225,7 +225,7 @@ const Home = ({ setRoute }) => {
   const primeiroNome = usuario.split(' ')[0];
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))', bgcolor: 'background.default' }}>
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast(t => ({ ...t, open: false }))}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
@@ -234,11 +234,11 @@ const Home = ({ setRoute }) => {
         </Alert>
       </Snackbar>
 
-      <Box sx={{ px: 2, pt: 2.5, maxWidth: 480, margin: 'auto' }}>
+      <Box sx={{ px: { xs: 1.5, sm: 2 }, pt: { xs: 1.25, sm: 1.7 }, pb: 1, maxWidth: 480, margin: 'auto' }}>
 
         {/* ── CABEÇALHO ─────────────────────────────────────────────────── */}
         <Box sx={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.8,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1,
           animation: 'fadeDown 0.35s ease both',
           '@keyframes fadeDown': {
             '0%': { opacity: 0, transform: 'translateY(-8px)' },
@@ -246,15 +246,15 @@ const Home = ({ setRoute }) => {
           },
         }}>
           <Box>
-            <Typography sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600, lineHeight: 1 }}>
+            <Typography sx={{ color: 'text.secondary', fontSize: '0.78rem', fontWeight: 600, lineHeight: 1 }}>
               {saudacao()},
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-              <Typography sx={{ fontWeight: 900, fontSize: '1.6rem', color: 'text.primary', lineHeight: 1.15, letterSpacing: '-0.5px' }}>
+              <Typography sx={{ fontWeight: 900, fontSize: '1.42rem', color: 'text.primary', lineHeight: 1.15, letterSpacing: '-0.5px' }}>
                 {primeiroNome}
               </Typography>
               <Typography sx={{
-                fontSize: '1.3rem', lineHeight: 1.15, display: 'inline-block',
+                fontSize: '1.16rem', lineHeight: 1.15, display: 'inline-block',
                 animation: 'wave 2.2s ease-in-out infinite',
                 '@keyframes wave': {
                   '0%, 60%, 100%': { transform: 'rotate(0deg)' },
@@ -266,37 +266,39 @@ const Home = ({ setRoute }) => {
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 0.55, alignItems: 'center' }}>
             {/* Badge dias para o pagamento */}
             {diasParaPagamento !== null && (() => {
               const urgente = diasParaPagamento <= 3;
               const hoje    = diasParaPagamento === 0;
+              const quando = hoje ? 'Hoje' : diasParaPagamento === 1 ? 'Amanhã' : `${diasParaPagamento} dias`;
               return (
                 <Box sx={{
-                  height: 38, px: 1.4, borderRadius: '12px',
-                  bgcolor: urgente ? 'rgba(247,37,133,0.08)' : 'rgba(0,0,0,0.04)',
-                  border: `1.5px solid ${urgente ? 'rgba(247,37,133,0.3)' : 'rgba(0,0,0,0.07)'}`,
-                  display: 'flex', alignItems: 'center', gap: 0.6,
-                  cursor: 'default',
+                  height: 38, px: 1, borderRadius: '12px',
+                  background: urgente
+                    ? 'linear-gradient(135deg, rgba(247,37,133,.11), rgba(123,44,191,.08))'
+                    : 'linear-gradient(135deg, rgba(123,44,191,.08), rgba(157,78,221,.05))',
+                  border: `1px solid ${urgente ? 'rgba(247,37,133,.26)' : 'rgba(123,44,191,.17)'}`,
+                  display: 'flex', alignItems: 'center', gap: .65, minWidth: 86,
                 }}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="4" width="18" height="18" rx="3" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" />
-                    <path d="M3 9h18" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" />
-                    <path d="M8 2v4M16 2v4" stroke={urgente ? '#F72585' : '#9D4EDD'} strokeWidth="2" strokeLinecap="round" />
-                    <circle cx="12" cy="15" r="1.5" fill={urgente ? '#F72585' : '#9D4EDD'} />
-                  </svg>
-                  <Typography sx={{
-                    fontSize: '0.68rem', fontWeight: 800, lineHeight: 1, whiteSpace: 'nowrap',
-                    color: urgente ? '#F72585' : '#7B2CBF',
-                  }}>
-                    {hoje ? 'Hoje' : diasParaPagamento === 1 ? 'Amanhã' : `${diasParaPagamento}d`}
-                  </Typography>
+                  <Box sx={{ width: 24, height: 24, borderRadius: '8px', flexShrink: 0,
+                    bgcolor: urgente ? 'rgba(247,37,133,.12)' : 'rgba(123,44,191,.11)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="4" width="18" height="18" rx="3" stroke={urgente ? '#F72585' : '#7B2CBF'} strokeWidth="2" />
+                      <path d="M3 9h18M8 2v4M16 2v4" stroke={urgente ? '#F72585' : '#7B2CBF'} strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </Box>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography sx={{ fontSize: '.62rem', fontWeight: 800, color: 'text.secondary', lineHeight: 1.05, whiteSpace: 'nowrap' }}>Próx. pagamento</Typography>
+                    <Typography sx={{ fontSize: '.72rem', fontWeight: 900, color: urgente ? '#D91E74' : '#6A23A7', lineHeight: 1.15, mt: .15, whiteSpace: 'nowrap' }}>{quando}</Typography>
+                  </Box>
                 </Box>
               );
             })()}
             {/* Sino de alertas */}
             <Box onClick={() => setModalAlertas(true)} sx={{
-              width: 38, height: 38, borderRadius: '12px',
+              width: 36, height: 36, borderRadius: '12px',
               bgcolor: alertasUrgentes.length > 0 ? 'rgba(247,37,133,0.08)' : 'rgba(0,0,0,0.04)',
               border: alertasUrgentes.length > 0 ? '1.5px solid rgba(247,37,133,0.3)' : '1.5px solid rgba(0,0,0,0.07)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -322,7 +324,7 @@ const Home = ({ setRoute }) => {
                   bgcolor: '#F72585', border: '2px solid #F5F5F5',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Typography sx={{ fontSize: '0.5rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
                     {alertasUrgentes.length}
                   </Typography>
                 </Box>
@@ -331,7 +333,7 @@ const Home = ({ setRoute }) => {
 
             {/* Avatar → abre TelaPerfil */}
             <Box onClick={() => setTelaPerfilOpen(true)} sx={{
-              width: 38, height: 38, borderRadius: '12px',
+              width: 36, height: 36, borderRadius: '12px',
               background: 'linear-gradient(135deg, rgba(123,44,191,0.15), rgba(247,37,133,0.1))',
               border: '1.5px solid rgba(123,44,191,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -388,7 +390,7 @@ const Home = ({ setRoute }) => {
             }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  <Chip label={a.tipo === 'acordo' ? 'Acordo' : 'Gasto'} size="small" color={a.tipo === 'acordo' ? 'info' : 'secondary'} />
+                  <Chip label={a.tipo === 'acordo' ? 'Acordo' : 'Gasto'} size="small" color={a.tipo === 'acordo' ? 'secondary' : 'secondary'} />
                   <Typography sx={{ fontWeight: 700, fontSize: '0.88rem' }}>{a.nome}</Typography>
                 </Box>
                 <Typography sx={{ fontWeight: 800, color: 'error.main', fontSize: '0.88rem' }}>{money(a.valor)}</Typography>

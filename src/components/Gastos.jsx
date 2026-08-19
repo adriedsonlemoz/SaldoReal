@@ -39,7 +39,7 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
   const isEntrada = item.operacao === 'entrada';
   const cor       = isEntrada ? '#10B981' : '#EF4444';
   const corBg     = isEntrada ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
-  const corBorda  = isAcordo  ? 'rgba(0,180,216,0.3)'
+  const corBorda  = isAcordo  ? 'rgba(123,44,191,0.24)'
                   : isVirtual ? 'rgba(16,185,129,0.4)'
                   : item.isPago ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.09)';
 
@@ -52,8 +52,8 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
   const icone = ICONES[item.categoria] || (isAcordo ? '🤝' : isEntrada ? '💵' : '💸');
   const ORIGENS = {
     manual: ['Manual', '✍️', '#7B2CBF'],
-    lista_compras: ['Compras', '🛒', '#00B4D8'],
-    acordo: ['Acordo', '🤝', '#118a8b'],
+    lista_compras: ['Compras', '🛒', '#8B5CF6'],
+    acordo: ['Acordo', '🤝', '#7B2CBF'],
     renda: ['Renda', '💰', '#10B981'],
   };
   const origemMeta = ORIGENS[item.origem] || null;
@@ -98,13 +98,13 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           </Typography>
           {origemMeta && (
             <Chip label={`${origemMeta[1]} ${origemMeta[0]}`} size="small" sx={{
-              height: 17, fontSize: '0.56rem', fontWeight: 800,
+              height: 20, fontSize: '0.64rem', fontWeight: 800,
               bgcolor: `${origemMeta[2]}12`, color: origemMeta[2],
               border: `1px solid ${origemMeta[2]}24`,
             }} />
           )}
         </Box>
-        <Typography sx={{ fontSize: '0.67rem', color: 'text.secondary', mt: 0.2, lineHeight: 1.25 }}>
+        <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', mt: 0.2, lineHeight: 1.25 }}>
           {isVirtual ? 'Saldo Acumulado'
             : isMovimento
               ? `Pago dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}`
@@ -129,16 +129,16 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           {isAcordo ? (
             <Box onClick={() => setRoute('acordos')} sx={{
               minWidth: 36, height: 30, px: 0.8, borderRadius: '9px', cursor: 'pointer',
-              bgcolor: 'rgba(17,138,139,0.1)', color: '#118a8b',
+              bgcolor: 'rgba(123,44,191,0.09)', color: '#7B2CBF',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.62rem', fontWeight: 900,
+              fontSize: '0.68rem', fontWeight: 900,
             }}>Abrir</Box>
           ) : isLista ? (
             <Box onClick={() => setRoute('lista')} sx={{
               minWidth: 36, height: 30, px: 0.8, borderRadius: '9px', cursor: 'pointer',
-              bgcolor: 'rgba(0,180,216,0.1)', color: '#0284C7',
+              bgcolor: 'rgba(139,92,246,0.09)', color: '#7C3AED',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.62rem', fontWeight: 900,
+              fontSize: '0.68rem', fontWeight: 900,
             }}>Lista</Box>
           ) : (
             <>
@@ -185,14 +185,14 @@ const Secao = ({ titulo, cor, itens, setRoute, onPago, onEdit, onDelete }) => {
       }}>
         <Box sx={{ flex: 1, height: 1, bgcolor: `${cor}30` }} />
         <Typography sx={{
-          fontSize: '0.63rem', fontWeight: 800, color: cor,
+          fontSize: '0.68rem', fontWeight: 800, color: cor,
           letterSpacing: '1px', textTransform: 'uppercase',
           px: 0.5,
         }}>
           {titulo} · {itens.length}
         </Typography>
         <Box sx={{ flex: 1, height: 1, bgcolor: `${cor}30` }} />
-        <Typography sx={{ fontSize: '0.65rem', color: cor, ml: 0.5 }}>
+        <Typography sx={{ fontSize: '0.69rem', color: cor, ml: 0.5 }}>
           {aberta ? '▲' : '▼'}
         </Typography>
       </Box>
@@ -414,7 +414,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
               flex: 1, textAlign: 'center', py: 1, px: 0.5,
               bgcolor: m.bg, border: `1px solid ${m.borda}`, borderRadius: '12px',
             }}>
-              <Typography sx={{ fontSize: '0.55rem', fontWeight: 800, color: m.cor, letterSpacing: '0.6px', textTransform: 'uppercase', lineHeight: 1 }}>
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: m.cor, letterSpacing: '0.6px', textTransform: 'uppercase', lineHeight: 1 }}>
                 {m.label}
               </Typography>
               <Typography sx={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff', mt: 0.3, lineHeight: 1, letterSpacing: '-0.5px' }}>
@@ -430,7 +430,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
           bgcolor: 'rgba(255,255,255,0.06)', borderRadius: '10px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.65rem', fontWeight: 700 }}>
+          <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.69rem', fontWeight: 700 }}>
             Balanço previsto
           </Typography>
           <Typography sx={{
@@ -520,7 +520,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
               </Typography>
               {modalConfirmPag.item.parcelaText && (
                 <Chip label={`Parcela ${modalConfirmPag.item.parcelaText}`} size="small"
-                  sx={{ bgcolor: 'rgba(0,180,216,0.1)', color: '#00B4D8', fontWeight: 700, mb: 1 }} />
+                  sx={{ bgcolor: 'rgba(123,44,191,0.09)', color: '#7B2CBF', fontWeight: 800, mb: 1 }} />
               )}
               <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
                 Deseja marcar como pago?

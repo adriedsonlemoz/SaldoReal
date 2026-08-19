@@ -1,7 +1,7 @@
 # 🛒 SaldoReal
 
 **Slogan:** O controle do seu bolso dentro do carrinho.  
-**Versão:** 1.0.0-beta.4
+**Versão:** 1.0.0-beta.5
 
 ## Sobre
 

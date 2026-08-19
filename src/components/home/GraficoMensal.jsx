@@ -21,9 +21,9 @@ const ICONE_CAT = {
   'Outros':           '📦',
 };
 
-const CORES = ['#A855F7', '#EC4899', '#06B6D4', '#10B981', '#F59E0B'];
+const CORES = ['#7B2CBF', '#F72585', '#6D5BD0', '#9D4EDD', '#C046A4'];
 
-const BAR_MAX_H = 100; // px — altura máxima real da barra mais alta
+const BAR_MAX_H = 62; // px — altura máxima real da barra mais alta
 
 const GraficoMensal = () => {
   const [dados,   setDados]   = useState([]);
@@ -67,19 +67,19 @@ const GraficoMensal = () => {
   return (
     <Box sx={{
       bgcolor: 'background.paper',
-      borderRadius: '20px',
+      borderRadius: '18px',
       border: '1px solid rgba(0,0,0,0.05)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
-      mb: 1.5,
+      boxShadow: '0 5px 20px rgba(45,11,94,0.055)',
+      mb: 1,
       overflow: 'hidden',
     }}>
       {/* Header */}
-      <Box sx={{ px: 2, pt: 1.8, pb: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Box sx={{ px: 1.5, pt: 1.2, pb: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography sx={{ fontWeight: 800, fontSize: '0.95rem', color: 'text.primary', lineHeight: 1.2 }}>
+          <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: 'text.primary', lineHeight: 1.2 }}>
             Saídas do Mês
           </Typography>
-          <Typography sx={{ fontSize: '0.63rem', color: 'text.secondary', fontWeight: 600, mt: 0.2 }}>
+          <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 600, mt: 0.2 }}>
             fluxo real por categoria
           </Typography>
         </Box>
@@ -89,7 +89,7 @@ const GraficoMensal = () => {
             background: 'linear-gradient(135deg, rgba(168,85,247,0.12), rgba(236,72,153,0.08))',
             border: '1px solid rgba(168,85,247,0.2)',
           }}>
-            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#A855F7' }}>
+            <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#7B2CBF' }}>
               {money(total)}
             </Typography>
           </Box>
@@ -97,18 +97,18 @@ const GraficoMensal = () => {
       </Box>
 
       {loading ? (
-        <Box sx={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Typography sx={{ color: 'text.disabled', fontSize: '0.8rem' }}>Carregando...</Typography>
         </Box>
       ) : dados.length === 0 ? (
-        <Box sx={{ height: 150, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-          <Typography sx={{ fontSize: '2rem' }}>📊</Typography>
+        <Box sx={{ height: 104, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+          <Typography sx={{ fontSize: '1.45rem' }}>📊</Typography>
           <Typography sx={{ color: 'text.disabled', fontSize: '0.78rem', fontWeight: 600 }}>
             Nenhuma saída paga este mês
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ px: 2, pt: 1.5, pb: 1.5 }}>
+        <Box sx={{ px: 1.5, pt: .8, pb: 1 }}>
 
           {/* Área das barras — altura fixa = BAR_MAX_H + espaço para emoji + valor */}
           <Box sx={{
@@ -116,7 +116,7 @@ const GraficoMensal = () => {
             alignItems: 'flex-end',
             justifyContent: 'space-around',
             // Reserva: BAR_MAX_H px barra + ~20px emoji + ~16px valor = ~136px total
-            height: (BAR_MAX_H + 50) + 'px',
+            height: (BAR_MAX_H + 44) + 'px',
             position: 'relative',
           }}>
             {dados.map((d, i) => {
@@ -135,7 +135,7 @@ const GraficoMensal = () => {
                 }}>
                   {/* Valor monetário */}
                   <Typography sx={{
-                    fontSize: '0.52rem', fontWeight: 800, color: cor,
+                    fontSize: '0.66rem', fontWeight: 800, color: cor,
                     mb: 0.2, lineHeight: 1, textAlign: 'center',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%',
                   }}>
@@ -143,7 +143,7 @@ const GraficoMensal = () => {
                   </Typography>
 
                   {/* Emoji */}
-                  <Typography sx={{ fontSize: '0.95rem', lineHeight: 1, mb: 0.35 }}>
+                  <Typography sx={{ fontSize: '0.9rem', lineHeight: 1, mb: 0.35 }}>
                     {ICONE_CAT[d.categoria] || '📦'}
                   </Typography>
 
@@ -172,7 +172,7 @@ const GraficoMensal = () => {
 
                   {/* % pequeno no fundo */}
                   <Typography sx={{
-                    fontSize: '0.5rem', fontWeight: 700,
+                    fontSize: '0.64rem', fontWeight: 700,
                     color: 'text.disabled', mt: 0.3, lineHeight: 1,
                   }}>
                     {pct}%
@@ -187,7 +187,7 @@ const GraficoMensal = () => {
             {dados.map((d, i) => (
               <Box key={d.categoria} sx={{ flex: 1, textAlign: 'center', mx: 0.3 }}>
                 <Typography sx={{
-                  fontSize: '0.55rem', fontWeight: 700, color: 'text.secondary',
+                  fontSize: '0.66rem', fontWeight: 700, color: 'text.secondary',
                   lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis',
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
                 }}>
@@ -198,10 +198,10 @@ const GraficoMensal = () => {
           </Box>
 
           {/* Total */}
-          <Box sx={{ mt: 1.2, pt: 1, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ mt: .7, pt: .7, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'center' }}>
             <Typography sx={{ fontSize: '0.78rem', fontWeight: 800, color: 'text.primary' }}>
               Total Gasto Mês:{' '}
-              <Box component="span" sx={{ color: '#A855F7' }}>{money(total)}</Box>
+              <Box component="span" sx={{ color: '#7B2CBF' }}>{money(total)}</Box>
             </Typography>
           </Box>
         </Box>

@@ -14,7 +14,7 @@ import CardLista from './CardLista';
 import { money } from './constants';
 
 const sectionTitle = {
-  fontSize: '.66rem', fontWeight: 900, color: '#64748B', textTransform: 'uppercase',
+  fontSize: '.7rem', fontWeight: 900, color: '#64748B', textTransform: 'uppercase',
   letterSpacing: '.8px', mb: 1,
 };
 
@@ -46,34 +46,34 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
   };
 
   return (
-    <Box sx={{ maxWidth: 560, mx: 'auto', px: 2, pt: 1.5, pb: 12, minHeight: '100vh' }}>
+    <Box sx={{ maxWidth: 560, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.2, pb: 2, minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))' }}>
       <Box sx={{
-        borderRadius: '24px', p: 2.2, mb: 2,
-        background: 'linear-gradient(135deg,#0F766E 0%,#06B6D4 52%,#7B2CBF 100%)',
-        color: '#fff', boxShadow: '0 12px 32px rgba(6,182,212,.18)', overflow: 'hidden', position: 'relative',
+        borderRadius: '22px', p: 1.8, mb: 1.4,
+        background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 55%,#7B2CBF 100%)',
+        color: '#fff', boxShadow: '0 11px 30px rgba(45,11,94,.20)', overflow: 'hidden', position: 'relative',
       }}>
         <Box sx={{ position: 'absolute', width: 120, height: 120, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.08)', right: -35, top: -55 }} />
-        <Typography sx={{ fontSize: '.67rem', fontWeight: 900, letterSpacing: '1px', opacity: .8, textTransform: 'uppercase' }}>
+        <Typography sx={{ fontSize: '.7rem', fontWeight: 900, letterSpacing: '1px', opacity: .8, textTransform: 'uppercase' }}>
           SaldoReal · Compras
         </Typography>
-        <Typography sx={{ fontWeight: 900, fontSize: '1.45rem', mt: .25, lineHeight: 1.15 }}>
+        <Typography sx={{ fontWeight: 900, fontSize: '1.28rem', mt: .25, lineHeight: 1.15 }}>
           Seu mercado, sem bagunçar as contas.
         </Typography>
-        <Typography sx={{ fontSize: '.77rem', mt: .7, opacity: .88, maxWidth: 360, lineHeight: 1.45 }}>
+        <Typography sx={{ fontSize: '.76rem', mt: .7, opacity: .88, maxWidth: 360, lineHeight: 1.45 }}>
           Planeje a compra e registre cada pagamento no fluxo financeiro na hora em que acontecer.
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1, mt: 1.4 }}>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Em andamento</Typography>
+            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Em andamento</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '1.05rem' }}>{abertas.length}</Typography>
           </Box>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Planejado</Typography>
+            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Planejado</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.planejado)}</Typography>
           </Box>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Já pago</Typography>
+            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Já pago</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.pago)}</Typography>
           </Box>
         </Box>
@@ -83,9 +83,9 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
         fullWidth variant="contained" onClick={() => setModalNova(true)}
         startIcon={<AddShoppingCartRoundedIcon />}
         sx={{
-          py: 1.35, mb: 2.5, borderRadius: '16px', fontWeight: 900,
-          background: 'linear-gradient(135deg,#0D9488 0%,#06B6D4 100%)',
-          boxShadow: '0 7px 20px rgba(13,148,136,.20)',
+          py: 1.15, mb: 1.7, borderRadius: '16px', fontWeight: 900,
+          background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)',
+          boxShadow: '0 7px 20px rgba(123,44,191,.20)',
         }}
       >
         Nova lista de compras
@@ -94,7 +94,7 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
       {loading && <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>}
 
       {!loading && listas.length === 0 && (
-        <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'background.paper', borderRadius: '20px', border: '1px dashed #CBD5E1' }}>
+        <Box sx={{ p: 3.2, textAlign: 'center', bgcolor: 'background.paper', borderRadius: '20px', border: '1px dashed #CBD5E1' }}>
           <Typography sx={{ fontSize: '2.2rem' }}>🧾</Typography>
           <Typography sx={{ fontWeight: 900, mt: 1 }}>Comece pela próxima compra</Typography>
           <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mt: .4 }}>

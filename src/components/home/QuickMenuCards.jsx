@@ -16,11 +16,11 @@ const BigCard = ({ label, sub, icon, accent, bg, onClick, delay = 0 }) => (
     sx={{
       borderRadius: '18px',
       background: bg,
-      p: 1.8,
+      p: 1.25,
       cursor: 'pointer',
       position: 'relative',
       overflow: 'hidden',
-      minHeight: 110,
+      minHeight: 82,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
@@ -43,8 +43,8 @@ const BigCard = ({ label, sub, icon, accent, bg, onClick, delay = 0 }) => (
   >
     {/* Ícone decorativo grande */}
     <Box sx={{
-      position: 'absolute', right: -8, bottom: -8,
-      fontSize: '4rem', lineHeight: 1, opacity: 0.18,
+      position: 'absolute', right: -5, bottom: -9,
+      fontSize: '3.2rem', lineHeight: 1, opacity: 0.18,
       pointerEvents: 'none',
       filter: 'saturate(0.6)',
     }}>
@@ -53,7 +53,7 @@ const BigCard = ({ label, sub, icon, accent, bg, onClick, delay = 0 }) => (
 
     <Box>
       <Typography sx={{
-        fontWeight: 900, fontSize: '1rem', color: '#fff',
+        fontWeight: 900, fontSize: '.88rem', color: '#fff',
         lineHeight: 1.2, mb: 0.3,
         textShadow: '0 1px 4px rgba(0,0,0,0.2)',
       }}>
@@ -63,7 +63,7 @@ const BigCard = ({ label, sub, icon, accent, bg, onClick, delay = 0 }) => (
 
     <Box>
       <Typography sx={{
-        fontSize: '0.72rem', color: 'rgba(255,255,255,0.82)',
+        fontSize: '0.7rem', color: 'rgba(255,255,255,0.82)',
         fontWeight: 600, lineHeight: 1.3,
       }}>
         {sub}
@@ -113,8 +113,8 @@ const QuickMenuCards = ({ setRoute }) => {
         ? (totalAcordos > 0 ? `Devido ${money(totalAcordos)}` : 'Tudo em dia')
         : 'Carregando...',
       icon: '🤝',
-      accent: '#6D28D9',
-      bg: 'linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%)',
+      accent: '#7B2CBF',
+      bg: 'linear-gradient(135deg, #4C1478 0%, #7B2CBF 100%)',
       route: 'acordos',
       delay: 0,
     },
@@ -124,8 +124,8 @@ const QuickMenuCards = ({ setRoute }) => {
         ? (qtdListas > 0 ? `${qtdListas} lista${qtdListas !== 1 ? 's' : ''} ativa${qtdListas !== 1 ? 's' : ''}` : 'Nenhuma aberta')
         : 'Carregando...',
       icon: '🛒',
-      accent: '#0E7490',
-      bg: 'linear-gradient(135deg, #0E7490 0%, #0891B2 100%)',
+      accent: '#9D4EDD',
+      bg: 'linear-gradient(135deg, #6A1B9A 0%, #9D4EDD 100%)',
       route: 'lista',
       delay: 60,
     },
@@ -133,8 +133,8 @@ const QuickMenuCards = ({ setRoute }) => {
       label: 'Relatório de Gastos',
       sub: 'Ver evolução',
       icon: '📊',
-      accent: '#065F46',
-      bg: 'linear-gradient(135deg, #065F46 0%, #047857 100%)',
+      accent: '#6D5BD0',
+      bg: 'linear-gradient(135deg, #4938A8 0%, #6D5BD0 100%)',
       route: 'relatorio',
       delay: 120,
     },
@@ -144,8 +144,8 @@ const QuickMenuCards = ({ setRoute }) => {
         ? (qtdContas > 0 ? `${qtdContas} conta${qtdContas !== 1 ? 's' : ''} próxima${qtdContas !== 1 ? 's' : ''}` : 'Tudo em dia ✓')
         : 'Carregando...',
       icon: '💳',
-      accent: '#9D174D',
-      bg: 'linear-gradient(135deg, #9D174D 0%, #BE185D 100%)',
+      accent: '#C22578',
+      bg: 'linear-gradient(135deg, #9C1A63 0%, #D12B8B 100%)',
       route: 'gastos',
       delay: 180,
     },
@@ -155,7 +155,7 @@ const QuickMenuCards = ({ setRoute }) => {
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography sx={{
-          fontSize: '0.62rem', fontWeight: 800, color: 'text.secondary',
+          fontSize: '0.68rem', fontWeight: 800, color: 'text.secondary',
           letterSpacing: '1px', textTransform: 'uppercase',
         }}>
           Acesso Rápido
@@ -163,7 +163,7 @@ const QuickMenuCards = ({ setRoute }) => {
         <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
       </Box>
 
-      <Grid container spacing={1.2}>
+      <Grid container spacing={1}>
         {CARDS.map(card => (
           <Grid item xs={6} key={card.route + card.label}>
             <BigCard

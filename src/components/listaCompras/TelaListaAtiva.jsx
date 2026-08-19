@@ -23,26 +23,26 @@ import { money } from './constants';
 
 const SummaryBox = ({ label, value, tone = 'neutral', caption }) => {
   const tones = {
-    teal: { bg: 'rgba(13,148,136,.08)', color: '#0D9488' },
-    cyan: { bg: 'rgba(6,182,212,.08)', color: '#0891B2' },
+    teal: { bg: 'rgba(17,156,114,.08)', color: '#087A58' },
+    cyan: { bg: 'rgba(123,44,191,.075)', color: '#7B2CBF' },
     neutral: { bg: '#F8FAFC', color: '#334155' },
   };
   const c = tones[tone] || tones.neutral;
   return (
     <Box sx={{ flex: 1, minWidth: 0, p: 1.15, borderRadius: '14px', bgcolor: c.bg }}>
-      <Typography sx={{ fontSize: '.56rem', fontWeight: 900, color: c.color, textTransform: 'uppercase', letterSpacing: '.45px' }}>{label}</Typography>
-      <Typography sx={{ fontWeight: 900, fontSize: '.95rem', color: c.color, mt: .15 }}>{money(value)}</Typography>
-      {caption && <Typography sx={{ fontSize: '.56rem', color: 'text.secondary', mt: .15 }}>{caption}</Typography>}
+      <Typography sx={{ fontSize: '.66rem', fontWeight: 900, color: c.color, textTransform: 'uppercase', letterSpacing: '.45px' }}>{label}</Typography>
+      <Typography sx={{ fontWeight: 900, fontSize: '.98rem', color: c.color, mt: .15 }}>{money(value)}</Typography>
+      {caption && <Typography sx={{ fontSize: '.66rem', color: 'text.secondary', mt: .15 }}>{caption}</Typography>}
     </Box>
   );
 };
 
 const SectionTitle = ({ title, count, paid }) => (
   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-    <Typography sx={{ fontSize: '.66rem', fontWeight: 900, letterSpacing: '.8px', textTransform: 'uppercase', color: paid ? '#0D9488' : '#475569' }}>
+    <Typography sx={{ fontSize: '.7rem', fontWeight: 900, letterSpacing: '.8px', textTransform: 'uppercase', color: paid ? '#087A58' : '#655B6D' }}>
       {title}
     </Typography>
-    <Box sx={{ px: .8, py: .15, borderRadius: '8px', bgcolor: paid ? 'rgba(13,148,136,.1)' : '#EEF2F7', color: paid ? '#0D9488' : '#64748B', fontSize: '.6rem', fontWeight: 900 }}>
+    <Box sx={{ px: .8, py: .15, borderRadius: '8px', bgcolor: paid ? 'rgba(17,156,114,.09)' : '#F0EAF5', color: paid ? '#087A58' : '#6F6479', fontSize: '.66rem', fontWeight: 900 }}>
       {count}
     </Box>
   </Box>
@@ -114,7 +114,7 @@ const TelaListaAtiva = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 620, mx: 'auto', px: 2, pt: 1.2, pb: 13, minHeight: '100vh' }}>
+    <Box sx={{ maxWidth: 620, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 2, minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))' }}>
       <Snackbar
         open={toast.open} autoHideDuration={4500}
         onClose={() => setToast(t => ({ ...t, open: false }))}
@@ -133,9 +133,9 @@ const TelaListaAtiva = ({
       </Snackbar>
 
       <Box sx={{
-        borderRadius: '24px', p: 2, color: '#fff', mb: 1.5, position: 'relative', overflow: 'hidden',
-        background: 'linear-gradient(135deg,#0F766E 0%,#06B6D4 55%,#7B2CBF 115%)',
-        boxShadow: '0 12px 30px rgba(13,148,136,.16)',
+        borderRadius: '22px', p: 1.65, color: '#fff', mb: 1.1, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 58%,#7B2CBF 100%)',
+        boxShadow: '0 10px 28px rgba(45,11,94,.20)',
       }}>
         <Box sx={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.08)', right: -45, top: -60 }} />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -143,37 +143,37 @@ const TelaListaAtiva = ({
             <ArrowBackRoundedIcon />
           </Button>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: '.6rem', fontWeight: 900, opacity: .75, textTransform: 'uppercase', letterSpacing: '.8px' }}>Compra em andamento</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 900, opacity: .75, textTransform: 'uppercase', letterSpacing: '.8px' }}>Compra em andamento</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1.18rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
               {lista.nome}
             </Typography>
           </Box>
           <Button
             size="small" onClick={() => { setOrcInput(orcamento ? String(orcamento) : ''); setModalOrc(true); }}
             startIcon={<EditRoundedIcon />}
-            sx={{ color: '#fff', bgcolor: 'rgba(255,255,255,.11)', fontSize: '.62rem', px: .9 }}
+            sx={{ color: '#fff', bgcolor: 'rgba(255,255,255,.11)', fontSize: '.68rem', px: .9 }}
           >
             Orçamento
           </Button>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, mt: 1.8 }}>
+        <Box sx={{ display: 'flex', gap: 1, mt: 1.35 }}>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Itens</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{dados.pagos.length}/{itens.length}</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Itens</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1rem' }}>{dados.pagos.length}/{itens.length}</Typography>
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pago</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{money(dados.totalPago)}</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pago</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1rem' }}>{money(dados.totalPago)}</Typography>
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Typography sx={{ fontSize: '.58rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pendente</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.08rem' }}>{dados.pendentes.length}</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .72, textTransform: 'uppercase' }}>Pendente</Typography>
+            <Typography sx={{ fontWeight: 900, fontSize: '1rem' }}>{dados.pendentes.length}</Typography>
           </Box>
         </Box>
       </Box>
 
-      <Box sx={{ bgcolor: 'background.paper', borderRadius: '18px', p: 1.4, mb: 1.4, border: '1px solid rgba(15,23,42,.06)' }}>
+      <Box sx={{ bgcolor: 'background.paper', borderRadius: '17px', p: 1.15, mb: 1.1, border: '1px solid rgba(15,23,42,.06)' }}>
         <Box sx={{ display: 'flex', gap: .8 }}>
           <SummaryBox label="Planejado" value={dados.planejado} tone="cyan" caption="todos os itens" />
           <SummaryBox label="Pago" value={dados.totalPago} tone="teal" caption="já no financeiro" />
@@ -183,19 +183,19 @@ const TelaListaAtiva = ({
         {orcamento > 0 && (
           <Box sx={{ mt: 1.3, px: .2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: .55 }}>
-              <Typography sx={{ fontSize: '.62rem', color: 'text.secondary', fontWeight: 800 }}>
+              <Typography sx={{ fontSize: '.68rem', color: 'text.secondary', fontWeight: 800 }}>
                 Orçamento {money(orcamento)}
               </Typography>
-              <Typography sx={{ fontSize: '.62rem', color: acima ? '#EF4444' : '#0D9488', fontWeight: 900 }}>
+              <Typography sx={{ fontSize: '.68rem', color: acima ? '#E54862' : '#7B2CBF', fontWeight: 900 }}>
                 {pctOrcamento.toFixed(0)}% pago
               </Typography>
             </Box>
             <LinearProgress
               variant="determinate" value={pctOrcamento}
-              sx={{ height: 7, bgcolor: '#EEF2F7', '& .MuiLinearProgress-bar': { bgcolor: acima ? '#EF4444' : '#0D9488' } }}
+              sx={{ height: 7, bgcolor: '#EEF2F7', '& .MuiLinearProgress-bar': { bgcolor: acima ? '#E54862' : '#7B2CBF' } }}
             />
             {dados.planejado > orcamento && (
-              <Typography sx={{ fontSize: '.62rem', color: '#F59E0B', mt: .55, fontWeight: 700 }}>
+              <Typography sx={{ fontSize: '.68rem', color: '#F59E0B', mt: .55, fontWeight: 700 }}>
                 ⚠️ O total planejado está {money(dados.planejado - orcamento)} acima do orçamento.
               </Typography>
             )}
@@ -205,13 +205,13 @@ const TelaListaAtiva = ({
 
       <Button
         fullWidth variant="outlined" startIcon={<AddRoundedIcon />} onClick={() => setModalAdd(true)}
-        sx={{ mb: 2, py: 1.15, borderRadius: '14px', color: '#0D9488', borderColor: 'rgba(13,148,136,.28)', bgcolor: 'rgba(13,148,136,.035)', fontWeight: 900 }}
+        sx={{ mb: 1.4, py: 1.05, borderRadius: '14px', color: '#7B2CBF', borderColor: 'rgba(123,44,191,.24)', bgcolor: 'rgba(123,44,191,.04)', fontWeight: 900 }}
       >
         Adicionar item
       </Button>
 
       {itens.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 5, border: '1px dashed #CBD5E1', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.55)' }}>
+        <Box sx={{ textAlign: 'center', py: 3.2, border: '1px dashed #D8CDE2', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.72)' }}>
           <Typography sx={{ fontSize: '2.1rem' }}>🧺</Typography>
           <Typography sx={{ fontWeight: 900, mt: .7 }}>Sua lista está vazia</Typography>
           <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mt: .3 }}>Adicione o primeiro produto para começar.</Typography>
@@ -230,7 +230,7 @@ const TelaListaAtiva = ({
       {dados.pagos.length > 0 && (
         <Box sx={{ mb: 2.4 }}>
           <SectionTitle title="Pago e lançado" count={dados.pagos.length} paid />
-          <Typography sx={{ fontSize: '.66rem', color: 'text.secondary', mb: 1, mt: -.5 }}>
+          <Typography sx={{ fontSize: '.7rem', color: 'text.secondary', mb: 1, mt: -.5 }}>
             Estes valores já fazem parte da Home, Fluxo, Relatório e gráficos do SaldoReal.
           </Typography>
           {dados.pagos.map(item => (
@@ -247,7 +247,7 @@ const TelaListaAtiva = ({
               <Typography sx={{ fontWeight: 900, fontSize: '.82rem' }}>Terminou a compra?</Typography>
               <Typography sx={{ fontSize: '.67rem', color: 'text.secondary' }}>Finalizar só arquiva a lista. Os itens pagos já estão no financeiro.</Typography>
             </Box>
-            <Button size="small" variant="outlined" onClick={() => setModalFinalizar(true)} startIcon={<ArchiveRoundedIcon />} sx={{ fontSize: '.63rem' }}>
+            <Button size="small" variant="outlined" onClick={() => setModalFinalizar(true)} startIcon={<ArchiveRoundedIcon />} sx={{ fontSize: '.68rem' }}>
               Finalizar
             </Button>
           </Box>
@@ -276,7 +276,7 @@ const TelaListaAtiva = ({
           <Button
             variant="contained" onClick={confirmarPagamento} disabled={processando}
             startIcon={<PaymentsRoundedIcon />}
-            sx={{ background: 'linear-gradient(135deg,#0D9488 0%,#06B6D4 100%)' }}
+            sx={{ background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)' }}
           >
             {processando ? 'Registrando…' : 'Pagar e lançar'}
           </Button>

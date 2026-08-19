@@ -105,7 +105,7 @@ const SeletorCategoria = ({ categorias, value, onChange, corAtiva }) => (
               bgcolor:     ativo ? `${corAtiva}15` : 'rgba(0,0,0,0.02)',
             }}>
               <Typography sx={{ fontSize: '1.35rem', mb: 0.3, lineHeight: 1 }}>{cat.emoji}</Typography>
-              <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, lineHeight: 1.2,
+              <Typography sx={{ fontSize: '0.66rem', fontWeight: 700, lineHeight: 1.2,
                 color: ativo ? corAtiva : 'text.secondary' }}>
                 {cat.label}
               </Typography>
@@ -137,7 +137,7 @@ const SeletorFrequencia = ({ value, onChange }) => (
               <Typography sx={{ fontSize: '1.1rem', mb: 0.3, lineHeight: 1 }}>{f.emoji}</Typography>
               <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, mb: 0.1,
                 color: ativo ? 'primary.main' : 'text.primary' }}>{f.label}</Typography>
-              <Typography sx={{ fontSize: '0.58rem', color: 'text.secondary', lineHeight: 1.2 }}>{f.desc}</Typography>
+              <Typography sx={{ fontSize: '0.66rem', color: 'text.secondary', lineHeight: 1.2 }}>{f.desc}</Typography>
             </Box>
           </Grid>
         );

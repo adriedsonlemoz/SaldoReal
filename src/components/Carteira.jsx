@@ -285,7 +285,7 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
                         {hist.pagamentoId && (
                           <Button size="small" color="warning" variant="outlined"
                             onClick={() => setModalEstorno({ open: true, acordoId: modalView.acordo.id, pagamento: hist })}
-                            sx={{ minWidth: 0, px: 1, py: 0.3, borderRadius: '8px', fontSize: '0.62rem', fontWeight: 800 }}>
+                            sx={{ minWidth: 0, px: 1, py: 0.3, borderRadius: '8px', fontSize: '0.66rem', fontWeight: 800 }}>
                             Estornar
                           </Button>
                         )}

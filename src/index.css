@@ -1,34 +1,23 @@
-/* ── Base: garante 16px em todos os browsers e bloqueia auto-ajuste
-   de fonte do Android/iOS WebView e Capacitor ─────────────────────*/
 html {
   font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  background: #F6F3FA;
 }
-
+html, body, #root { margin: 0; width: 100%; min-height: 100%; }
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #F5F7FA;
-  color: #1E293B;
-  font-family: 'Nunito', 'Segoe UI', sans-serif;
-  font-size: 1rem;        /* 16px */
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  padding: 0; background-color: #F6F3FA; color: #241A31;
+  font-family: 'Nunito', 'Segoe UI', sans-serif; font-size: 1rem;
+  overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
-
-/* Impede que qualquer elemento fique abaixo de 12px no WebView */
-* {
-  -webkit-text-size-adjust: inherit;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #F5F7FA; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-
+* { box-sizing: border-box; -webkit-text-size-adjust: inherit; }
+button, input, textarea, select { font: inherit; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D8CFE2; border-radius: 999px; }
+@media (max-width: 380px) { html { font-size: 15px !important; } }
+@media (min-width: 600px) { html { font-size: 16px !important; } }
 @media print {
   .d-print-none { display: none !important; }
   body { background: white !important; color: black !important; }

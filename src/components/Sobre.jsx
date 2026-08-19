@@ -82,6 +82,12 @@ const Sobre = ({ setRoute }) => {
 
   const changelog = [
     {
+      v: 'beta.5',
+      icon: '✨',
+      title: 'UI/UX e integração Android',
+      desc: 'Interface responsiva refinada, identidade roxa padronizada, Lista de Compras mais legível e ícone oficial integrado ao Android com barras do sistema alinhadas ao tema.',
+    },
+    {
       v: 'beta.4',
       icon: '📒',
       title: 'Razão financeiro unificado',
@@ -190,13 +196,13 @@ const Sobre = ({ setRoute }) => {
 
       {/* Cabeçalho do app */}
       <Card sx={{ mb: 3, overflow: 'hidden' }}>
-        <Box sx={{ background: 'linear-gradient(135deg, #E91E8C 0%, #7B2FBE 100%)', p: 3, textAlign: 'center' }}>
+        <Box sx={{ background: 'linear-gradient(135deg, #2D0B5E 0%, #7B2CBF 58%, #F72585 100%)', p: 3, textAlign: 'center' }}>
           <Typography sx={{ fontSize: '3.5rem', lineHeight: 1, mb: 1 }}>💜</Typography>
           <Typography sx={{ fontWeight: 800, color: '#fff', fontSize: '1.5rem' }}>SaldoReal</Typography>
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 4" sx={{ bgcolor: 'rgba(0,212,255,0.15)', color: '#00D4FF', border: '1px solid rgba(0,212,255,0.30)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 5" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>
@@ -219,7 +225,7 @@ const Sobre = ({ setRoute }) => {
                   <ListItemText
                     primary={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Chip label={item.v} size="small" sx={{ bgcolor: 'rgba(0,212,255,0.15)', color: '#00D4FF', border: '1px solid rgba(0,212,255,0.30)', fontWeight: 700, height: 20, fontSize: '0.65rem' }} />
+                        <Chip label={item.v} size="small" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, height: 20, fontSize: '0.65rem' }} />
                         <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: 'text.primary' }}>{item.title}</Typography>
                       </Box>
                     }
