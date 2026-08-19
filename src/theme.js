@@ -23,7 +23,7 @@ const theme = createTheme({
     fontFamily: `"Nunito", "Segoe UI", sans-serif`,
     htmlFontSize: 16,
     body1: { fontSize: '0.94rem' },
-    body2: { fontSize: '0.82rem' },
+    body2: { fontSize: '0.84rem' },
     button: { textTransform: 'none', fontWeight: 800, fontSize: '0.9rem' },
   },
   shape: { borderRadius: 14 },
@@ -44,7 +44,7 @@ const theme = createTheme({
     } } },
     MuiButton: { styleOverrides: {
       root: {
-        minHeight: 40, borderRadius: 12, fontWeight: 800, textTransform: 'none', boxShadow: 'none',
+        minHeight: 44, borderRadius: 12, fontWeight: 800, textTransform: 'none', boxShadow: 'none',
         fontSize: '0.9rem', transition: 'transform .15s ease, box-shadow .15s ease, background-color .15s ease',
         '&:active': { transform: 'scale(.98)' },
       },
@@ -70,7 +70,7 @@ const theme = createTheme({
     MuiDialog: { styleOverrides: { paper: { borderRadius: 22, boxShadow: '0 24px 70px rgba(45,11,94,.18)' } } },
     MuiTextField: { styleOverrides: { root: {
       '& .MuiOutlinedInput-root': {
-        minHeight: 52, borderRadius: 14, fontSize: '1rem', background: PAPER,
+        minHeight: 54, borderRadius: 14, fontSize: '1rem', background: PAPER,
         '& fieldset': { borderColor: '#DED6E7' },
         '&:hover fieldset': { borderColor: '#A98CC2' },
         '&.Mui-focused fieldset': { borderColor: PURPLE, borderWidth: 2 },

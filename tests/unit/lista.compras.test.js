@@ -33,6 +33,11 @@ const { dbMock, state } = vi.hoisted(() => {
       state[storeName] = state[storeName].filter(x => x.id !== id);
     },
     where: (field) => where(storeName, field),
+    toArray: async () => state[storeName].map(x => ({ ...x })),
+    bulkDelete: async (ids) => {
+      const set = new Set(ids);
+      state[storeName] = state[storeName].filter(x => !set.has(x.id));
+    },
   });
 
   const dbMock = {
@@ -128,6 +133,24 @@ describe('ListaComprasService — item pago integrado ao financeiro', () => {
     expect(state.gastos).toHaveLength(0);
     expect(state.movimentacoes).toHaveLength(0);
     expect(state.itens[0]).toMatchObject({ status: 'pendente', valorTotalReal: null, gastoId: null });
+    expect(state.listas[0].totalReal).toBe(0);
+  });
+
+
+  it('excluir produto pago remove gasto e movimentação, inclusive vínculo legado', async () => {
+    await ListaComprasService.marcarComprado(11, 18.5);
+    expect(state.gastos).toHaveLength(1);
+    expect(state.movimentacoes).toHaveLength(1);
+
+    // Simula uma chave criada por versão anterior, ainda vinculada ao gasto.
+    state.movimentacoes[0].chaveOrigem = `gasto:${state.gastos[0].id}:08/2026`;
+    delete state.movimentacoes[0].origemId;
+
+    await ListaComprasService.removerItem(11);
+
+    expect(state.itens).toHaveLength(0);
+    expect(state.gastos).toHaveLength(0);
+    expect(state.movimentacoes).toHaveLength(0);
     expect(state.listas[0].totalReal).toBe(0);
   });
 

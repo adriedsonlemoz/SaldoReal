@@ -15,7 +15,7 @@ import Simulador         from './Simulador';
 // Tab item
 // ─────────────────────────────────────────────────────────────────────────────
 const TabBtn = ({ label, icon, active, onClick, accent = '#7B2CBF' }) => (
-  <Box onClick={onClick} sx={{
+  <Box role="button" tabIndex={0} aria-pressed={active} onClick={onClick} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()} sx={{
     flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
     gap: 0.4, py: 1.1, px: 0.5, cursor: 'pointer',
     borderRadius: '12px',

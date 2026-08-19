@@ -60,12 +60,12 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
 
   return (
     <Box sx={{
-      display: 'flex', alignItems: 'center', gap: 1.2,
+      display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: { xs: 'wrap', sm: 'nowrap' },
       px: 1.4, py: 1.2, mb: 1,
       bgcolor: 'background.paper',
       border: `1.5px solid ${corBorda}`,
       borderRadius: '14px',
-      opacity: item.isPago && !isVirtual ? 0.62 : 1,
+      opacity: item.isPago && !isVirtual ? 0.84 : 1,
       transition: 'all 0.15s',
       position: 'relative',
       overflow: 'hidden',
@@ -79,7 +79,7 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
     }}>
       {/* Ícone */}
       <Box sx={{
-        width: 36, height: 36, borderRadius: '11px',
+        width: 40, height: 40, borderRadius: '11px',
         bgcolor: corBg, display: 'flex', alignItems: 'center',
         justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0,
       }}>
@@ -92,13 +92,13 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           <Typography sx={{
             fontWeight: 700, fontSize: '0.88rem', color: 'text.primary', lineHeight: 1.2,
             textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: { xs: '100%', sm: 160 },
           }}>
             {item.nome}
           </Typography>
           {origemMeta && (
             <Chip label={`${origemMeta[1]} ${origemMeta[0]}`} size="small" sx={{
-              height: 20, fontSize: '0.64rem', fontWeight: 800,
+              height: 20, fontSize: '0.66rem', fontWeight: 800,
               bgcolor: `${origemMeta[2]}12`, color: origemMeta[2],
               border: `1px solid ${origemMeta[2]}24`,
             }} />
@@ -118,32 +118,37 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
         fontWeight: 800, fontSize: '0.95rem',
         color: cor,
         textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none',
-        flexShrink: 0, mr: 0.5,
+        flexShrink: 0, mr: 0.5, ml: 'auto',
       }}>
         {isEntrada ? '+' : '-'}{money(item.valor)}
       </Typography>
 
       {/* Ações */}
       {!isVirtual && (
-        <Box sx={{ display: 'flex', gap: 0.4, flexShrink: 0 }}>
+        <Box sx={{
+          display: 'flex', gap: 0.55, flexShrink: 0,
+          width: { xs: (isAcordo || isLista) ? 'auto' : '100%', sm: 'auto' },
+          justifyContent: { xs: 'flex-end', sm: 'initial' },
+          pl: { xs: (isAcordo || isLista) ? 0 : '48px', sm: 0 },
+        }}>
           {isAcordo ? (
-            <Box onClick={() => setRoute('acordos')} sx={{
-              minWidth: 36, height: 30, px: 0.8, borderRadius: '9px', cursor: 'pointer',
+            <Box role="button" tabIndex={0} aria-label="Abrir acordo" onClick={() => setRoute('acordos')} onKeyDown={e => e.key === 'Enter' && setRoute('acordos')} sx={{
+              minWidth: 48, height: 40, px: 0.9, borderRadius: '10px', cursor: 'pointer',
               bgcolor: 'rgba(123,44,191,0.09)', color: '#7B2CBF',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.68rem', fontWeight: 900,
+              fontSize: '0.7rem', fontWeight: 900,
             }}>Abrir</Box>
           ) : isLista ? (
-            <Box onClick={() => setRoute('lista')} sx={{
-              minWidth: 36, height: 30, px: 0.8, borderRadius: '9px', cursor: 'pointer',
+            <Box role="button" tabIndex={0} aria-label="Abrir lista de compras" onClick={() => setRoute('lista')} onKeyDown={e => e.key === 'Enter' && setRoute('lista')} sx={{
+              minWidth: 48, height: 40, px: 0.9, borderRadius: '10px', cursor: 'pointer',
               bgcolor: 'rgba(139,92,246,0.09)', color: '#7C3AED',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.68rem', fontWeight: 900,
+              fontSize: '0.7rem', fontWeight: 900,
             }}>Lista</Box>
           ) : (
             <>
-              <Box onClick={() => onPago(item)} sx={{
-                width: 30, height: 30, borderRadius: '9px', cursor: 'pointer',
+              <Box role="button" tabIndex={0} aria-label={item.isPago ? `Desfazer pagamento de ${item.nome}` : `Marcar ${item.nome} como pago`} onClick={() => onPago(item)} onKeyDown={e => e.key === 'Enter' && onPago(item)} sx={{
+                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
                 bgcolor: item.isPago ? 'rgba(16,185,129,0.1)' : '#10B981',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.75rem', transition: 'all 0.15s',
@@ -151,14 +156,14 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
               }}>
                 {item.isPago ? '↩' : '✓'}
               </Box>
-              <Box onClick={() => onEdit(item)} sx={{
-                width: 30, height: 30, borderRadius: '9px', cursor: 'pointer',
+              <Box role="button" tabIndex={0} aria-label={`Editar ${item.nome}`} onClick={() => onEdit(item)} onKeyDown={e => e.key === 'Enter' && onEdit(item)} sx={{
+                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
                 bgcolor: 'rgba(123,44,191,0.1)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.75rem',
               }}>✎</Box>
-              <Box onClick={() => onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} sx={{
-                width: 30, height: 30, borderRadius: '9px', cursor: 'pointer',
+              <Box role="button" tabIndex={0} aria-label={`Excluir ${item.nome}`} onClick={() => onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} onKeyDown={e => e.key === 'Enter' && onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} sx={{
+                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
                 bgcolor: 'rgba(239,68,68,0.1)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '0.75rem', color: '#EF4444',
@@ -179,7 +184,8 @@ const Secao = ({ titulo, cor, itens, setRoute, onPago, onEdit, onDelete }) => {
   if (itens.length === 0) return null;
   return (
     <Box sx={{ mb: 2 }}>
-      <Box onClick={() => setAberta(v => !v)} sx={{
+      <Box role="button" tabIndex={0} aria-expanded={aberta} onClick={() => setAberta(v => !v)}
+        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setAberta(v => !v)} sx={{
         display: 'flex', alignItems: 'center', gap: 1, mb: 1, cursor: 'pointer',
         userSelect: 'none',
       }}>
@@ -358,7 +364,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
   const saldoPrevisto = resumo.ent - resumo.sai;
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', px: 2, pt: 2 }}>
+    <Box sx={{ maxWidth: 600, margin: 'auto', px: { xs: 1.5, sm: 2 }, pt: { xs: 1.25, sm: 2 }, pb: 1 }}>
 
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast(t => ({ ...t, open: false }))}
@@ -384,8 +390,8 @@ const Gastos = ({ setRoute, setEditItem }) => {
 
         {/* Navegação de mês */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1.8, pb: 1.2 }}>
-          <Box onClick={() => setMesOffset(v => v - 1)} sx={{
-            width: 34, height: 34, borderRadius: '10px',
+          <Box role="button" tabIndex={0} aria-label="Mês anterior" onClick={() => setMesOffset(v => v - 1)} onKeyDown={e => e.key === 'Enter' && setMesOffset(v => v - 1)} sx={{
+            width: 42, height: 42, borderRadius: '12px',
             bgcolor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', color: '#fff', '&:active': { transform: 'scale(0.88)' },
           }}>
@@ -394,8 +400,8 @@ const Gastos = ({ setRoute, setEditItem }) => {
           <Typography sx={{ color: '#fff', fontWeight: 900, fontSize: '1rem', letterSpacing: '-0.2px' }}>
             {nomeMes}
           </Typography>
-          <Box onClick={() => setMesOffset(v => v + 1)} sx={{
-            width: 34, height: 34, borderRadius: '10px',
+          <Box role="button" tabIndex={0} aria-label="Próximo mês" onClick={() => setMesOffset(v => v + 1)} onKeyDown={e => e.key === 'Enter' && setMesOffset(v => v + 1)} sx={{
+            width: 42, height: 42, borderRadius: '12px',
             bgcolor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', color: '#fff', '&:active': { transform: 'scale(0.88)' },
           }}>

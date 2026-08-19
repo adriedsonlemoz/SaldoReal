@@ -20,6 +20,7 @@ import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
 import ItemRow from './ItemRow';
 import ModalAdicionarItem from './ModalAdicionarItem';
 import { money } from './constants';
+import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/moedaInput';
 
 const SummaryBox = ({ label, value, tone = 'neutral', caption }) => {
   const tones = {
@@ -78,12 +79,12 @@ const TelaListaAtiva = ({
 
   const abrirPagamento = (item) => {
     setItemPagamento(item);
-    setValorPagamento(String(Number(item.valorTotal || 0).toFixed(2)));
+    setValorPagamento(Number(item.valorTotal || 0));
   };
 
   const confirmarPagamento = async () => {
     if (!itemPagamento) return;
-    const valor = Number(String(valorPagamento).replace(',', '.'));
+    const valor = Number(valorPagamento || 0);
     if (!Number.isFinite(valor) || valor < 0) return;
     setProcessando(true);
     try {
@@ -98,7 +99,7 @@ const TelaListaAtiva = ({
   };
 
   const salvarOrcamento = async () => {
-    await onEditarLista(lista.id, { orcamento: Number(String(orcInput).replace(',', '.')) || 0 });
+    await onEditarLista(lista.id, { orcamento: Number(orcInput || 0) });
     setModalOrc(false);
   };
 
@@ -139,7 +140,7 @@ const TelaListaAtiva = ({
       }}>
         <Box sx={{ position: 'absolute', width: 130, height: 130, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.08)', right: -45, top: -60 }} />
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button onClick={onVoltar} sx={{ minWidth: 0, p: .45, color: '#fff', bgcolor: 'rgba(255,255,255,.10)', '&:hover': { bgcolor: 'rgba(255,255,255,.16)' } }}>
+          <Button aria-label="Voltar às listas" onClick={onVoltar} sx={{ minWidth: 44, width: 44, height: 44, p: 0, color: '#fff', bgcolor: 'rgba(255,255,255,.10)', '&:hover': { bgcolor: 'rgba(255,255,255,.16)' } }}>
             <ArrowBackRoundedIcon />
           </Button>
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -149,7 +150,7 @@ const TelaListaAtiva = ({
             </Typography>
           </Box>
           <Button
-            size="small" onClick={() => { setOrcInput(orcamento ? String(orcamento) : ''); setModalOrc(true); }}
+            size="small" onClick={() => { setOrcInput(orcamento || 0); setModalOrc(true); }}
             startIcon={<EditRoundedIcon />}
             sx={{ color: '#fff', bgcolor: 'rgba(255,255,255,.11)', fontSize: '.68rem', px: .9 }}
           >
@@ -211,10 +212,23 @@ const TelaListaAtiva = ({
       </Button>
 
       {itens.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 3.2, border: '1px dashed #D8CDE2', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.72)' }}>
-          <Typography sx={{ fontSize: '2.1rem' }}>🧺</Typography>
-          <Typography sx={{ fontWeight: 900, mt: .7 }}>Sua lista está vazia</Typography>
-          <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mt: .3 }}>Adicione o primeiro produto para começar.</Typography>
+        <Box sx={{ textAlign: 'center', py: 2.4, px: 1.4, border: '1px dashed #D8CDE2', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.72)' }}>
+          <Typography sx={{ fontSize: '2rem' }}>🧺</Typography>
+          <Typography sx={{ fontWeight: 900, mt: .55 }}>Sua lista está vazia</Typography>
+          <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mt: .25 }}>Adicione o primeiro produto para começar.</Typography>
+          <Box sx={{ mt: 1.4, display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .6, textAlign: 'left' }}>
+            {[
+              ['1', 'Adicione', 'produto e preço'],
+              ['2', 'Pague', 'valor real'],
+              ['3', 'Sincroniza', 'automaticamente'],
+            ].map(([n, titulo, texto]) => (
+              <Box key={n} sx={{ minWidth: 0, p: .75, borderRadius: '12px', bgcolor: 'rgba(123,44,191,.045)', border: '1px solid rgba(123,44,191,.09)' }}>
+                <Typography sx={{ width: 20, height: 20, borderRadius: '7px', display: 'grid', placeItems: 'center', bgcolor: 'rgba(123,44,191,.10)', color: 'primary.main', fontSize: '.65rem', fontWeight: 900 }}>{n}</Typography>
+                <Typography sx={{ mt: .45, fontSize: '.68rem', fontWeight: 900, lineHeight: 1.1 }}>{titulo}</Typography>
+                <Typography sx={{ mt: .12, fontSize: '.65rem', color: 'text.secondary', lineHeight: 1.12 }}>{texto}</Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
       )}
 
@@ -264,9 +278,9 @@ const TelaListaAtiva = ({
             Confirme o valor realmente pago. Ao confirmar, a despesa entra imediatamente no fluxo financeiro.
           </Typography>
           <TextField
-            fullWidth autoFocus label="Valor pago" value={valorPagamento}
-            onChange={(e) => setValorPagamento(e.target.value)} type="number"
-            inputProps={{ min: 0, step: '.01', inputMode: 'decimal' }}
+            fullWidth autoFocus label="Valor pago" value={formatMoedaInput(valorPagamento)}
+            onChange={(e) => setValorPagamento(parseMoedaInput(e.target.value))}
+            inputProps={propsInputMoeda}
             InputProps={{ startAdornment: <InputAdornment position="start">R$</InputAdornment> }}
             onKeyDown={(e) => e.key === 'Enter' && confirmarPagamento()}
           />
@@ -324,8 +338,8 @@ const TelaListaAtiva = ({
         <DialogContent>
           <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mb: 1.6 }}>Use como limite de referência. Ele não cria nenhuma movimentação financeira.</Typography>
           <TextField
-            fullWidth autoFocus label="Limite" value={orcInput} onChange={(e) => setOrcInput(e.target.value)} type="number"
-            inputProps={{ min: 0, step: '.01', inputMode: 'decimal' }}
+            fullWidth autoFocus label="Limite" value={formatMoedaInput(orcInput)} onChange={(e) => setOrcInput(parseMoedaInput(e.target.value))}
+            inputProps={propsInputMoeda}
             InputProps={{ startAdornment: <InputAdornment position="start">R$</InputAdornment> }}
           />
         </DialogContent>

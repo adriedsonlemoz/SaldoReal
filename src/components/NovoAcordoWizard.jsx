@@ -50,7 +50,7 @@ const FORMAS_PAG = ['Boleto Bancário', 'Pix', 'Cartão de Crédito', 'Débito A
 // ── Subcomponentes de apoio ───────────────────────────────────────────────────
 
 const OptionCard = ({ selected, onClick, emoji, label, sub }) => (
-  <Box onClick={onClick} sx={{
+  <Box role="button" tabIndex={0} aria-pressed={selected} onClick={onClick} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()} sx={{
     p: 2, borderRadius: '16px', cursor: 'pointer', textAlign: 'center',
     border: '2px solid',
     borderColor: selected ? 'primary.main' : 'rgba(0,0,0,0.12)',
@@ -451,7 +451,7 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
                 <Typography sx={{ fontWeight: 700, fontSize: '0.8rem', color: 'text.secondary', mb: 1 }}>Possui entrada?</Typography>
                 <Box sx={{ display: 'flex', gap: 1.5 }}>
                   {[{ v: true, l: 'Sim' }, { v: false, l: 'Não' }].map(opt => (
-                    <Box key={opt.l} onClick={() => update('temEntrada', opt.v)} sx={{
+                    <Box key={opt.l} role="button" tabIndex={0} aria-pressed={form.temEntrada === opt.v} onClick={() => update('temEntrada', opt.v)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && update('temEntrada', opt.v)} sx={{
                       flex: 1, p: 1.2, borderRadius: '12px', cursor: 'pointer', textAlign: 'center',
                       border: '2px solid', transition: 'all .15s', fontWeight: 800, fontSize: '0.9rem',
                       borderColor: form.temEntrada === opt.v ? 'primary.main' : 'rgba(0,0,0,0.12)',
@@ -560,7 +560,7 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
           <StepWrapper emoji="💳" pergunta="Como você vai pagar as parcelas?" sub="Forma de pagamento combinada">
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2, mt: 1 }}>
               {FORMAS_PAG.map(f => (
-                <Box key={f} onClick={() => update('formaPagamento', f)} sx={{
+                <Box key={f} role="button" tabIndex={0} aria-pressed={form.formaPagamento === f} onClick={() => update('formaPagamento', f)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && update('formaPagamento', f)} sx={{
                   p: 1.5, borderRadius: '14px', cursor: 'pointer',
                   border: '2px solid',
                   borderColor: form.formaPagamento === f ? 'primary.main' : 'rgba(0,0,0,0.12)',
@@ -691,7 +691,7 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
         display: 'flex', alignItems: 'center', gap: 1.5,
       }}>
         <IconButton onClick={step === 0 ? onCancelar : back} size="small"
-          sx={{ bgcolor: 'rgba(0,0,0,0.05)', borderRadius: '10px', width: 36, height: 36 }}>
+          sx={{ bgcolor: 'rgba(0,0,0,0.05)', borderRadius: '10px', width: 42, height: 42 }}>
           ←
         </IconButton>
         <Box sx={{ flex: 1 }}>

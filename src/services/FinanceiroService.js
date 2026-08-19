@@ -113,6 +113,22 @@ const FinanceiroService = {
   async setRenda(val) { return this.setConfig('renda', val); },
   async getDiaPagamento() { return this.getConfig('diaPagamento', null); },
   async setDiaPagamento(dia) { return this.setConfig('diaPagamento', dia); },
+  async getCategoriasPersonalizadas(tipo = 'despesa') {
+    const chave = tipo === 'entrada' ? 'categorias_entrada' : 'categorias_despesa';
+    const categorias = await this.getConfig(chave, []);
+    return Array.isArray(categorias) ? categorias : [];
+  },
+  async adicionarCategoriaPersonalizada(tipo = 'despesa', nome = '') {
+    const label = String(nome || '').trim().replace(/\s+/g, ' ');
+    if (!label) throw new Error('Informe um nome para a categoria.');
+    const chave = tipo === 'entrada' ? 'categorias_entrada' : 'categorias_despesa';
+    const atuais = await this.getCategoriasPersonalizadas(tipo);
+    const existe = atuais.some(c => String(c).localeCompare(label, 'pt-BR', { sensitivity: 'accent' }) === 0);
+    if (existe) return atuais.find(c => String(c).toLocaleLowerCase('pt-BR') === label.toLocaleLowerCase('pt-BR')) || label;
+    const novas = [...atuais, label].slice(-30);
+    await this.setConfig(chave, novas);
+    return label;
+  },
 
   // ── LEITURA ───────────────────────────────────────────────────────────────
   async carregarAcordos() { return db.acordos.toArray(); },

@@ -60,9 +60,9 @@ const CardHero = ({
           }}>
             Saldo disponível
           </Typography>
-          <Box onClick={() => setMostrar(v => !v)} sx={{
-            cursor: 'pointer', bgcolor: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', px: 0.9, py: 0.4,
+          <Box role="button" tabIndex={0} aria-label={mostrar ? 'Ocultar saldo' : 'Mostrar saldo'} onClick={() => setMostrar(v => !v)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setMostrar(v => !v)} sx={{
+            cursor: 'pointer', width: 44, height: 44, display: 'grid', placeItems: 'center', bgcolor: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', px: 0, py: 0,
             fontSize: '0.68rem', lineHeight: 1, userSelect: 'none', transition: 'all 0.2s',
             '&:active': { transform: 'scale(0.9)' },
           }}>
@@ -84,7 +84,7 @@ const CardHero = ({
               : 'linear-gradient(135deg, rgba(239,35,60,0.3), rgba(239,35,60,0.1))',
             border: `1px solid ${positivo ? 'rgba(4,210,161,0.4)' : 'rgba(239,35,60,0.4)'}`,
           }}>
-            <Typography sx={{ fontSize: '0.64rem', fontWeight: 900, color: positivo ? '#4DFFC3' : '#FF8FA3' }}>
+            <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, color: positivo ? '#4DFFC3' : '#FF8FA3' }}>
               {positivo ? '✓ NO AZUL' : '⚠ ATENÇÃO'}
             </Typography>
           </Box>

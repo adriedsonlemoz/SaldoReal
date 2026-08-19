@@ -1,7 +1,7 @@
 # 🛒 SaldoReal
 
 **Slogan:** O controle do seu bolso dentro do carrinho.  
-**Versão:** 1.0.0-beta.5
+**Versão:** 1.0.0-beta.6
 
 ## Sobre
 
@@ -13,7 +13,9 @@ O SaldoReal é um gerenciador financeiro pessoal offline com renda, despesas, ac
 - Saldo disponível e saldo projetado após pendências.
 - Acordos parcelados com primeiro vencimento real, histórico de pagamentos, parcelas atrasadas acumuladas, valor real pago e estorno individual por pagamento.
 - Vencimentos seguros para dias 29/30/31 e meses curtos.
-- Lista de compras com identidade própria; cada item pago gera uma movimentação vinculada no Razão.
+- Lista de compras com identidade própria; cada item pago gera uma movimentação vinculada no Razão e a exclusão/desmarcação mantém o financeiro sincronizado.
+- Cadastro de lançamentos com categorias personalizadas criadas no próprio formulário e campos monetários otimizados para teclado numérico.
+- Home com distribuição de saídas por categoria, ritmo do mês, próximos compromissos e perfil financeiro ampliado.
 - Backup/restauração v3 incluindo o Razão (`movimentacoes`), além de gastos, acordos, configurações, listas e itens.
 - PWA/web via Vite e APK Android via Capacitor.
 - Testes unitários com Vitest e E2E com Playwright.
@@ -35,4 +37,4 @@ npm run test:e2e
 
 ## Atenção ao Android
 
-O identificador Android foi padronizado para `com.saldoreal.app`. Se você já instalou uma versão de desenvolvimento com o identificador antigo `com.minhasfinancas.app`, o Android tratará a beta.2 como outro aplicativo. **Exporte um backup na versão antiga antes de migrar**, depois importe-o no SaldoReal novo.
+O identificador Android foi padronizado para `com.saldoreal.app`. Se você já instalou uma versão de desenvolvimento com o identificador antigo `com.minhasfinancas.app`, o Android tratará a versão atual como outro aplicativo. **Exporte um backup na versão antiga antes de migrar**, depois importe-o no SaldoReal novo.

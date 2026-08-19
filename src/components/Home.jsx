@@ -1,4 +1,4 @@
-// src/components/Home.jsx — v5
+// src/components/Home.jsx — beta.6
 // Navbar e modais Add/Config removidos daqui — vivem no App.jsx global.
 // Home mantém apenas: TelaPerfil, modal de alertas, conteúdo do dashboard.
 
@@ -14,8 +14,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Snackbar      from '@mui/material/Snackbar';
 import Alert         from '@mui/material/Alert';
-import InputAdornment from '@mui/material/InputAdornment';
 import Slide         from '@mui/material/Slide';
+import Paper         from '@mui/material/Paper';
+import Divider       from '@mui/material/Divider';
 
 import FinanceiroService from '../services/FinanceiroService';
 import FinanceiroUtils   from '../utils/financeiro';
@@ -24,105 +25,121 @@ import CardHero          from './home/CardHero';
 import InsightStrip      from './home/InsightStrip';
 import GraficoMensal     from './home/GraficoMensal';
 import QuickMenuCards    from './home/QuickMenuCards';
+import ResumoAtividadeMes from './home/ResumoAtividadeMes';
 import { money, saudacao } from './home/constants';
+import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../utils/moedaInput';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tela Perfil — Dialog fullscreen com Slide de baixo para cima
 // ─────────────────────────────────────────────────────────────────────────────
-const TelaPerfil = ({ open, onClose, usuario, renda, diaPagamento: diaPagamentoProp, onSaved }) => {
-  const [nome,          setNome]          = useState('');
-  const [inputRenda,    setInputRenda]    = useState('');
-  const [diaPag,        setDiaPag]        = useState('');
-  const [salvando,      setSalvando]      = useState(false);
+const TelaPerfil = ({
+  open, onClose, usuario, renda, diaPagamento: diaPagamentoProp, onSaved,
+  saldoResumo = {}, totalMes = 0, percentual = 0, setRoute,
+}) => {
+  const [nome, setNome] = useState('');
+  const [inputRenda, setInputRenda] = useState(0);
+  const [diaPag, setDiaPag] = useState('');
+  const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setNome(usuario || '');
-      setInputRenda(renda || '');
-      setDiaPag(diaPagamentoProp ? String(diaPagamentoProp) : '');
-    }
+    if (!open) return;
+    setNome(usuario || '');
+    setInputRenda(Number(renda || 0));
+    setDiaPag(diaPagamentoProp ? String(diaPagamentoProp) : '');
   }, [open, usuario, renda, diaPagamentoProp]);
-
-  const handleRendaChange = (e) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    const num = parseFloat(raw) / 100;
-    setInputRenda(isNaN(num) ? '' : num);
-  };
 
   const salvar = async () => {
     setSalvando(true);
     try {
-      if (nome.trim()) await FinanceiroService.setUsuario(nome.trim());
-      const val = typeof inputRenda === 'number' ? inputRenda : parseFloat(String(inputRenda)) || 0;
-      await FinanceiroService.setRenda(val);
-      const dia = parseInt(diaPag);
+      const nomeFinal = nome.trim() || usuario || 'Usuário';
+      const val = Number(inputRenda || 0);
+      const dia = parseInt(diaPag, 10);
       const diaValido = dia >= 1 && dia <= 31 ? dia : null;
-      await FinanceiroService.setDiaPagamento(diaValido);
-      onSaved({ nome: nome.trim(), renda: val, diaPagamento: diaValido });
+      await Promise.all([
+        FinanceiroService.setUsuario(nomeFinal),
+        FinanceiroService.setRenda(val),
+        FinanceiroService.setDiaPagamento(diaValido),
+      ]);
+      onSaved({ nome: nomeFinal, renda: val, diaPagamento: diaValido });
       onClose();
     } finally {
       setSalvando(false);
     }
   };
 
-  const rendaDisplay = typeof inputRenda === 'number' && inputRenda > 0
-    ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(inputRenda)
-    : '';
+  const navegar = (rota) => {
+    onClose();
+    setRoute?.(rota);
+  };
+
+  const stats = [
+    { label: 'Disponível', value: money(saldoResumo.saldoDisponivel || 0), icon: '💜', color: '#6A23A7' },
+    { label: 'Pago no mês', value: money(saldoResumo.despesasPagas || 0), icon: '✅', color: '#087A58' },
+    { label: 'Pendente', value: money(totalMes || 0), icon: '⏳', color: '#C22578' },
+  ];
 
   return (
-    <Dialog open={open} onClose={onClose} fullScreen
-      TransitionComponent={Slide} TransitionProps={{ direction: 'up' }}
-      PaperProps={{ sx: { bgcolor: 'background.default' } }}>
-
-      {/* Header */}
+    <Dialog open={open} onClose={onClose} fullScreen TransitionComponent={Slide}
+      TransitionProps={{ direction: 'up' }} PaperProps={{ sx: { bgcolor: 'background.default' } }}>
       <Box sx={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        px: 2.5, pt: 3, pb: 1.5,
-        background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 60%, #6B1FA8 100%)',
+        px: { xs: 2, sm: 2.5 }, pt: 'calc(18px + env(safe-area-inset-top, 0px))', pb: 2,
+        background: 'linear-gradient(145deg,#1A0533 0%,#2D0B5E 55%,#6B1FA8 100%)', color: '#fff',
       }}>
-        <Box>
-          <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>
-            Meu Perfil
-          </Typography>
-          <Typography sx={{ color: '#fff', fontWeight: 900, fontSize: '1.4rem', letterSpacing: '-0.3px', mt: 0.3 }}>
-            {(usuario || 'Usuário').split(' ')[0]} 👤
-          </Typography>
+        <Box sx={{ maxWidth: 500, mx: 'auto' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.1, minWidth: 0 }}>
+              <Box sx={{ width: 48, height: 48, borderRadius: '16px', bgcolor: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.16)', display: 'grid', placeItems: 'center', fontSize: '1.35rem' }}>👤</Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ fontSize: '.65rem', fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase', opacity: .62 }}>Meu perfil financeiro</Typography>
+                <Typography sx={{ fontWeight: 900, fontSize: '1.25rem', lineHeight: 1.15, mt: .15, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{usuario || 'Usuário'}</Typography>
+                <Typography sx={{ fontSize: '.68rem', opacity: .72, mt: .15 }}>{Math.round(percentual || 0)}% da renda usada neste mês</Typography>
+              </Box>
+            </Box>
+            <Box onClick={onClose} onKeyDown={e => e.key === 'Enter' && onClose()} role="button" tabIndex={0} aria-label="Fechar perfil" sx={{ width: 40, height: 40, borderRadius: '13px', bgcolor: 'rgba(255,255,255,.11)', display: 'grid', placeItems: 'center', cursor: 'pointer', flexShrink: 0 }}>✕</Box>
+          </Box>
         </Box>
-        <Box onClick={onClose} sx={{
-          width: 36, height: 36, borderRadius: '12px',
-          bgcolor: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', fontSize: '1rem', '&:active': { transform: 'scale(0.9)' },
-        }}>✕</Box>
       </Box>
 
-      <Box sx={{ px: 2.5, pt: 2.5, pb: 10, maxWidth: 480, margin: 'auto', width: '100%' }}>
-        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: 'text.secondary', letterSpacing: '0.8px', textTransform: 'uppercase', mb: 0.8 }}>
-          Nome
-        </Typography>
-        <TextField fullWidth value={nome} onChange={e => setNome(e.target.value)} placeholder="Seu nome" sx={{ mb: 2.5 }} />
+      <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', px: { xs: 1.5, sm: 2 }, py: 1.5, pb: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .7, mb: 1.35 }}>
+          {stats.map(st => (
+            <Paper key={st.label} elevation={0} sx={{ p: .9, borderRadius: '14px', border: '1px solid rgba(80,55,100,.08)', minWidth: 0 }}>
+              <Typography sx={{ fontSize: '.82rem', lineHeight: 1 }}>{st.icon}</Typography>
+              <Typography sx={{ fontSize: '.65rem', color: 'text.secondary', fontWeight: 800, mt: .4 }}>{st.label}</Typography>
+              <Typography sx={{ fontSize: '.76rem', color: st.color, fontWeight: 900, mt: .15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{st.value}</Typography>
+            </Paper>
+          ))}
+        </Box>
 
-        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: 'text.secondary', letterSpacing: '0.8px', textTransform: 'uppercase', mb: 0.8 }}>
-          Renda Mensal
-        </Typography>
-        <TextField fullWidth label="Renda mensal" value={rendaDisplay} onChange={handleRendaChange}
-          inputProps={{ inputMode: 'numeric' }}
-          InputProps={{ startAdornment: <InputAdornment position="start"><Typography sx={{ fontWeight: 700, color: 'text.secondary' }}>R$</Typography></InputAdornment> }}
-          sx={{ mb: 2.5 }} />
+        <Paper elevation={0} sx={{ p: 1.5, borderRadius: '18px', border: '1px solid rgba(80,55,100,.08)', mb: 1.2 }}>
+          <Typography sx={{ fontWeight: 900, fontSize: '.88rem', mb: .2 }}>Dados principais</Typography>
+          <Typography sx={{ fontSize: '.69rem', color: 'text.secondary', mb: 1.3 }}>Essas informações alimentam o saldo e a previsão de pagamento.</Typography>
+          <TextField fullWidth label="Nome" value={nome} onChange={e => setNome(e.target.value.slice(0, 40))} sx={{ mb: 1.2 }} />
+          <TextField fullWidth label="Renda mensal" value={formatMoedaInput(inputRenda, { comSimbolo: true })}
+            onChange={e => setInputRenda(parseMoedaInput(e.target.value))} inputProps={propsInputMoeda} sx={{ mb: 1.2 }} />
+          <TextField fullWidth label="Dia do recebimento (1–31)" value={diaPag}
+            onChange={e => { const v = e.target.value.replace(/\D/g, ''); if (v === '' || Number(v) <= 31) setDiaPag(v); }}
+            inputProps={{ inputMode: 'numeric', maxLength: 2 }} helperText="Usado na contagem do próximo pagamento" />
+          <Button fullWidth variant="contained" disabled={salvando} onClick={salvar} sx={{ mt: 1.35, py: 1.15, borderRadius: '14px', fontWeight: 900 }}>
+            {salvando ? 'Salvando…' : 'Salvar alterações'}
+          </Button>
+        </Paper>
 
-        <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: 'text.secondary', letterSpacing: '0.8px', textTransform: 'uppercase', mb: 0.8 }}>
-          Dia do Recebimento
-        </Typography>
-        <TextField fullWidth label="Dia do salário (1–31)" value={diaPag}
-          onChange={e => { const v = e.target.value.replace(/\D/g, ''); if (v === '' || parseInt(v) <= 31) setDiaPag(v); }}
-          inputProps={{ inputMode: 'numeric', maxLength: 2 }}
-          helperText="Aparece a contagem regressiva na tela inicial"
-          sx={{ mb: 2.5 }} />
-
-        <Button fullWidth variant="contained" size="large" disabled={salvando} onClick={salvar}
-          sx={{ borderRadius: '16px', py: 1.5, fontWeight: 900, fontSize: '1rem',
-            background: 'linear-gradient(135deg, #7B2CBF, #F72585)', boxShadow: '0 6px 22px rgba(123,44,191,0.35)' }}>
-          {salvando ? 'Salvando...' : '✅ Salvar Alterações'}
-        </Button>
+        <Paper elevation={0} sx={{ p: 1.25, borderRadius: '18px', border: '1px solid rgba(80,55,100,.08)' }}>
+          <Typography sx={{ fontWeight: 900, fontSize: '.82rem' }}>Atalhos úteis</Typography>
+          <Typography sx={{ fontSize: '.67rem', color: 'text.secondary', mb: .9 }}>Acesse suas informações sem voltar para a Home.</Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .7 }}>
+            {[
+              ['gastos', '📒', 'Fluxo'], ['relatorio', '📊', 'Relatório'], ['backup', '🛡️', 'Backup'],
+            ].map(([rota, icon, label]) => (
+              <Button key={rota} variant="outlined" color="inherit" onClick={() => navegar(rota)} sx={{ minWidth: 0, py: .9, px: .5, borderColor: 'divider', color: 'text.primary', fontSize: '.69rem', flexDirection: 'column', gap: .2 }}>
+                <Box component="span" sx={{ fontSize: '1rem' }}>{icon}</Box>{label}
+              </Button>
+            ))}
+          </Box>
+          <Divider sx={{ my: 1 }} />
+          <Typography sx={{ fontSize: '.66rem', color: 'text.disabled', textAlign: 'center' }}>Os dados financeiros permanecem armazenados no dispositivo.</Typography>
+        </Paper>
       </Box>
     </Dialog>
   );
@@ -245,12 +262,12 @@ const Home = ({ setRoute }) => {
             '100%': { opacity: 1, transform: 'translateY(0)' },
           },
         }}>
-          <Box>
+          <Box sx={{ minWidth: 0, pr: .6 }}>
             <Typography sx={{ color: 'text.secondary', fontSize: '0.78rem', fontWeight: 600, lineHeight: 1 }}>
               {saudacao()},
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-              <Typography sx={{ fontWeight: 900, fontSize: '1.42rem', color: 'text.primary', lineHeight: 1.15, letterSpacing: '-0.5px' }}>
+              <Typography sx={{ fontWeight: 900, fontSize: { xs: '1.26rem', sm: '1.42rem' }, color: 'text.primary', lineHeight: 1.15, letterSpacing: '-0.5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: { xs: 118, sm: 180 } }}>
                 {primeiroNome}
               </Typography>
               <Typography sx={{
@@ -274,12 +291,12 @@ const Home = ({ setRoute }) => {
               const quando = hoje ? 'Hoje' : diasParaPagamento === 1 ? 'Amanhã' : `${diasParaPagamento} dias`;
               return (
                 <Box sx={{
-                  height: 38, px: 1, borderRadius: '12px',
+                  height: 40, px: .8, borderRadius: '12px',
                   background: urgente
                     ? 'linear-gradient(135deg, rgba(247,37,133,.11), rgba(123,44,191,.08))'
                     : 'linear-gradient(135deg, rgba(123,44,191,.08), rgba(157,78,221,.05))',
                   border: `1px solid ${urgente ? 'rgba(247,37,133,.26)' : 'rgba(123,44,191,.17)'}`,
-                  display: 'flex', alignItems: 'center', gap: .65, minWidth: 86,
+                  display: 'flex', alignItems: 'center', gap: .55, minWidth: 76,
                 }}>
                   <Box sx={{ width: 24, height: 24, borderRadius: '8px', flexShrink: 0,
                     bgcolor: urgente ? 'rgba(247,37,133,.12)' : 'rgba(123,44,191,.11)',
@@ -290,15 +307,15 @@ const Home = ({ setRoute }) => {
                     </svg>
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
-                    <Typography sx={{ fontSize: '.62rem', fontWeight: 800, color: 'text.secondary', lineHeight: 1.05, whiteSpace: 'nowrap' }}>Próx. pagamento</Typography>
+                    <Typography sx={{ fontSize: '.65rem', fontWeight: 800, color: 'text.secondary', lineHeight: 1.05, whiteSpace: 'nowrap', '@media (max-width:370px)': { display: 'none' } }}>Próx. pagamento</Typography>
                     <Typography sx={{ fontSize: '.72rem', fontWeight: 900, color: urgente ? '#D91E74' : '#6A23A7', lineHeight: 1.15, mt: .15, whiteSpace: 'nowrap' }}>{quando}</Typography>
                   </Box>
                 </Box>
               );
             })()}
             {/* Sino de alertas */}
-            <Box onClick={() => setModalAlertas(true)} sx={{
-              width: 36, height: 36, borderRadius: '12px',
+            <Box role="button" tabIndex={0} aria-label="Abrir alertas" onClick={() => setModalAlertas(true)} onKeyDown={e => e.key === 'Enter' && setModalAlertas(true)} sx={{
+              width: 42, height: 42, borderRadius: '13px',
               bgcolor: alertasUrgentes.length > 0 ? 'rgba(247,37,133,0.08)' : 'rgba(0,0,0,0.04)',
               border: alertasUrgentes.length > 0 ? '1.5px solid rgba(247,37,133,0.3)' : '1.5px solid rgba(0,0,0,0.07)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -324,7 +341,7 @@ const Home = ({ setRoute }) => {
                   bgcolor: '#F72585', border: '2px solid #F5F5F5',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <Typography sx={{ fontSize: '0.62rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#fff', lineHeight: 1 }}>
                     {alertasUrgentes.length}
                   </Typography>
                 </Box>
@@ -332,8 +349,8 @@ const Home = ({ setRoute }) => {
             </Box>
 
             {/* Avatar → abre TelaPerfil */}
-            <Box onClick={() => setTelaPerfilOpen(true)} sx={{
-              width: 36, height: 36, borderRadius: '12px',
+            <Box role="button" tabIndex={0} aria-label="Abrir perfil" onClick={() => setTelaPerfilOpen(true)} onKeyDown={e => e.key === 'Enter' && setTelaPerfilOpen(true)} sx={{
+              width: 42, height: 42, borderRadius: '13px',
               background: 'linear-gradient(135deg, rgba(123,44,191,0.15), rgba(247,37,133,0.1))',
               border: '1.5px solid rgba(123,44,191,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -355,6 +372,38 @@ const Home = ({ setRoute }) => {
         {/* ── CARDS 2x2 ─────────────────────────────────────────────────── */}
         <QuickMenuCards setRoute={setRoute} />
 
+        <ResumoAtividadeMes
+          saldoDisponivel={saldoResumo.saldoDisponivel}
+          despesasPagas={saldoResumo.despesasPagas}
+          percentual={percentual}
+        />
+
+        <Box role="button" tabIndex={0} aria-label="Ver próximos compromissos" onClick={() => setModalAlertas(true)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setModalAlertas(true)} sx={{
+          mt: .9, p: 1.05, borderRadius: '15px', bgcolor: 'background.paper',
+          border: '1px solid rgba(80,55,100,.07)', boxShadow: '0 4px 14px rgba(45,11,94,.035)',
+          cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+        }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{ fontSize: '.66rem', fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '.7px' }}>Próximos compromissos</Typography>
+              <Typography sx={{ fontSize: '.76rem', fontWeight: 900, mt: .18 }}>
+                {alertas.length ? `${alertas.length} conta${alertas.length !== 1 ? 's' : ''} para acompanhar` : 'Nenhuma conta próxima 🎉'}
+              </Typography>
+            </Box>
+            <Typography sx={{ color: 'primary.main', fontSize: '.7rem', fontWeight: 900, flexShrink: 0 }}>{alertas.length ? 'Ver alertas ›' : 'Tudo em dia'}</Typography>
+          </Box>
+          {alertas.length > 0 && (
+            <Box sx={{ display: 'flex', gap: .6, mt: .8, overflow: 'hidden' }}>
+              {alertas.slice(0, 2).map((a, i) => (
+                <Box key={`${a.nome}-${i}`} sx={{ flex: 1, minWidth: 0, px: .8, py: .65, borderRadius: '11px', bgcolor: a.atrasado ? 'rgba(229,72,98,.07)' : 'rgba(123,44,191,.055)', border: `1px solid ${a.atrasado ? 'rgba(229,72,98,.15)' : 'rgba(123,44,191,.11)'}` }}>
+                  <Typography sx={{ fontSize: '.67rem', fontWeight: 900, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{a.nome}</Typography>
+                  <Typography sx={{ fontSize: '.65rem', color: a.atrasado ? 'error.main' : 'text.secondary', mt: .15 }}>{a.atrasado ? `${Math.abs(a.diff)}d atrasada` : a.diff === 0 ? 'vence hoje' : `vence em ${a.diff}d`}</Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+
       </Box>
 
       {/* ════ MODAIS DA HOME ════ */}
@@ -365,6 +414,10 @@ const Home = ({ setRoute }) => {
         usuario={usuario}
         renda={renda}
         diaPagamento={diaPagamento}
+        saldoResumo={saldoResumo}
+        totalMes={totalMes}
+        percentual={percentual}
+        setRoute={setRoute}
         onSaved={({ nome, renda: r, diaPagamento: dp }) => {
           if (nome) setUsuario(nome);
           setRenda(r);

@@ -82,6 +82,12 @@ const Sobre = ({ setRoute }) => {
 
   const changelog = [
     {
+      v: 'beta.6',
+      icon: '🧩',
+      title: 'Sincronização e experiência refinada',
+      desc: 'Lista e Fluxo permanecem sincronizados ao remover itens pagos, edição pelo Fluxo foi corrigida, Home e perfil ganharam informações mais úteis, categorias podem ser criadas no lançamento e campos monetários ficaram mais fáceis no celular.',
+    },
+    {
       v: 'beta.5',
       icon: '✨',
       title: 'UI/UX e integração Android',
@@ -181,9 +187,9 @@ const Sobre = ({ setRoute }) => {
           <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 2 }}>
             Encontrou algum bug ou tem uma sugestão? Manda mensagem!
           </Typography>
-          <Box sx={{ p: 2, bgcolor: '#EFF6FF', borderRadius: '12px', border: '1.5px dashed #93C5FD', textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#1E40AF', mb: 0.5 }}>E-mail de suporte</Typography>
-            <Typography sx={{ color: '#3B82F6', fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace' }}>suporte@saldoreal.app</Typography>
+          <Box sx={{ p: 2, bgcolor: 'rgba(123,44,191,.055)', borderRadius: '12px', border: '1.5px dashed rgba(123,44,191,.28)', textAlign: 'center' }}>
+            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#5A189A', mb: 0.5 }}>E-mail de suporte</Typography>
+            <Typography sx={{ color: '#7B2CBF', fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace' }}>suporte@saldoreal.app</Typography>
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
@@ -202,7 +208,7 @@ const Sobre = ({ setRoute }) => {
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 5" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 6" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>
@@ -274,7 +280,7 @@ const Sobre = ({ setRoute }) => {
                 ))}
               </Box>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button variant="contained" size="small" onClick={handleCopyLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', bgcolor: '#3B82F6' }}>
+                <Button variant="contained" size="small" onClick={handleCopyLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', bgcolor: '#7B2CBF' }}>
                   📋 Copiar log
                 </Button>
                 <Button variant="outlined" size="small" onClick={handleClearLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', color: '#EF4444', borderColor: '#EF4444' }}>
@@ -306,7 +312,7 @@ const Sobre = ({ setRoute }) => {
           >
             <Box sx={{ p: 2, textAlign: 'center' }}>
               <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>📬</Typography>
-              <Typography sx={{ color: '#3B82F6', fontWeight: 700, fontSize: '0.9rem' }}>Contato</Typography>
+              <Typography sx={{ color: '#7B2CBF', fontWeight: 700, fontSize: '0.9rem' }}>Contato</Typography>
             </Box>
           </Card>
         </Grid>

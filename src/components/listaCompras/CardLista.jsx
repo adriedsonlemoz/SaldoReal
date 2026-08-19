@@ -19,7 +19,10 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
 
   return (
     <Box
+      role={aberta ? 'button' : undefined} tabIndex={aberta ? 0 : undefined}
+      aria-label={aberta ? `Abrir lista ${lista.nome}` : undefined}
       onClick={aberta ? onClick : undefined}
+      onKeyDown={aberta ? (e) => (e.key === 'Enter' || e.key === ' ') && onClick() : undefined}
       sx={{
         p: 1.45, mb: 1, borderRadius: '18px', bgcolor: 'background.paper',
         border: '1px solid rgba(15,23,42,.07)', cursor: aberta ? 'pointer' : 'default',
@@ -62,16 +65,16 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
           <Button
             size="small" variant="outlined" onClick={(e) => { e.stopPropagation(); onReabrir(); }}
             startIcon={<RestoreRoundedIcon />}
-            sx={{ color: '#7B2CBF', borderColor: 'rgba(123,44,191,.25)', fontSize: '.68rem', px: .8 }}
+            sx={{ color: '#7B2CBF', borderColor: 'rgba(123,44,191,.25)', fontSize: '.7rem', px: .9, minHeight: 40 }}
           >
             Reabrir
           </Button>
         )}
 
         <IconButton
-          size="small"
+          size="small" aria-label={`Excluir lista ${lista.nome}`}
           onClick={(e) => { e.stopPropagation(); onExcluir(); }}
-          sx={{ color: '#CBD5E1', '&:hover': { color: '#EF4444', bgcolor: '#FEF2F2' } }}
+          sx={{ color: '#94A3B8', width: 40, height: 40, '&:hover': { color: '#EF4444', bgcolor: '#FEF2F2' } }}
         >
           <DeleteOutlineIcon sx={{ fontSize: '1rem' }} />
         </IconButton>
@@ -87,10 +90,10 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
             }}
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: .45 }}>
-            <Typography sx={{ fontSize: '.6rem', color: 'text.secondary', fontWeight: 700 }}>
+            <Typography sx={{ fontSize: '.68rem', color: 'text.secondary', fontWeight: 700 }}>
               {pctPago.toFixed(0)}% do orçamento pago
             </Typography>
-            <Typography sx={{ fontSize: '.6rem', color: acima ? '#EF4444' : 'text.secondary', fontWeight: 800 }}>
+            <Typography sx={{ fontSize: '.68rem', color: acima ? '#EF4444' : 'text.secondary', fontWeight: 800 }}>
               Limite {money(orcamento)}
             </Typography>
           </Box>

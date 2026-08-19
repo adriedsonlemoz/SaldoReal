@@ -11,8 +11,8 @@ const SeletorCategoria = ({ value, onChange }) => (
     {CATEGORIAS.map((cat) => {
       const ativo = value === cat.id;
       return (
-        <Box key={cat.id} onClick={() => onChange(cat.id)} sx={{
-          flexShrink: 0, minHeight: 38, px: 1.05, py: .55, borderRadius: '12px', cursor: 'pointer', scrollSnapAlign: 'start',
+        <Box key={cat.id} role="button" tabIndex={0} aria-pressed={ativo} onClick={() => onChange(cat.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onChange(cat.id)} sx={{
+          flexShrink: 0, minHeight: 44, px: 1.05, py: .55, borderRadius: '12px', cursor: 'pointer', scrollSnapAlign: 'start',
           border: '1.5px solid', borderColor: ativo ? '#7B2CBF' : '#E3DCE9',
           bgcolor: ativo ? 'rgba(123,44,191,.09)' : '#fff', display: 'flex', alignItems: 'center', gap: .55,
           boxShadow: ativo ? '0 4px 12px rgba(123,44,191,.08)' : 'none', userSelect: 'none', '&:active': { transform: 'scale(.97)' },

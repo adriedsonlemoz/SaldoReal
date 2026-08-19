@@ -119,7 +119,7 @@ const Relatorio = ({ setRoute }) => {
                       {item.nome || item.empresa}
                     </Typography>
                     {item.origem && ORIGENS[item.origem] && (
-                      <Chip label={ORIGENS[item.origem]} size="small" sx={{ height: 20, fontSize: '0.62rem', fontWeight: 800 }} />
+                      <Chip label={ORIGENS[item.origem]} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800 }} />
                     )}
                   </Box>
                   <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
@@ -140,7 +140,7 @@ const Relatorio = ({ setRoute }) => {
   );
 
   return (
-    <Box sx={{ maxWidth: 620, margin: 'auto', pb: 6, px: 2 }}>
+    <Box sx={{ maxWidth: 620, margin: 'auto', pb: { xs: 1.5, sm: 2.5 }, px: { xs: 1.5, sm: 2 } }}>
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Box sx={{ background: 'linear-gradient(135deg,#2D0B5E,#5A189A)', color: '#fff', px: 3, py: 1.5, borderRadius: '12px', fontWeight: 600 }}>{toast.texto}</Box>
       </Snackbar>
@@ -160,11 +160,11 @@ const Relatorio = ({ setRoute }) => {
       {/* Navegação mês */}
       <Card sx={{ mb: 2, p: 1.5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button onClick={() => setMesOffset(v => v - 1)} sx={{ minWidth: 36, p: 0, fontSize: '1.2rem', color: 'text.primary' }}>◀</Button>
+          <Button aria-label="Mês anterior" onClick={() => setMesOffset(v => v - 1)} sx={{ minWidth: 44, width: 44, height: 44, p: 0, fontSize: '1.2rem', color: 'text.primary', borderRadius: '12px' }}>◀</Button>
           <Typography sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.95rem' }}>
             📄 {FinanceiroUtils.nomeMesOffset(mesOffset)}
           </Typography>
-          <Button onClick={() => setMesOffset(v => v + 1)} sx={{ minWidth: 36, p: 0, fontSize: '1.2rem', color: 'text.primary' }}>▶</Button>
+          <Button aria-label="Próximo mês" onClick={() => setMesOffset(v => v + 1)} sx={{ minWidth: 44, width: 44, height: 44, p: 0, fontSize: '1.2rem', color: 'text.primary', borderRadius: '12px' }}>▶</Button>
         </Box>
       </Card>
 

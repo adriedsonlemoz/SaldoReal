@@ -9,6 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
+import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/moedaInput';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
 import CardLista from './CardLista';
 import { money } from './constants';
@@ -65,15 +66,15 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
 
         <Box sx={{ display: 'flex', gap: 1, mt: 1.4 }}>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Em andamento</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Em andamento</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '1.05rem' }}>{abertas.length}</Typography>
           </Box>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Planejado</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Planejado</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.planejado)}</Typography>
           </Box>
           <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.64rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Já pago</Typography>
+            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Já pago</Typography>
             <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.pago)}</Typography>
           </Box>
         </Box>
@@ -139,9 +140,9 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
             onKeyDown={(e) => e.key === 'Enter' && criar()}
           />
           <TextField
-            fullWidth label="Orçamento (opcional)" value={orcamento}
-            onChange={(e) => setOrcamento(e.target.value)} type="number"
-            inputProps={{ min: 0, step: '.01', inputMode: 'decimal' }}
+            fullWidth label="Orçamento (opcional)" value={formatMoedaInput(orcamento)}
+            onChange={(e) => setOrcamento(parseMoedaInput(e.target.value))}
+            inputProps={propsInputMoeda}
             InputProps={{ startAdornment: <InputAdornment position="start">R$</InputAdornment> }}
           />
         </DialogContent>

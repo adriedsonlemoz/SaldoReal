@@ -55,7 +55,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
             onClick={() => onPagar(item)}
             startIcon={<PaymentsRoundedIcon sx={{ fontSize: '14px !important' }} />}
             sx={{
-              mt: .45, minWidth: 0, px: 1.1, py: .35, borderRadius: '9px', fontSize: '.7rem',
+              mt: .45, minWidth: 68, minHeight: 40, px: 1.1, py: .35, borderRadius: '9px', fontSize: '.7rem',
               background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)',
               boxShadow: 'none', '&:hover': { boxShadow: 'none' },
             }}
@@ -68,7 +68,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
             variant="text"
             onClick={() => onDesfazer(item)}
             startIcon={<UndoRoundedIcon sx={{ fontSize: '13px !important' }} />}
-            sx={{ mt: .25, color: '#64748B', fontSize: '.68rem', p: .2, minWidth: 0 }}
+            sx={{ mt: .25, color: '#64748B', fontSize: '.7rem', minHeight: 40, px: .7, minWidth: 0 }}
           >
             Desfazer
           </Button>
@@ -79,7 +79,7 @@ const ItemRow = ({ item, onPagar, onDesfazer, onRemove }) => {
         size="small"
         onClick={() => onRemove(item)}
         aria-label={`Remover ${item.nome}`}
-        sx={{ color: '#CBD5E1', p: .45, '&:hover': { color: '#EF4444', bgcolor: '#FEF2F2' } }}
+        sx={{ color: '#94A3B8', width: 40, height: 40, '&:hover': { color: '#EF4444', bgcolor: '#FEF2F2' } }}
       >
         <DeleteOutlineIcon sx={{ fontSize: '1.05rem' }} />
       </IconButton>

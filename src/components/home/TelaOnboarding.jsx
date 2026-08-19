@@ -41,7 +41,7 @@ const TelaOnboarding = ({ onConcluir }) => {
   };
 
   if (step === 0) return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3, textAlign: 'center' }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3, textAlign: 'center' }}>
       <Box sx={{ width: 96, height: 96, borderRadius: '28px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', mb: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
         💜
       </Box>
@@ -68,7 +68,7 @@ const TelaOnboarding = ({ onConcluir }) => {
   );
 
   if (step === 1) return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
       <Card sx={{ width: '100%', maxWidth: 380, p: 3.5, borderRadius: '20px', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}>
         <Typography sx={{ fontSize: '1.8rem', mb: 0.5 }}>👋</Typography>
         <Typography sx={{ fontWeight: 800, fontSize: '1.4rem', color: 'text.primary', mb: 0.5 }}>Como você se chama?</Typography>
@@ -83,7 +83,7 @@ const TelaOnboarding = ({ onConcluir }) => {
   );
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
       <Card sx={{ width: '100%', maxWidth: 380, p: 3.5, borderRadius: '20px', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}>
         <Typography sx={{ fontSize: '1.8rem', mb: 0.5 }}>💼</Typography>
         <Typography sx={{ fontWeight: 800, fontSize: '1.4rem', color: 'text.primary', mb: 0.5 }}>Qual é sua renda mensal?</Typography>

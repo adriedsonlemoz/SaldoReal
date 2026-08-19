@@ -413,7 +413,7 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
                 : 'primary.main',
               borderRadius: '14px', overflow: 'hidden',
             }}>
-              <Box onClick={() => toggleExpandir(acordo.id)} sx={{
+              <Box role="button" tabIndex={0} aria-expanded={isExpanded} onClick={() => toggleExpandir(acordo.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleExpandir(acordo.id)} sx={{
                 p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 cursor: 'pointer', bgcolor: isExpanded ? 'rgba(123,44,191,0.05)' : 'background.paper',
               }}>

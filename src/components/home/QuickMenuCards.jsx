@@ -12,7 +12,8 @@ import { money } from './constants';
 
 const BigCard = ({ label, sub, icon, accent, bg, onClick, delay = 0 }) => (
   <Box
-    onClick={onClick}
+    role="button" tabIndex={0} aria-label={label}
+    onClick={onClick} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()}
     sx={{
       borderRadius: '18px',
       background: bg,

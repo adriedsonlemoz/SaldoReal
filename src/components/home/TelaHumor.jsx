@@ -19,7 +19,7 @@ const TelaHumor = ({ nome, onConcluir }) => {
   const primeiroNome = nome.split(' ')[0];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
+    <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>
       <Card sx={{ width: '100%', maxWidth: 380, p: 3.5, borderRadius: '20px', boxShadow: '0 24px 60px rgba(0,0,0,0.25)', textAlign: 'center' }}>
         <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>💬</Typography>
         <Typography sx={{ fontWeight: 800, fontSize: '1.4rem', color: 'text.primary', mb: 0.5 }}>

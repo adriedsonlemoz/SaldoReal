@@ -1,5 +1,15 @@
 # Changelog — SaldoReal
 
+## 1.0.0-beta.6 — Sincronização, edição e revisão de UX
+
+- Corrigida a sincronização ao excluir/desmarcar itens pagos da Lista de Compras, incluindo vínculos legados do Fluxo.
+- Corrigida a tela branca ao editar lançamentos pelo Fluxo e endurecido o carregamento de datas antigas/malformadas.
+- Home recebe novo resumo por categorias, indicadores de ritmo do mês e próximos compromissos.
+- Cadastro de lançamentos permite criar categorias sem sair do formulário.
+- Campos monetários passam a usar digitação automática em centavos e formatação pt-BR.
+- Perfil ampliado com resumo financeiro, dados principais e atalhos úteis.
+- Revisão de responsividade, contraste, áreas de toque, espaçamento e acessibilidade em telas mobile.
+
 ## 1.0.0-beta.5 — UI/UX e Android
 - Revisão visual responsiva com identidade roxa unificada.
 - Home compactada para remover rolagem criada por alturas/paddings redundantes.

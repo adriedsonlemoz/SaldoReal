@@ -187,3 +187,13 @@ O SaldoReal passa a guardar duas referências para pagamentos:
 - **Competência:** mês ao qual a conta/parcela pertence.
 
 Exemplo: uma parcela de fevereiro paga em 28 de janeiro aparece no fluxo de janeiro, mas mantém competência `02/2026`.
+## Regressões beta.6
+
+A suíte passou a cobrir também:
+
+- exclusão de item já pago removendo gasto e movimentação vinculados, inclusive chave legada;
+- edição de lançamento pelo Fluxo sem perda do estado de edição/tela branca;
+- criação de categoria personalizada sem sair do novo lançamento;
+- entrada monetária por centavos (`1990` → `19,90`) em teclado numérico;
+- fluxo E2E Lista → pagar item → Fluxo → remover item → confirmar ausência no Fluxo.
+

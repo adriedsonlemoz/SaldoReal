@@ -46,7 +46,7 @@ const Simulador = ({ acordos }) => {
   }, [simulAcordoId, simulValor, acordos]);
 
   const acordosElegiveis = acordos.filter(a => a.situacao === 'acordo' && a.parcelasPagas < a.parcelas);
-  const fieldBg = { bgcolor: 'rgba(17,138,139,0.05)', '& fieldset': { borderColor: 'primary.main' } };
+  const fieldBg = { bgcolor: 'rgba(123,44,191,0.05)', '& fieldset': { borderColor: 'primary.main' } };
 
   return (
     <Card sx={{ p: { xs: 2, sm: 3 }, border: '2px solid', borderColor: 'primary.main', bgcolor: 'background.paper', borderRadius: '12px' }}>
@@ -75,7 +75,7 @@ const Simulador = ({ acordos }) => {
       )}
 
       {resultado && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: resultado.quitacaoTotal ? 'rgba(34,197,94,0.08)' : 'rgba(17,138,139,0.08)', border: '2px dashed', borderColor: resultado.quitacaoTotal ? 'success.main' : 'primary.main', borderRadius: '8px' }}>
+        <Box sx={{ mt: 2, p: 2, bgcolor: resultado.quitacaoTotal ? 'rgba(34,197,94,0.08)' : 'rgba(123,44,191,0.08)', border: '2px dashed', borderColor: resultado.quitacaoTotal ? 'success.main' : 'primary.main', borderRadius: '8px' }}>
           <Typography sx={{ fontWeight: '900', color: resultado.quitacaoTotal ? 'success.main' : 'primary.main', fontSize: '1.2rem', textTransform: 'uppercase', textAlign: 'center', mb: 2, lineHeight: 1.2 }}>
             {resultado.quitacaoTotal ? '🎉 QUITAÇÃO TOTAL DA DÍVIDA!' : `⏳ AVANÇA ${resultado.qtd} MESES NO TEMPO!`}
           </Typography>
@@ -94,7 +94,7 @@ const Simulador = ({ acordos }) => {
           <Divider sx={{ my: 2 }} />
           <Box sx={{ mb: 2 }}>
             <Typography variant="caption" sx={{ fontWeight: '900', color: 'text.primary', mb: 0.5, display: 'block', textTransform: 'uppercase' }}>Salto no Progresso:</Typography>
-            <Box sx={{ width: '100%', bgcolor: 'rgba(17,138,139,0.15)', borderRadius: '6px', height: '24px', overflow: 'hidden', position: 'relative', display: 'flex' }}>
+            <Box sx={{ width: '100%', bgcolor: 'rgba(123,44,191,0.15)', borderRadius: '6px', height: '24px', overflow: 'hidden', position: 'relative', display: 'flex' }}>
               <Box sx={{ width: `${resultado.progressoAtual}%`, bgcolor: 'primary.main', height: '100%' }} />
               <Box sx={{ width: `${resultado.progressoNovo - resultado.progressoAtual}%`, bgcolor: 'success.main', height: '100%' }} />
               <Typography sx={{ position: 'absolute', top: 0, left: 0, right: 0, textAlign: 'center', fontSize: '0.8rem', fontWeight: '900', color: '#fff', lineHeight: '24px', textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>
@@ -102,7 +102,7 @@ const Simulador = ({ acordos }) => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ bgcolor: 'rgba(17,138,139,0.06)', p: 1, borderRadius: '6px', border: '1px solid', borderColor: 'primary.main', textAlign: 'center' }}>
+          <Box sx={{ bgcolor: 'rgba(123,44,191,0.06)', p: 1, borderRadius: '6px', border: '1px solid', borderColor: 'primary.main', textAlign: 'center' }}>
             <Typography sx={{ fontWeight: 'bold', color: 'text.primary' }}>
               O seu Troco será de: <Box component="span" sx={{ color: 'primary.main', fontWeight: '900', fontSize: '1.1rem' }}>{money(resultado.troco)}</Box>
             </Typography>

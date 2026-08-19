@@ -130,14 +130,21 @@ const ListaComprasService = {
             valor: valorRealDoItem(atualizado),
           };
           await db.gastos.update(gasto.id, alteracoesGasto);
-          const chave = `lista:${item.id}`;
-          const mov = await db.movimentacoes.where('chaveOrigem').equals(chave).first();
-          if (mov) await db.movimentacoes.update(mov.id, {
-            descricao: alteracoesGasto.nome,
-            categoria: alteracoesGasto.categoria,
-            valor: alteracoesGasto.valor,
-            atualizadoEm: new Date().toISOString(),
-          });
+          const movimentos = await db.movimentacoes.toArray();
+          const vinculados = movimentos.filter(m =>
+            m.chaveOrigem === `lista:${item.id}` ||
+            (m.origem === 'lista_compras' && String(m.origemId) === String(item.id)) ||
+            String(m.entidadeId ?? '') === String(gasto.id) ||
+            String(m.referenciaId ?? '') === String(gasto.id)
+          );
+          for (const mov of vinculados) {
+            await db.movimentacoes.update(mov.id, {
+              descricao: alteracoesGasto.nome,
+              categoria: alteracoesGasto.categoria,
+              valor: alteracoesGasto.valor,
+              atualizadoEm: new Date().toISOString(),
+            });
+          }
         }
       }
 
@@ -192,10 +199,9 @@ const ListaComprasService = {
     if (!item) return;
 
     await db.transaction('rw', db.itensLista, db.gastos, db.listas, db.movimentacoes, async () => {
-      const gasto = await this._buscarGastoVinculado(item);
-      if (gasto) await db.gastos.delete(gasto.id);
-      const movimento = await db.movimentacoes.where('chaveOrigem').equals(`lista:${item.id}`).first();
-      if (movimento) await db.movimentacoes.delete(movimento.id);
+      // Remove todos os artefatos financeiros relacionados ao item, inclusive
+      // vínculos criados por versões anteriores do app.
+      await this._removerFinanceiroDoItemTx(item);
 
       await db.itensLista.update(itemId, {
         status: 'pendente',
@@ -212,12 +218,9 @@ const ListaComprasService = {
     if (!item) return;
 
     await db.transaction('rw', db.itensLista, db.gastos, db.listas, db.movimentacoes, async () => {
-      if (item.status === 'comprado') {
-        const gasto = await this._buscarGastoVinculado(item);
-        if (gasto) await db.gastos.delete(gasto.id);
-        const movimento = await db.movimentacoes.where('chaveOrigem').equals(`lista:${item.id}`).first();
-        if (movimento) await db.movimentacoes.delete(movimento.id);
-      }
+      // Não dependemos apenas de status="comprado": um item pode ter sido
+      // parcialmente migrado e ainda possuir gasto/movimentação vinculados.
+      await this._removerFinanceiroDoItemTx(item);
       await db.itensLista.delete(itemId);
       await this._recalcularTotaisTx(item.listaId);
     });
@@ -292,6 +295,32 @@ const ListaComprasService = {
     const gastosLista = await db.gastos.where('origemLista').equals(item.listaId).toArray();
     const nomeEsperado = `🛒 ${item.nome}`;
     return gastosLista.find(g => !g.origemItemLista && g.nome === nomeEsperado) || null;
+  },
+
+  async _removerFinanceiroDoItemTx(item) {
+    const gastosRelacionados = await db.gastos.where('origemItemLista').equals(item.id).toArray();
+    const gastoPorId = item.gastoId ? await db.gastos.get(item.gastoId) : null;
+    if (gastoPorId && !gastosRelacionados.some(g => g.id === gastoPorId.id)) gastosRelacionados.push(gastoPorId);
+
+    // Compatibilidade com beta.2/beta.3: alguns lançamentos só conheciam a lista
+    // e o nome do produto, sem origemItemLista.
+    if (!gastosRelacionados.length) {
+      const legado = await this._buscarGastoVinculado(item);
+      if (legado) gastosRelacionados.push(legado);
+    }
+
+    const gastoIds = new Set(gastosRelacionados.map(g => String(g.id)));
+    const movimentos = await db.movimentacoes.toArray();
+    const idsMovimentos = movimentos.filter(m => {
+      const chaveNova = m.chaveOrigem === `lista:${item.id}`;
+      const origemItem = m.origem === 'lista_compras' && String(m.origemId) === String(item.id);
+      const porEntidade = gastoIds.has(String(m.entidadeId ?? '')) || gastoIds.has(String(m.referenciaId ?? ''));
+      const chaveGastoLegada = [...gastoIds].some(id => String(m.chaveOrigem || '').startsWith(`gasto:${id}:`));
+      return chaveNova || origemItem || porEntidade || chaveGastoLegada;
+    }).map(m => m.id);
+
+    if (idsMovimentos.length) await db.movimentacoes.bulkDelete([...new Set(idsMovimentos)]);
+    if (gastosRelacionados.length) await db.gastos.bulkDelete([...new Set(gastosRelacionados.map(g => g.id))]);
   },
 
   async _recalcularTotaisTx(listaId) {

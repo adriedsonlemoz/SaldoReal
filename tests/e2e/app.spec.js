@@ -8,19 +8,22 @@ import { test, expect } from '@playwright/test';
 // helpers
 // ─────────────────────────────────────────────────────────────────────────────
 async function fazerOnboarding(page, nome = 'Teste Bot') {
-  // Se a tela de onboarding aparecer, preenche
-  const nomeInput = page.locator('input[placeholder*="nome"], input[placeholder*="Nome"]').first();
-  if (await nomeInput.isVisible({ timeout: 3000 }).catch(() => false)) {
+  const comecar = page.getByRole('button', { name: /começar/i }).first();
+  if (await comecar.isVisible({ timeout: 2500 }).catch(() => false)) {
+    await comecar.click();
+  }
+
+  const nomeInput = page.getByLabel('Seu primeiro nome').first();
+  if (await nomeInput.isVisible({ timeout: 2500 }).catch(() => false)) {
     await nomeInput.fill(nome);
-    await page.getByRole('button', { name: /começar|continuar|próximo/i }).first().click();
-    // pular humor se aparecer
-    const skipBtn = page.getByRole('button', { name: /pular|agora não|depois/i }).first();
-    if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await skipBtn.click();
-    } else {
-      // seleciona qualquer humor
-      await page.locator('[class*="humor"], [data-humor]').first().click().catch(() => {});
-      await page.getByRole('button', { name: /confirmar|continuar|salvar/i }).first().click().catch(() => {});
+    await page.getByRole('button', { name: /continuar/i }).click();
+
+    const renda = page.getByLabel(/renda mensal/i).first();
+    if (await renda.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await renda.fill('60000'); // R$ 600,00
+      const dia = page.getByLabel(/dia do recebimento/i).first();
+      if (await dia.isVisible().catch(() => false)) await dia.fill('25');
+      await page.getByRole('button', { name: /entrar no app/i }).click();
     }
   }
 }
@@ -36,27 +39,27 @@ test.describe('Tela Inicial (Home)', () => {
   });
 
   test('exibe o card de saldo restante', async ({ page }) => {
-    await expect(page.getByText('SALDO RESTANTE NO MÊS')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/Saldo disponível/i)).toBeVisible({ timeout: 5000 });
   });
 
   test('botões de acesso rápido estão presentes', async ({ page }) => {
-    await expect(page.getByText('Acordos')).toBeVisible();
+    await expect(page.getByText('Meus Acordos')).toBeVisible();
     await expect(page.getByText('Fluxo')).toBeVisible();
     await expect(page.getByText('Relatório')).toBeVisible();
   });
 
   test('navega para Acordos e volta ao Home', async ({ page }) => {
-    await page.getByText('Acordos').first().click();
+    await page.getByText('Meus Acordos').first().click();
     await expect(page.getByText('Livro Razão')).toBeVisible();
     await page.getByRole('button', { name: /voltar|início/i }).first().click();
-    await expect(page.getByText('SALDO RESTANTE NO MÊS')).toBeVisible();
+    await expect(page.getByText(/Saldo disponível/i)).toBeVisible();
   });
 
   test('navega para Fluxo e volta ao Home', async ({ page }) => {
-    await page.getByText('Fluxo').first().click();
-    await expect(page.getByRole('button', { name: /novo lançamento/i })).toBeVisible();
+    await page.getByRole('button', { name: 'Fluxo' }).click();
+    await expect(page.getByText('Razão financeiro')).toBeVisible();
     await page.getByRole('button', { name: /início/i }).first().click();
-    await expect(page.getByText('SALDO RESTANTE NO MÊS')).toBeVisible();
+    await expect(page.getByText(/Saldo disponível/i)).toBeVisible();
   });
 });
 
@@ -69,7 +72,7 @@ test.describe('Wizard de Novo Acordo', () => {
     await page.goto('/');
     await fazerOnboarding(page);
     // navega para Acordos
-    await page.getByText('Acordos').first().click();
+    await page.getByText('Meus Acordos').first().click();
     await expect(page.getByText('Livro Razão')).toBeVisible();
     // abre wizard
     await page.getByText('Novo', { exact: true }).click();
@@ -172,7 +175,8 @@ test.describe('Lançamento de Gastos', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await fazerOnboarding(page);
-    await page.getByText('Lançamento').first().click();
+    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await page.getByText('Novo Gasto').click();
   });
 
   test('tela de novo lançamento carrega', async ({ page }) => {
@@ -208,6 +212,50 @@ test.describe('Lançamento de Gastos', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// REGRESSÕES — edição pelo Fluxo e categoria criada no lançamento
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Regressões do Fluxo', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await fazerOnboarding(page);
+  });
+
+  test('edita um lançamento pago pelo Fluxo sem abrir tela branca', async ({ page }) => {
+    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await page.getByText('Novo Gasto').click();
+    await page.getByLabel('Descrição').fill('Despesa editável');
+    await page.getByLabel('Valor (R$)').fill('7900');
+    await page.getByRole('button', { name: /^salvar$/i }).click();
+
+    await expect(page.getByText('Razão financeiro')).toBeVisible({ timeout: 5000 });
+    await page.getByRole('button', { name: /marcar despesa editável como pago/i }).click();
+    await page.getByRole('button', { name: /confirmar/i }).click();
+    await expect(page.getByText('Despesa editável')).toBeVisible({ timeout: 4000 });
+
+    await page.getByRole('button', { name: /editar despesa editável/i }).click();
+    await expect(page.getByText('Editar Registro')).toBeVisible({ timeout: 4000 });
+    await expect(page.getByLabel('Descrição')).toHaveValue('Despesa editável');
+    await page.getByLabel('Descrição').fill('Despesa editada');
+    await page.getByRole('button', { name: /atualizar/i }).click();
+
+    await expect(page.getByText('Razão financeiro')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Despesa editada')).toBeVisible({ timeout: 4000 });
+  });
+
+  test('cria categoria sem sair do cadastro e seleciona imediatamente', async ({ page }) => {
+    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await page.getByText('Novo Gasto').click();
+    await page.getByRole('button', { name: /criar nova categoria/i }).click();
+    await page.getByLabel('Nome da categoria').fill('Pets');
+    await page.getByRole('button', { name: /criar e selecionar/i }).click();
+
+    const categoria = page.getByRole('button', { name: 'Pets' });
+    await expect(categoria).toBeVisible();
+    await expect(categoria).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SALDO — verifica que o saldo atualiza após pagar
 // ─────────────────────────────────────────────────────────────────────────────
 test.describe('Saldo restante atualiza após pagamento', () => {
@@ -217,7 +265,8 @@ test.describe('Saldo restante atualiza após pagamento', () => {
     await fazerOnboarding(page);
 
     // adiciona um gasto
-    await page.getByText('Lançamento').first().click();
+    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await page.getByText('Novo Gasto').click();
     await page.getByLabel('Descrição').fill('Conta de luz');
     await page.locator('input[inputmode="numeric"]').first().fill('20000'); // R$ 200
     await page.getByRole('button', { name: /salvar/i }).click();
@@ -225,11 +274,11 @@ test.describe('Saldo restante atualiza após pagamento', () => {
 
     // volta ao home e anota o saldo
     await page.getByRole('button', { name: /início/i }).first().click();
-    const textoSaldoAntes = await page.getByText('SALDO RESTANTE NO MÊS').locator('..').locator('..').textContent();
+    const textoSaldoAntes = await page.getByText(/Saldo disponível/i).locator('..').locator('..').textContent();
 
     // vai para o Fluxo e paga o item
-    await page.getByText('Fluxo').first().click();
-    const btnPagar = page.locator('button').filter({ hasText: '✅' }).first();
+    await page.getByRole('button', { name: 'Fluxo' }).click();
+    const btnPagar = page.getByRole('button', { name: /marcar .* como pago/i }).first();
     if (await btnPagar.isVisible({ timeout: 2000 }).catch(() => false)) {
       await btnPagar.click();
       // confirma se aparecer modal
@@ -245,7 +294,7 @@ test.describe('Saldo restante atualiza após pagamento', () => {
     await page.waitForTimeout(500);
 
     // saldo deve ter mudado (o componente foi remontado com homeKey)
-    const textoSaldoDepois = await page.getByText('SALDO RESTANTE NO MÊS').locator('..').locator('..').textContent();
+    const textoSaldoDepois = await page.getByText(/Saldo disponível/i).locator('..').locator('..').textContent();
     // os textos devem ser diferentes (débito pendente diminuiu)
     expect(textoSaldoAntes).not.toBe(textoSaldoDepois);
   });
@@ -259,7 +308,8 @@ test.describe('Backup', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await fazerOnboarding(page);
-    await page.getByText('Backup').first().click();
+    await page.getByRole('button', { name: /abrir perfil/i }).click();
+    await page.getByRole('button', { name: /backup/i }).click();
   });
 
   test('tela de backup carrega', async ({ page }) => {
@@ -311,5 +361,28 @@ test.describe('Lista de Compras integrada ao financeiro', () => {
 
     await page.getByRole('button', { name: /ver fluxo/i }).click();
     await expect(page.getByText('🛒 Arroz E2E')).toBeVisible({ timeout: 4000 });
+  });
+
+  test('excluir produto já pago remove também o registro do Fluxo', async ({ page }) => {
+    await page.getByRole('button', { name: /nova lista de compras/i }).click();
+    await page.getByLabel('Nome da lista').fill('Mercado Sync');
+    await page.getByRole('button', { name: /criar lista/i }).click();
+    await page.getByRole('button', { name: /adicionar item/i }).click();
+    await page.getByPlaceholder(/carne moída|arroz|detergente/i).fill('Feijão Sync');
+    await page.getByLabel(/R\$ por un/i).fill('1290');
+    await page.getByRole('button', { name: /^adicionar$/i }).click();
+
+    await page.getByRole('button', { name: /^pagar$/i }).click();
+    await page.getByLabel('Valor pago').fill('1190');
+    await page.getByRole('button', { name: /pagar e lançar/i }).click();
+    await expect(page.getByText(/pago e lançado/i)).toBeVisible();
+
+    await page.getByRole('button', { name: /remover feijão sync/i }).click();
+    await expect(page.getByText(/também excluirá/i)).toBeVisible();
+    await page.getByRole('button', { name: /^remover$/i }).click();
+    await expect(page.getByText('Feijão Sync')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Fluxo' }).click();
+    await expect(page.getByText('🛒 Feijão Sync')).toHaveCount(0);
   });
 });

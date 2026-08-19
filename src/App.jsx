@@ -88,7 +88,9 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
     const active = route === id || (id === 'config' && (route === 'sobre' || route === 'backup'));
     return (
       <Box
+        role="button" tabIndex={0} aria-label={label}
         onClick={() => id === 'config' ? setRoute('__config__') : setRoute(id)}
+        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (id === 'config' ? setRoute('__config__') : setRoute(id))}
         sx={{
           flex: 1, py: 0.9, display: 'flex', flexDirection: 'column',
           alignItems: 'center', gap: 0.35, cursor: 'pointer',
@@ -99,7 +101,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       >
         <Icon active={active} />
         <Typography sx={{
-          fontSize: '0.66rem', fontWeight: active ? 800 : 600,
+          fontSize: '0.69rem', fontWeight: active ? 800 : 600,
           color: active ? activeColor(id) : '#9A92A1',
           letterSpacing: '0.1px', lineHeight: 1,
         }}>
@@ -122,7 +124,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       bgcolor: 'background.paper',
       borderTop: '1px solid rgba(0,0,0,0.07)',
       boxShadow: '0 -6px 24px rgba(45,11,94,0.08)',
-      display: 'flex', alignItems: 'center', minHeight: 62,
+      display: 'flex', alignItems: 'center', minHeight: 64,
       pb: 'env(safe-area-inset-bottom, 0px)',
     }}>
       {LEFT.map(item => <NavItem key={item.id} {...item} />)}
@@ -130,7 +132,8 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       {/* FAB central */}
       <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', py: 0.6 }}>
         <Box
-          onClick={onAddPress}
+          role="button" tabIndex={0} aria-label="Adicionar"
+          onClick={onAddPress} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onAddPress()}
           sx={{
             width: 50, height: 50, borderRadius: '16px',
             background: 'linear-gradient(135deg, #7B2CBF 0%, #F72585 100%)',
@@ -267,7 +270,9 @@ const App = () => {
   // Intercepta rota especial __config__
   const handleSetRoute = (r) => {
     if (r === '__config__') { setModalConfig(true); return; }
-    setEditItem(null);
+    // Ao abrir o formulário de edição, preserve o registro selecionado.
+    // Nas demais navegações limpamos o estado para nunca reaproveitar uma edição antiga.
+    if (r !== 'novaConta') setEditItem(null);
     setRoute(r);
   };
 
