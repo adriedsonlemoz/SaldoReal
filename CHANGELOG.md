@@ -1,13 +1,22 @@
-# Changelog — SaldoReal
+# Changelog
 
-## 1.0.0-beta.8.1 — Correção do CI de pré-publicação
+## 1.0.0-beta.8.2
+
+- Corrige o build de produção substituindo o ícone `EcoRounded`, ausente no pacote Material Icons resolvido, por `LocalFloristRounded`.
+- Inclui o `package-lock.json` gerado pelo GitHub Actions para instalações reproduzíveis com `npm ci`.
+- Atualiza `actions/upload-artifact` para v7, eliminando o aviso de runtime Node.js 20 no runner atual.
+- Mantém os 112 testes unitários da beta.8.1 sem alteração de regras financeiras.
+
+ — SaldoReal
+
+## 1.0.0-beta.8.2 — Correção do CI de pré-publicação
 
 - Atualiza os testes legados de acordos para a regra atual de primeiro vencimento.
 - Torna os testes financeiros determinísticos, sem depender do dia em que o CI é executado.
 - Evita tentativa de abrir IndexedDB em ambientes de teste sem essa API.
 - Atualiza checkout/setup-java/setup-node para Actions v5.
 - Publica o `package-lock.json` gerado como artefato quando o repositório ainda não possui lockfile.
-- Android passa a usar `versionCode 9` e `versionName 1.0.0-beta.8.1`.
+- Android passa a usar `versionCode 9` e `versionName 1.0.0-beta.8.2`.
 
 
 ## 1.0.0-beta.8 — Preparação para Google Play

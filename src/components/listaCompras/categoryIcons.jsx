@@ -1,5 +1,5 @@
 import RestaurantRoundedIcon from '@mui/icons-material/RestaurantRounded';
-import EcoRoundedIcon from '@mui/icons-material/EcoRounded';
+import LocalFloristRoundedIcon from '@mui/icons-material/LocalFloristRounded';
 import LocalDrinkRoundedIcon from '@mui/icons-material/LocalDrinkRounded';
 import BakeryDiningRoundedIcon from '@mui/icons-material/BakeryDiningRounded';
 import SportsBarRoundedIcon from '@mui/icons-material/SportsBarRounded';
@@ -11,7 +11,7 @@ import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 
 export const LIST_CATEGORY_ICONS = {
   Carnes: RestaurantRoundedIcon,
-  Hortifruti: EcoRoundedIcon,
+  Hortifruti: LocalFloristRoundedIcon,
   Laticinios: LocalDrinkRoundedIcon,
   Padaria: BakeryDiningRoundedIcon,
   Bebidas: SportsBarRoundedIcon,
