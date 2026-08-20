@@ -229,19 +229,21 @@ db.version(13).stores({
 // Nunca apagamos o banco automaticamente. Em um app financeiro, uma falha de
 // abertura deve preservar os dados para que o usuário ainda possa tentar
 // recuperar/exportar o conteúdo ou corrigir o ambiente.
-export const dbReady = db.open().catch((err) => {
-  console.error('[SaldoRealDB] Erro ao abrir base de dados. Dados preservados:', err);
+export const dbReady = typeof globalThis.indexedDB === 'undefined'
+  ? Promise.resolve(null)
+  : db.open().catch((err) => {
+    console.error('[SaldoRealDB] Erro ao abrir base de dados. Dados preservados:', err);
 
-  // Permite que a interface/telemetria local reaja ao erro sem destruir dados.
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('saldoreal:db-error', {
-      detail: { message: err?.message || 'Falha ao abrir o banco local.' },
-    }));
-  }
+    // Permite que a interface/telemetria local reaja ao erro sem destruir dados.
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('saldoreal:db-error', {
+        detail: { message: err?.message || 'Falha ao abrir o banco local.' },
+      }));
+    }
 
-  // Não relança aqui para evitar uma rejeição global não tratada. As operações
-  // que dependem do banco continuarão retornando seus próprios erros.
-  return null;
-});
+    // Não relança aqui para evitar uma rejeição global não tratada. As operações
+    // que dependem do banco continuarão retornando seus próprios erros.
+    return null;
+  });
 
 export default db;

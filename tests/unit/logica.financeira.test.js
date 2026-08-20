@@ -61,37 +61,35 @@ function registrarPagamento(acordo, qtd) {
 // debitoDoMes
 // ─────────────────────────────────────────────────────────────────────────────
 describe('debitoDoMes()', () => {
-  const mesAtual = new Date();
-  const mesAnoAtual = u.dateParaMesAno(mesAtual);
-  const dataAcordoHoje = mesAtual.toISOString().substr(0, 10);
+  const hoje = new Date(2026, 7, 20); // 20/08/2026
+  const mesAnoAtual = u.dateParaMesAno(hoje);
+  const acordoAtual = {
+    situacao: 'acordo',
+    dataAcordo: '2026-08-10',
+    vencimentoMesAno: '2026-08',
+    vencimentoDia: 25,
+    parcelas: 6,
+    parcelasPagas: 0,
+    historicoPagamentos: [],
+  };
 
   it('conta acordo ativo não pago no mês', () => {
-    const acordos = [{
-      situacao: 'acordo',
-      dataAcordo: dataAcordoHoje,
-      parcelas: 6,
-      parcelasPagas: 0,
-      valorParcela: 300,
-      historicoPagamentos: [],
-    }];
-    expect(debitoDoMes(acordos, [])).toBe(300);
+    const acordos = [{ ...acordoAtual, valorParcela: 300 }];
+    expect(debitoDoMes(acordos, [], hoje)).toBe(300);
   });
 
   it('não conta acordo já pago neste mês', () => {
     const acordos = [{
-      situacao: 'acordo',
-      dataAcordo: dataAcordoHoje,
-      parcelas: 6,
+      ...acordoAtual,
       parcelasPagas: 1,
       valorParcela: 300,
-      historicoPagamentos: [{ data: `01/${mesAnoAtual}`, valorPago: 300 }],
+      historicoPagamentos: [{ parcela: 1, data: `01/${mesAnoAtual}`, valorPago: 300 }],
     }];
-    // parcela paga neste mês → não deve entrar no débito
-    expect(debitoDoMes(acordos, [])).toBe(0);
+    expect(debitoDoMes(acordos, [], hoje)).toBe(0);
   });
 
   it('não conta acordo antes do mês do primeiro vencimento', () => {
-    const hoje = new Date(2026, 1, 20); // fevereiro/2026
+    const fevereiro = new Date(2026, 1, 20);
     const acordos = [{
       situacao: 'acordo',
       dataAcordo: '2026-02-10',
@@ -102,72 +100,41 @@ describe('debitoDoMes()', () => {
       valorParcela: 300,
       historicoPagamentos: [],
     }];
-    expect(debitoDoMes(acordos, [], hoje)).toBe(0);
+    expect(debitoDoMes(acordos, [], fevereiro)).toBe(0);
   });
 
   it('não conta acordo com situação vencida', () => {
-    const acordos = [{
-      situacao: 'vencida',
-      dataAcordo: dataAcordoHoje,
-      parcelas: 6,
-      parcelasPagas: 0,
-      valorParcela: 300,
-      historicoPagamentos: [],
-    }];
-    expect(debitoDoMes(acordos, [])).toBe(0);
+    const acordos = [{ ...acordoAtual, situacao: 'vencida', valorParcela: 300 }];
+    expect(debitoDoMes(acordos, [], hoje)).toBe(0);
   });
 
   it('não conta acordo quitado', () => {
-    const acordos = [{
-      situacao: 'quitado',
-      dataAcordo: dataAcordoHoje,
-      parcelas: 6,
-      parcelasPagas: 6,
-      valorParcela: 300,
-      historicoPagamentos: [],
-    }];
-    expect(debitoDoMes(acordos, [])).toBe(0);
+    const acordos = [{ ...acordoAtual, situacao: 'quitado', parcelasPagas: 6, valorParcela: 300 }];
+    expect(debitoDoMes(acordos, [], hoje)).toBe(0);
   });
 
   it('conta gasto fixo não pago', () => {
-    const gastos = [{
-      tipoOperacao: 'despesa',
-      mesAno: 'fixo',
-      valor: 150,
-      pagos: [],
-    }];
-    expect(debitoDoMes([], gastos)).toBe(150);
+    const gastos = [{ tipoOperacao: 'despesa', mesAno: 'fixo', valor: 150, pagos: [] }];
+    expect(debitoDoMes([], gastos, hoje)).toBe(150);
   });
 
   it('não conta gasto fixo já pago no mês', () => {
-    const gastos = [{
-      tipoOperacao: 'despesa',
-      mesAno: 'fixo',
-      valor: 150,
-      pagos: [mesAnoAtual],
-    }];
-    expect(debitoDoMes([], gastos)).toBe(0);
+    const gastos = [{ tipoOperacao: 'despesa', mesAno: 'fixo', valor: 150, pagos: [mesAnoAtual] }];
+    expect(debitoDoMes([], gastos, hoje)).toBe(0);
   });
 
   it('não conta gasto de entrada como débito', () => {
-    const gastos = [{
-      tipoOperacao: 'entrada',
-      mesAno: mesAnoAtual,
-      valor: 5000,
-      pago: false,
-    }];
-    expect(debitoDoMes([], gastos)).toBe(0);
+    const gastos = [{ tipoOperacao: 'entrada', mesAno: mesAnoAtual, valor: 5000, pago: false }];
+    expect(debitoDoMes([], gastos, hoje)).toBe(0);
   });
 
   it('soma múltiplos acordos e gastos', () => {
     const acordos = [
-      { situacao: 'acordo', dataAcordo: dataAcordoHoje, parcelas: 6, parcelasPagas: 0, valorParcela: 200, historicoPagamentos: [] },
-      { situacao: 'acordo', dataAcordo: dataAcordoHoje, parcelas: 3, parcelasPagas: 0, valorParcela: 100, historicoPagamentos: [] },
+      { ...acordoAtual, valorParcela: 200 },
+      { ...acordoAtual, parcelas: 3, valorParcela: 100 },
     ];
-    const gastos = [
-      { tipoOperacao: 'despesa', mesAno: 'fixo', valor: 500, pagos: [] },
-    ];
-    expect(debitoDoMes(acordos, gastos)).toBe(800);
+    const gastos = [{ tipoOperacao: 'despesa', mesAno: 'fixo', valor: 500, pagos: [] }];
+    expect(debitoDoMes(acordos, gastos, hoje)).toBe(800);
   });
 });
 
@@ -175,25 +142,31 @@ describe('debitoDoMes()', () => {
 // calcularSaldoRestante
 // ─────────────────────────────────────────────────────────────────────────────
 describe('calcularSaldoRestante()', () => {
-  const dataHoje = new Date().toISOString().substr(0, 10);
+  const hoje = new Date(2026, 7, 20);
 
   it('saldo = renda - débitos', () => {
     const acordos = [{
-      situacao: 'acordo', dataAcordo: dataHoje, parcelas: 6, parcelasPagas: 0,
-      valorParcela: 500, historicoPagamentos: [],
+      situacao: 'acordo',
+      dataAcordo: '2026-08-10',
+      vencimentoMesAno: '2026-08',
+      vencimentoDia: 25,
+      parcelas: 6,
+      parcelasPagas: 0,
+      valorParcela: 500,
+      historicoPagamentos: [],
     }];
-    expect(calcularSaldoRestante(3000, acordos, [])).toBe(2500);
+    expect(calcularSaldoRestante(3000, acordos, [], hoje)).toBe(2500);
   });
 
   it('saldo cheio quando não há débitos', () => {
-    expect(calcularSaldoRestante(5000, [], [])).toBe(5000);
+    expect(calcularSaldoRestante(5000, [], [], hoje)).toBe(5000);
   });
 
   it('saldo negativo quando débitos superam renda', () => {
     const gastos = [
-      { tipoOperacao: 'despesa', mesAno: u.dateParaMesAno(new Date()), valor: 2000, pago: false },
+      { tipoOperacao: 'despesa', mesAno: '08/2026', valor: 2000, pago: false },
     ];
-    expect(calcularSaldoRestante(1000, [], gastos)).toBe(-1000);
+    expect(calcularSaldoRestante(1000, [], gastos, hoje)).toBe(-1000);
   });
 });
 

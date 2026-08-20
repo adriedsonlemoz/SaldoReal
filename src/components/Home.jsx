@@ -1,4 +1,4 @@
-// src/components/Home.jsx — beta.8
+// src/components/Home.jsx — beta.8.1
 // Navbar e modais Add/Config removidos daqui — vivem no App.jsx global.
 // Home mantém apenas: TelaPerfil, modal de alertas, conteúdo do dashboard.
 

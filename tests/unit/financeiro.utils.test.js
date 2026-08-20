@@ -82,11 +82,14 @@ describe('parcelasEsperadas()', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// temParcelaNesteMes
+// temParcelaNesteMes — usa situação de acordo + mês real do primeiro vencimento
 // ─────────────────────────────────────────────────────────────────────────────
 describe('temParcelaNesteMes()', () => {
   const acordoAtivo = {
+    situacao: 'acordo',
     dataAcordo: '2026-03-01',
+    vencimentoMesAno: '2026-03',
+    vencimentoDia: 10,
     parcelas: 6,
     parcelasPagas: 0,
   };
@@ -108,15 +111,16 @@ describe('temParcelaNesteMes()', () => {
     expect(u.temParcelaNesteMes(quitado, new Date(2026, 3, 1))).toBe(false);
   });
 
-  it('não tem parcela após o prazo do acordo', () => {
-    // acordo de 3 parcelas começando em março — não deve aparecer em julho
-    const curto = { dataAcordo: '2026-03-01', parcelas: 3, parcelasPagas: 0 };
-    expect(u.temParcelaNesteMes(curto, new Date(2026, 6, 1))).toBe(false);
+  it('mantém parcelas vencidas pendentes mesmo após o prazo do acordo', () => {
+    // O cronograma acabou em maio, mas parcelas não pagas continuam devidas em julho.
+    const curto = { situacao: 'acordo', dataAcordo: '2026-03-01', vencimentoMesAno: '2026-03', vencimentoDia: 10, parcelas: 3, parcelasPagas: 0 };
+    expect(u.temParcelaNesteMes(curto, new Date(2026, 6, 1))).toBe(true);
+    expect(u.quantidadeParcelasDevidasAteMes(curto, new Date(2026, 6, 1))).toBe(3);
   });
 
   it('não tem parcela quando parcelasPagas alcança parcelas esperadas', () => {
     // 1 parcela esperada neste mês, mas já foi paga
-    const parcialPago = { dataAcordo: '2026-03-01', parcelas: 6, parcelasPagas: 1 };
+    const parcialPago = { situacao: 'acordo', dataAcordo: '2026-03-01', vencimentoMesAno: '2026-03', vencimentoDia: 10, parcelas: 6, parcelasPagas: 1 };
     expect(u.temParcelaNesteMes(parcialPago, new Date(2026, 2, 1))).toBe(false);
   });
 });

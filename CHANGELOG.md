@@ -1,5 +1,15 @@
 # Changelog — SaldoReal
 
+## 1.0.0-beta.8.1 — Correção do CI de pré-publicação
+
+- Atualiza os testes legados de acordos para a regra atual de primeiro vencimento.
+- Torna os testes financeiros determinísticos, sem depender do dia em que o CI é executado.
+- Evita tentativa de abrir IndexedDB em ambientes de teste sem essa API.
+- Atualiza checkout/setup-java/setup-node para Actions v5.
+- Publica o `package-lock.json` gerado como artefato quando o repositório ainda não possui lockfile.
+- Android passa a usar `versionCode 9` e `versionName 1.0.0-beta.8.1`.
+
+
 ## 1.0.0-beta.8 — Preparação para Google Play
 
 - Capacitor atualizado de 5 para 8.5.0 e pipeline migrado para Node 22;

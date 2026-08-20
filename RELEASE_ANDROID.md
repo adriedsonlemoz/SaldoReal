@@ -2,7 +2,7 @@
 
 ## Configuração desta versão
 - App ID: `com.saldoreal.app`
-- Version name: `1.0.0-beta.8`
+- Version name: `1.0.0-beta.8.1`
 - Version code: `8`
 - minSdk: 24
 - compileSdk/targetSdk: 36 (Android 16)
@@ -45,8 +45,8 @@ Nunca coloque o `.jks`, senhas ou `keystore.properties` no Git.
 Execute o workflow **Android — APK de teste + AAB Play Store**.
 
 Artefatos esperados:
-- `saldoreal-beta8-debug-apk`: instalação/testes fora da Play Store;
-- `saldoreal-beta8-play-aab`: pacote assinado para o Play Console, quando os secrets estiverem configurados.
+- `saldoreal-beta8-1-debug-apk`: instalação/testes fora da Play Store;
+- `saldoreal-beta8-1-play-aab`: pacote assinado para o Play Console, quando os secrets estiverem configurados.
 
 ## 4. Play App Signing
 Para um app novo, use a Assinatura de Apps do Google Play. A chave deste documento funciona como **chave de upload**; a chave de assinatura de distribuição pode ser gerenciada pelo Google Play.

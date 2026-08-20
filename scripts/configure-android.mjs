@@ -67,8 +67,8 @@ fs.writeFileSync(variablesPath, vars);
 // Versionamento Play Store.
 let appGradle = fs.readFileSync(appGradlePath, 'utf8');
 appGradle = appGradle
-  .replace(/versionCode\s*(?:=\s*)?\d+/, 'versionCode 8')
-  .replace(/versionName\s*(?:=\s*)?["'][^"']+["']/, 'versionName "1.0.0-beta.8"');
+  .replace(/versionCode\s*(?:=\s*)?\d+/, 'versionCode 9')
+  .replace(/versionName\s*(?:=\s*)?["'][^"']+["']/, 'versionName "1.0.0-beta.8.1"');
 
 // Assinatura opcional via android/keystore.properties, criada apenas no CI.
 const signingApply = "apply from: 'saldoreal-signing.gradle'";
@@ -93,4 +93,4 @@ manifest = manifest.replace(/<application\b([^>]*)>/, (full, attrs) => {
 });
 fs.writeFileSync(manifestPath, manifest);
 
-console.log('Android do SaldoReal preparado: API 36, versionCode 8, barras do sistema e hardening aplicados.');
+console.log('Android do SaldoReal preparado: API 36, versionCode 9, barras do sistema e hardening aplicados.');
