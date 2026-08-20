@@ -1,5 +1,17 @@
 # Changelog — SaldoReal
 
+## 1.0.0-beta.7 — Polimento visual e consistência de interface
+
+- identidade visual consolidada em roxo/violeta, reservando verde e vermelho para significado financeiro;
+- Home refinada com saldo mais limpo, gráfico de categorias compacto, cards rápidos consistentes e indicadores de ritmo do mês;
+- Novo Lançamento compactado, com categorias vetoriais, seletores mais claros e melhor uso em telas estreitas;
+- Fluxo reorganizado para leitura em três zonas, filtros mais consistentes e ações com áreas de toque adequadas;
+- Lista de Compras alinhada à identidade geral, com cartões, estados vazios, categorias e unidades mais coerentes;
+- Acordos e Relatórios receberam a mesma linguagem de cards, navegação, ícones e espaçamento;
+- tipografia, bordas, sombras, campos, diálogos e espaçamentos globais padronizados;
+- barra inferior e botão central refinados para reduzir peso visual;
+- melhorias de acessibilidade, foco, redução de movimento e responsividade para Android compacto.
+
 ## 1.0.0-beta.6 — Sincronização, edição e revisão de UX
 
 - Corrigida a sincronização ao excluir/desmarcar itens pagos da Lista de Compras, incluindo vínculos legados do Fluxo.

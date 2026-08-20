@@ -5,6 +5,10 @@ import React, { useState, useEffect } from 'react';
 import Box        from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button     from '@mui/material/Button';
+import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import CalculateRoundedIcon from '@mui/icons-material/CalculateRounded';
+import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
 
 import { useAcordos }    from '../hooks/useAcordos';
 import Carteira          from './Carteira';
@@ -14,29 +18,23 @@ import Simulador         from './Simulador';
 // ─────────────────────────────────────────────────────────────────────────────
 // Tab item
 // ─────────────────────────────────────────────────────────────────────────────
-const TabBtn = ({ label, icon, active, onClick, accent = '#7B2CBF' }) => (
-  <Box role="button" tabIndex={0} aria-pressed={active} onClick={onClick} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()} sx={{
-    flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-    gap: 0.4, py: 1.1, px: 0.5, cursor: 'pointer',
-    borderRadius: '12px',
-    bgcolor: active ? `${accent}14` : 'transparent',
-    border: active ? `1.5px solid ${accent}30` : '1.5px solid transparent',
-    transition: 'all 0.18s',
-    userSelect: 'none',
-    WebkitTapHighlightColor: 'transparent',
-    '&:active': { transform: 'scale(0.95)' },
-  }}>
-    <Typography sx={{ fontSize: '1.1rem', lineHeight: 1 }}>{icon}</Typography>
-    <Typography sx={{
-      fontSize: '0.66rem', fontWeight: active ? 800 : 600,
-      color: active ? accent : 'text.secondary',
-      letterSpacing: '0.2px',
-    }}>
-      {label}
-    </Typography>
-    {active && (
-      <Box sx={{ width: 20, height: 2.5, borderRadius: 2, bgcolor: accent, mt: 0.2 }} />
-    )}
+const TabBtn = ({ label, Icon, active, onClick }) => (
+  <Box
+    role="button" tabIndex={0} aria-pressed={active}
+    onClick={onClick}
+    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()}
+    sx={{
+      flex: 1, minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      gap: .6, px: .8, cursor: 'pointer', borderRadius: '12px',
+      bgcolor: active ? 'primary.main' : 'transparent',
+      color: active ? '#fff' : 'text.secondary',
+      transition: 'background-color .16s ease, color .16s ease, transform .12s ease',
+      userSelect: 'none', WebkitTapHighlightColor: 'transparent',
+      '&:active': { transform: 'scale(.98)' },
+    }}
+  >
+    <Icon sx={{ fontSize: '1.08rem' }} />
+    <Typography sx={{ fontSize: '.72rem', fontWeight: 850, color: 'inherit' }}>{label}</Typography>
   </Box>
 );
 
@@ -95,13 +93,13 @@ const Acordos = ({ setRoute }) => {
     s + (parseInt(a.parcelas || 0) - parseInt(a.parcelasPagas || 0)) * (a.valorParcela || 0), 0);
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', px: 2, pt: 2 }}>
+    <Box sx={{ maxWidth: 600, margin: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.2, pb: 1.5 }}>
 
       {/* ── HEADER CARD ──────────────────────────────────────────────── */}
       <Box sx={{
-        borderRadius: '20px', overflow: 'hidden', mb: 2,
+        borderRadius: '22px', overflow: 'hidden', mb: 1.2,
         background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 50%, #6B1FA8 100%)',
-        boxShadow: '0 8px 28px rgba(107,31,168,0.35)',
+        boxShadow: '0 10px 28px rgba(45,11,94,.18)',
         position: 'relative', p: 0,
       }}>
         {/* Orb decorativo */}
@@ -127,15 +125,15 @@ const Acordos = ({ setRoute }) => {
                 Acordos & Dívidas
               </Typography>
             </Box>
-            <Typography sx={{ fontSize: '1.6rem' }}>🤝</Typography>
+            <Box sx={{ width: 42, height: 42, borderRadius: '13px', bgcolor: 'rgba(255,255,255,.10)', display: 'grid', placeItems: 'center' }}><HandshakeRoundedIcon /></Box>
           </Box>
 
           {/* Stats 3 colunas */}
           <Box sx={{ display: 'flex', gap: 1 }}>
             {[
-              { label: 'Ativos',   valor: ativos.length,   cor: '#A78BFA', bg: 'rgba(167,139,250,0.15)', borda: 'rgba(167,139,250,0.3)' },
-              { label: 'Vencidas', valor: vencidas.length, cor: '#FB7185', bg: 'rgba(251,113,133,0.15)', borda: 'rgba(251,113,133,0.3)' },
-              { label: 'Quitados', valor: quitados.length, cor: '#4ADE80', bg: 'rgba(74,222,128,0.15)',  borda: 'rgba(74,222,128,0.3)'  },
+              { label: 'Ativos', valor: ativos.length, cor: '#D8B4FE', bg: 'rgba(255,255,255,.08)', borda: 'rgba(255,255,255,.10)' },
+              { label: 'Vencidas', valor: vencidas.length, cor: '#FDA4AF', bg: 'rgba(255,255,255,.08)', borda: 'rgba(255,255,255,.10)' },
+              { label: 'Quitados', valor: quitados.length, cor: '#86EFAC', bg: 'rgba(255,255,255,.08)', borda: 'rgba(255,255,255,.10)' },
             ].map(s => (
               <Box key={s.label} sx={{
                 flex: 1, textAlign: 'center', py: 0.9,
@@ -171,15 +169,15 @@ const Acordos = ({ setRoute }) => {
 
       {/* ── ABAS ─────────────────────────────────────────────────────── */}
       <Box sx={{
-        display: 'flex', gap: 0.8, mb: 2,
+        display: 'flex', gap: .35, mb: 1.25,
         bgcolor: 'background.paper', borderRadius: '16px',
-        p: 0.8,
+        p: .4,
         border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+        boxShadow: '0 4px 14px rgba(45,11,94,.045)',
       }}>
-        <TabBtn label="Carteira"   icon="💼" active={abaGeral === 'carteira'}  onClick={() => setAbaGeral('carteira')}  accent="#7B2CBF" />
-        <TabBtn label="Novo"       icon="➕" active={false}                    onClick={abrirNovo}                      accent="#F72585" />
-        <TabBtn label="Simulador"  icon="📊" active={abaGeral === 'simulador'} onClick={() => setAbaGeral('simulador')} accent="#8B5CF6" />
+        <TabBtn label="Carteira" Icon={AccountBalanceWalletRoundedIcon} active={abaGeral === 'carteira'} onClick={() => setAbaGeral('carteira')} />
+        <TabBtn label="Novo" Icon={AddRoundedIcon} active={false} onClick={abrirNovo} />
+        <TabBtn label="Simulador" Icon={CalculateRoundedIcon} active={abaGeral === 'simulador'} onClick={() => setAbaGeral('simulador')} />
       </Box>
 
       {/* ── CONTEÚDO ─────────────────────────────────────────────────── */}

@@ -6,6 +6,9 @@ import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider';
+import CalculateRoundedIcon from '@mui/icons-material/CalculateRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
 
 const money = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
 
@@ -49,9 +52,9 @@ const Simulador = ({ acordos }) => {
   const fieldBg = { bgcolor: 'rgba(123,44,191,0.05)', '& fieldset': { borderColor: 'primary.main' } };
 
   return (
-    <Card sx={{ p: { xs: 2, sm: 3 }, border: '2px solid', borderColor: 'primary.main', bgcolor: 'background.paper', borderRadius: '12px' }}>
-      <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 1 }}>🧮 Simular Antecipação</Typography>
-      <Typography sx={{ mb: 3, color: 'text.secondary', fontSize: '0.85rem', lineHeight: 1.4 }}>
+    <Card sx={{ p: { xs: 1.4, sm: 2 }, bgcolor: 'background.paper', borderRadius: '18px', boxShadow: 'none' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: .75, mb: .35 }}><Box sx={{ width: 36, height: 36, borderRadius: '11px', bgcolor: 'rgba(123,44,191,.07)', color: 'primary.main', display: 'grid', placeItems: 'center' }}><CalculateRoundedIcon /></Box><Typography sx={{ fontWeight: 900, fontSize: '.92rem' }}>Simular antecipação</Typography></Box>
+      <Typography sx={{ mb: 1.5, color: 'text.secondary', fontSize: '.76rem', lineHeight: 1.4 }}>
         Descubra quanto tempo de dívida consegue eliminar se injetar um valor extra (13º salário, bônus, renda extra).
       </Typography>
 
@@ -75,9 +78,9 @@ const Simulador = ({ acordos }) => {
       )}
 
       {resultado && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: resultado.quitacaoTotal ? 'rgba(34,197,94,0.08)' : 'rgba(123,44,191,0.08)', border: '2px dashed', borderColor: resultado.quitacaoTotal ? 'success.main' : 'primary.main', borderRadius: '8px' }}>
-          <Typography sx={{ fontWeight: '900', color: resultado.quitacaoTotal ? 'success.main' : 'primary.main', fontSize: '1.2rem', textTransform: 'uppercase', textAlign: 'center', mb: 2, lineHeight: 1.2 }}>
-            {resultado.quitacaoTotal ? '🎉 QUITAÇÃO TOTAL DA DÍVIDA!' : `⏳ AVANÇA ${resultado.qtd} MESES NO TEMPO!`}
+        <Box sx={{ mt: 1.2, p: 1.35, bgcolor: resultado.quitacaoTotal ? 'rgba(34,197,94,0.08)' : 'rgba(123,44,191,0.08)', border: '1px solid', borderColor: resultado.quitacaoTotal ? 'success.main' : 'primary.main', borderRadius: '8px' }}>
+          <Typography sx={{ fontWeight: '900', color: resultado.quitacaoTotal ? 'success.main' : 'primary.main', fontSize: '.9rem', textTransform: 'uppercase', textAlign: 'center', mb: 2, lineHeight: 1.2 }}>
+            {resultado.quitacaoTotal ? <><CheckCircleRoundedIcon sx={{ mr: .45, verticalAlign: 'middle', fontSize: 18 }} /> Quitação total da dívida</> : <><FastForwardRoundedIcon sx={{ mr: .45, verticalAlign: 'middle', fontSize: 18 }} /> Avança {resultado.qtd} meses</>}
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={6} sx={{ textAlign: 'center', borderRight: '1px solid', borderColor: 'divider' }}>

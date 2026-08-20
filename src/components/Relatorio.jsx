@@ -6,38 +6,52 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Snackbar from '@mui/material/Snackbar';
 import Chip from '@mui/material/Chip';
+import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
+import TrendingDownRoundedIcon from '@mui/icons-material/TrendingDownRounded';
+import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import ScheduleRoundedIcon from '@mui/icons-material/ScheduleRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import InboxRoundedIcon from '@mui/icons-material/InboxRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
+import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
 
 import FinanceiroUtils from '../utils/financeiro';
 import FinanceiroService from '../services/FinanceiroService';
 
 const money = (v) => FinanceiroUtils.money(v);
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const ORIGENS = { manual: '✍️ Manual', lista_compras: '🛒 Compras', acordo: '🤝 Acordo', renda: '💰 Renda' };
+const ORIGENS = { manual: { label: 'Manual', Icon: EditNoteRoundedIcon }, lista_compras: { label: 'Compras', Icon: ShoppingCartRoundedIcon }, acordo: { label: 'Acordo', Icon: HandshakeRoundedIcon }, renda: { label: 'Renda', Icon: SavingsRoundedIcon } };
 
 const GraficoBarras = ({ dados }) => {
   const maxVal = Math.max(...dados.map(d => Math.max(d.entradas, d.saidas)), 1);
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: { xs: '4px', sm: '8px' }, height: 160, px: 1, pb: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: { xs: .45, sm: .8 }, height: 142, px: .25, pb: .8 }}>
         {dados.map((d, i) => {
-          const hEnt = Math.round((d.entradas / maxVal) * 140);
-          const hSai = Math.round((d.saidas   / maxVal) * 140);
+          const hEnt = Math.round((d.entradas / maxVal) * 112);
+          const hSai = Math.round((d.saidas / maxVal) * 112);
           return (
-            <Box key={i} sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: 140 }}>
-                <Box title={`Entradas: ${money(d.entradas)}`} sx={{ width: { xs: '10px', sm: '14px' }, height: `${hEnt}px`, bgcolor: '#22C55E', borderRadius: '3px 3px 0 0', minHeight: d.entradas > 0 ? 3 : 0 }} />
-                <Box title={`Saídas: ${money(d.saidas)}`}     sx={{ width: { xs: '10px', sm: '14px' }, height: `${hSai}px`, bgcolor: '#EF4444', borderRadius: '3px 3px 0 0', minHeight: d.saidas  > 0 ? 3 : 0 }} />
+            <Box key={i} sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: .35 }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: .25, height: 112, width: '100%' }}>
+                <Box title={`Entradas: ${money(d.entradas)}`} sx={{ width: { xs: 8, sm: 12 }, height: `${hEnt}px`, bgcolor: 'success.main', borderRadius: '5px 5px 2px 2px', minHeight: d.entradas > 0 ? 3 : 0 }} />
+                <Box title={`Saídas: ${money(d.saidas)}`} sx={{ width: { xs: 8, sm: 12 }, height: `${hSai}px`, bgcolor: 'error.main', borderRadius: '5px 5px 2px 2px', minHeight: d.saidas > 0 ? 3 : 0 }} />
               </Box>
-              <Typography sx={{ fontSize: { xs: '0.64rem', sm: '0.68rem' }, fontWeight: 700, color: 'text.secondary', mt: 0.5 }}>{d.label}</Typography>
+              <Typography sx={{ fontSize: { xs: '.61rem', sm: '.67rem' }, fontWeight: 750, color: 'text.secondary' }}>{d.label}</Typography>
             </Box>
           );
         })}
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 1.5 }}>
-        {[{ cor: '#22C55E', label: 'Entradas' }, { cor: '#EF4444', label: 'Saídas' }].map(l => (
-          <Box key={l.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            <Box sx={{ width: 10, height: 10, bgcolor: l.cor, borderRadius: '3px' }} />
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>{l.label}</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2.4, pt: .8, borderTop: '1px solid', borderColor: 'divider' }}>
+        {[{ cor: 'success.main', label: 'Entradas' }, { cor: 'error.main', label: 'Saídas' }].map(l => (
+          <Box key={l.label} sx={{ display: 'flex', alignItems: 'center', gap: .55 }}>
+            <Box sx={{ width: 8, height: 8, bgcolor: l.cor, borderRadius: '50%' }} />
+            <Typography sx={{ fontSize: '.7rem', fontWeight: 700, color: 'text.secondary' }}>{l.label}</Typography>
           </Box>
         ))}
       </Box>
@@ -92,8 +106,8 @@ const Relatorio = ({ setRoute }) => {
     }
     txt += '\n📱 Gerado por SaldoReal';
     navigator.clipboard.writeText(txt)
-      .then(() => setToast({ open: true, texto: '📋 Relatório copiado!' }))
-      .catch(() => setToast({ open: true, texto: '❌ Erro ao copiar.' }));
+      .then(() => setToast({ open: true, texto: 'Relatório copiado!' }))
+      .catch(() => setToast({ open: true, texto: 'Não foi possível copiar.' }));
   };
 
   const saldo     = dados ? dados.totalEnt - dados.totalSai : 0;
@@ -101,26 +115,27 @@ const Relatorio = ({ setRoute }) => {
 
   const SecaoLista = ({ titulo, itens, cor }) => (
     itens.length > 0 && (
-      <Card sx={{ mb: 2, overflow: 'hidden', border: `1.5px solid ${cor}20` }}>
-        <Box sx={{ bgcolor: cor, p: 1.2, px: 2, display: 'flex', justifyContent: 'space-between' }}>
-          <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>{titulo}</Typography>
-          <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
+      <Card sx={{ mb: 1.1, overflow: 'hidden', border: `1px solid ${cor}18`, boxShadow: 'none' }}>
+        <Box sx={{ bgcolor: `${cor}0D`, p: 1.05, px: 1.35, display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${cor}12` }}>
+          <Typography sx={{ color: cor, fontWeight: 900, fontSize: '.78rem', textTransform: 'uppercase', letterSpacing: '.45px' }}>{titulo}</Typography>
+          <Typography sx={{ color: cor, fontWeight: 900, fontSize: '.8rem' }}>
             {money(itens.reduce((s, i) => s + (i.valorFluxo ?? i.valor ?? i.valorParcela ?? 0), 0))}
           </Typography>
         </Box>
-        <Box sx={{ p: 1.5 }}>
+        <Box sx={{ px: 1.2, py: .55 }}>
           {itens.map((item, i) => (
-            <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.8, borderBottom: i < itens.length - 1 ? '1px dashed' : 'none', borderColor: 'divider' }}>
+            <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: .75, borderBottom: i < itens.length - 1 ? '1px dashed' : 'none', borderColor: 'divider' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography>{item._pago ? '✅' : '⏳'}</Typography>
+                <Box sx={{ width: 30, height: 30, borderRadius: '10px', display: 'grid', placeItems: 'center', bgcolor: item._pago ? 'rgba(17,156,114,.08)' : 'rgba(123,44,191,.06)', color: item._pago ? 'success.main' : 'primary.main', flexShrink: 0 }}>{item._pago ? <CheckCircleRoundedIcon sx={{ fontSize: '1rem' }} /> : <ScheduleRoundedIcon sx={{ fontSize: '1rem' }} />}</Box>
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
                     <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', color: 'text.primary', textDecoration: item._pago ? 'line-through' : 'none' }}>
                       {item.nome || item.empresa}
                     </Typography>
-                    {item.origem && ORIGENS[item.origem] && (
-                      <Chip label={ORIGENS[item.origem]} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800 }} />
-                    )}
+                    {item.origem && ORIGENS[item.origem] && (() => {
+                      const OrigemIcon = ORIGENS[item.origem].Icon;
+                      return <Chip icon={<OrigemIcon />} label={ORIGENS[item.origem].label} size="small" sx={{ height: 22, fontSize: '.64rem', fontWeight: 800, bgcolor: 'rgba(123,44,191,.055)', color: 'primary.main', '& .MuiChip-icon': { color: 'inherit', fontSize: '.9rem' } }} />;
+                    })()}
                   </Box>
                   <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
                     {item.empresa
@@ -140,17 +155,18 @@ const Relatorio = ({ setRoute }) => {
   );
 
   return (
-    <Box sx={{ maxWidth: 620, margin: 'auto', pb: { xs: 1.5, sm: 2.5 }, px: { xs: 1.5, sm: 2 } }}>
+    <Box sx={{ maxWidth: 620, margin: 'auto', pt: 1.1, pb: { xs: 1.2, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Box sx={{ background: 'linear-gradient(135deg,#2D0B5E,#5A189A)', color: '#fff', px: 3, py: 1.5, borderRadius: '12px', fontWeight: 600 }}>{toast.texto}</Box>
       </Snackbar>
 
       {/* Gráfico */}
-      <Card sx={{ mb: 2, overflow: 'hidden' }}>
-        <Box sx={{ bgcolor: 'primary.main', p: 1.2, px: 2 }}>
-          <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>📊 Evolução — Últimos 6 meses</Typography>
+      <Card sx={{ mb: 1.2, overflow: 'hidden' }}>
+        <Box sx={{ p: 1.35, pb: .4, display: 'flex', alignItems: 'center', gap: .8 }}>
+          <Box sx={{ width: 34, height: 34, borderRadius: '11px', bgcolor: 'rgba(123,44,191,.07)', color: 'primary.main', display: 'grid', placeItems: 'center' }}><InsightsRoundedIcon sx={{ fontSize: '1.05rem' }} /></Box>
+          <Box><Typography sx={{ fontWeight: 900, fontSize: '.88rem' }}>Evolução financeira</Typography><Typography sx={{ fontSize: '.68rem', color: 'text.secondary' }}>Entradas e saídas dos últimos 6 meses</Typography></Box>
         </Box>
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 1.35, pt: .8 }}>
           {dadosGrafico.length > 0
             ? <GraficoBarras dados={dadosGrafico} />
             : <Typography sx={{ textAlign: 'center', color: 'text.secondary', py: 3 }}>Sem dados suficientes.</Typography>}
@@ -158,31 +174,29 @@ const Relatorio = ({ setRoute }) => {
       </Card>
 
       {/* Navegação mês */}
-      <Card sx={{ mb: 2, p: 1.5 }}>
+      <Card sx={{ mb: 1.2, p: .65 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button aria-label="Mês anterior" onClick={() => setMesOffset(v => v - 1)} sx={{ minWidth: 44, width: 44, height: 44, p: 0, fontSize: '1.2rem', color: 'text.primary', borderRadius: '12px' }}>◀</Button>
-          <Typography sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.95rem' }}>
-            📄 {FinanceiroUtils.nomeMesOffset(mesOffset)}
-          </Typography>
-          <Button aria-label="Próximo mês" onClick={() => setMesOffset(v => v + 1)} sx={{ minWidth: 44, width: 44, height: 44, p: 0, fontSize: '1.2rem', color: 'text.primary', borderRadius: '12px' }}>▶</Button>
+          <Button aria-label="Mês anterior" onClick={() => setMesOffset(v => v - 1)} sx={{ minWidth: 42, width: 42, height: 42, p: 0, color: 'text.secondary', borderRadius: '12px' }}><ArrowBackIosNewRoundedIcon sx={{ fontSize: '1rem' }} /></Button>
+          <Box sx={{ textAlign: 'center' }}><Typography sx={{ fontSize: '.61rem', fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '.7px' }}>Período</Typography><Typography sx={{ fontWeight: 900, color: 'text.primary', fontSize: '.9rem' }}>{FinanceiroUtils.nomeMesOffset(mesOffset)}</Typography></Box>
+          <Button aria-label="Próximo mês" onClick={() => setMesOffset(v => v + 1)} sx={{ minWidth: 42, width: 42, height: 42, p: 0, color: 'text.secondary', borderRadius: '12px' }}><ArrowForwardIosRoundedIcon sx={{ fontSize: '1rem' }} /></Button>
         </Box>
       </Card>
 
       {dados && (
         <>
           {/* Resumo */}
-          <Card sx={{ mb: 2, overflow: 'hidden' }}>
-            <Box sx={{ background: 'linear-gradient(135deg,#2D0B5E,#5A189A)', p: 1.2, px: 2 }}>
-              <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>💰 Resumo do mês</Typography>
+          <Card sx={{ mb: 1.2, overflow: 'hidden' }}>
+            <Box sx={{ px: 1.4, pt: 1.25, pb: .75, display: 'flex', alignItems: 'center', gap: .7 }}>
+              <AccountBalanceWalletRoundedIcon sx={{ color: 'primary.main', fontSize: '1.15rem' }} /><Typography sx={{ fontWeight: 900, fontSize: '.88rem' }}>Resumo do mês</Typography>
             </Box>
             <Grid container>
               {[
-                { label: 'Entradas Prev.',  val: dados.totalEnt,  cor: '#22C55E', border: true  },
-                { label: 'Saídas Prev.',    val: dados.totalSai,  cor: '#EF4444', border: false },
-                { label: 'Saldo Previsto',  val: saldo,           cor: saldo     >= 0 ? 'primary.main' : '#EF4444', border: true,  bg: true },
-                { label: 'Saldo Pago',      val: saldoPago,       cor: saldoPago >= 0 ? 'primary.main' : '#EF4444', border: false, bg: true },
+                { label: 'Entradas previstas', val: dados.totalEnt, cor: 'success.main', border: true },
+                { label: 'Saídas previstas', val: dados.totalSai, cor: 'error.main', border: false },
+                { label: 'Saldo Previsto',  val: saldo,           cor: saldo >= 0 ? 'primary.main' : 'error.main', border: true,  bg: true },
+                { label: 'Saldo Pago',      val: saldoPago,       cor: saldoPago >= 0 ? 'primary.main' : 'error.main', border: false, bg: true },
               ].map((c, i) => (
-                <Grid item xs={6} key={i} sx={{ p: 1.5, textAlign: 'center', borderRight: c.border ? '1px solid' : 'none', borderTop: c.bg ? '1px solid' : 'none', borderColor: 'divider', bgcolor: c.bg ? '#F8FAFC' : 'transparent' }}>
+                <Grid item xs={6} key={i} sx={{ p: 1.2, textAlign: 'center', borderRight: c.border ? '1px solid' : 'none', borderTop: c.bg ? '1px solid' : 'none', borderColor: 'divider', bgcolor: c.bg ? 'rgba(123,44,191,.025)' : 'transparent' }}>
                   <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: c.cor, textTransform: 'uppercase', mb: 0.3 }}>{c.label}</Typography>
                   <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: c.cor }}>{money(c.val)}</Typography>
                 </Grid>
@@ -191,32 +205,26 @@ const Relatorio = ({ setRoute }) => {
           </Card>
 
           <SecaoLista
-            titulo="🔺 Entradas"
+            titulo="Entradas"
             itens={[...dados.entradasPagas.map(g => ({...g, _pago: true})), ...dados.entradas.map(g => ({...g, _pago: false}))]}
-            cor="#22C55E"
+            cor="#119C72"
           />
           <SecaoLista
-            titulo="🔻 Gastos mensais"
+            titulo="Gastos mensais"
             itens={[...dados.despesasPagas.map(g => ({...g, _pago: true})), ...dados.despesas.map(g => ({...g, _pago: false}))]}
-            cor="#EF4444"
+            cor="#E54862"
           />
           <SecaoLista
-            titulo="🤝 Acordos"
+            titulo="Acordos"
             itens={[...dados.acordosPagos.map(a => ({...a, _pago: true})), ...dados.acordosPendentes.map(a => ({...a, _pago: false}))]}
             cor="#7B2CBF"
           />
 
           {dados.totalEnt === 0 && dados.totalSai === 0 && dados.acordosPendentes.length === 0 && dados.acordosPagos.length === 0 && (
-            <Box sx={{ textAlign: 'center', py: 5 }}>
-              <Typography sx={{ fontSize: '3rem' }}>📭</Typography>
-              <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>Nenhum lançamento neste mês.</Typography>
-            </Box>
+            <Box sx={{ textAlign: 'center', py: 3 }}><InboxRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main', opacity: .7 }} /><Typography sx={{ mt: .5, fontWeight: 800 }}>Nenhum lançamento neste mês</Typography><Typography sx={{ fontSize: '.74rem', color: 'text.secondary', mt: .2 }}>Quando houver movimentações, o resumo aparece aqui.</Typography></Box>
           )}
 
-          <Button fullWidth variant="contained" onClick={copiarRelatorio}
-            sx={{ py: 1.5, fontWeight: 700, borderRadius: '12px', mt: 1 }}>
-            📋 Copiar relatório (WhatsApp / E-mail)
-          </Button>
+          <Button fullWidth variant="outlined" startIcon={<ContentCopyRoundedIcon />} onClick={copiarRelatorio} sx={{ minHeight: 46, fontWeight: 850, borderRadius: '14px', mt: 1 }}>Copiar relatório</Button>
         </>
       )}
     </Box>

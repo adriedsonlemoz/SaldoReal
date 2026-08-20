@@ -12,6 +12,20 @@ import DialogActions  from '@mui/material/DialogActions';
 import Snackbar   from '@mui/material/Snackbar';
 import Alert      from '@mui/material/Alert';
 import Chip       from '@mui/material/Chip';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
+import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import CategoryIcon from '../ui/categoryIcons';
+import InboxRoundedIcon from '@mui/icons-material/InboxRounded';
+import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 
 import FinanceiroUtils  from '../utils/financeiro';
 import FinanceiroService from '../services/FinanceiroService';
@@ -29,189 +43,73 @@ const IcoChevron = ({ left }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Card de item individual
+// Card de item individual — leitura em três zonas: origem, contexto, valor/ação.
 // ─────────────────────────────────────────────────────────────────────────────
+const ORIGENS = {
+  manual: { label: 'Manual', Icon: EditNoteRoundedIcon, color: '#7B2CBF' },
+  lista_compras: { label: 'Compras', Icon: ShoppingCartRoundedIcon, color: '#8C48C8' },
+  acordo: { label: 'Acordo', Icon: HandshakeRoundedIcon, color: '#7B2CBF' },
+  renda: { label: 'Renda', Icon: SavingsRoundedIcon, color: '#119C72' },
+};
+
+const ActionButton = ({ label, onClick, color = '#7B2CBF', bg = 'rgba(123,44,191,.07)', children }) => (
+  <Box role="button" tabIndex={0} aria-label={label} onClick={onClick} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onClick()} sx={{ width: 38, height: 38, borderRadius: '11px', bgcolor: bg, color, display: 'grid', placeItems: 'center', cursor: 'pointer', border: `1px solid ${color}14`, transition: 'transform .14s ease, background-color .14s ease', '&:active': { transform: 'scale(.92)' } }}>{children}</Box>
+);
+
 const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
-  const isAcordo  = item.tipo === 'acordo' || item.origem === 'acordo';
+  const isAcordo = item.tipo === 'acordo' || item.origem === 'acordo';
   const isVirtual = item.tipo === 'virtual';
   const isMovimento = item.tipo === 'movimentacao';
   const isLista = item.origem === 'lista_compras';
   const isEntrada = item.operacao === 'entrada';
-  const cor       = isEntrada ? '#10B981' : '#EF4444';
-  const corBg     = isEntrada ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)';
-  const corBorda  = isAcordo  ? 'rgba(123,44,191,0.24)'
-                  : isVirtual ? 'rgba(16,185,129,0.4)'
-                  : item.isPago ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.09)';
-
-  // Ícone por categoria
-  const ICONES = {
-    'Mercado':'🛒','Alimentação':'🍽️','Transporte':'🚗','Saúde':'💊',
-    'Lazer':'🏖️','Educação':'📚','Casa':'🏠','Vestuário':'👗',
-    'Carnes':'🥩','Acordos/Dívidas':'🤝','Saldo Acumulado':'💰',
-  };
-  const icone = ICONES[item.categoria] || (isAcordo ? '🤝' : isEntrada ? '💵' : '💸');
-  const ORIGENS = {
-    manual: ['Manual', '✍️', '#7B2CBF'],
-    lista_compras: ['Compras', '🛒', '#8B5CF6'],
-    acordo: ['Acordo', '🤝', '#7B2CBF'],
-    renda: ['Renda', '💰', '#10B981'],
-  };
-  const origemMeta = ORIGENS[item.origem] || null;
+  const cor = isEntrada ? '#119C72' : '#E54862';
+  const origemMeta = ORIGENS[item.origem] || ORIGENS.manual;
+  const OrigemIcon = origemMeta.Icon;
 
   return (
-    <Box sx={{
-      display: 'flex', alignItems: 'center', gap: 1.2, flexWrap: { xs: 'wrap', sm: 'nowrap' },
-      px: 1.4, py: 1.2, mb: 1,
-      bgcolor: 'background.paper',
-      border: `1.5px solid ${corBorda}`,
-      borderRadius: '14px',
-      opacity: item.isPago && !isVirtual ? 0.84 : 1,
-      transition: 'all 0.15s',
-      position: 'relative',
-      overflow: 'hidden',
-      // barra lateral colorida
-      '&::before': {
-        content: '""',
-        position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
-        bgcolor: item.isPago ? 'transparent' : cor,
-        borderRadius: '3px 0 0 3px',
-      },
-    }}>
-      {/* Ícone */}
-      <Box sx={{
-        width: 40, height: 40, borderRadius: '11px',
-        bgcolor: corBg, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0,
-      }}>
-        {icone}
-      </Box>
-
-      {/* Info */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, flexWrap: 'wrap' }}>
-          <Typography sx={{
-            fontWeight: 700, fontSize: '0.88rem', color: 'text.primary', lineHeight: 1.2,
-            textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: { xs: '100%', sm: 160 },
-          }}>
-            {item.nome}
-          </Typography>
-          {origemMeta && (
-            <Chip label={`${origemMeta[1]} ${origemMeta[0]}`} size="small" sx={{
-              height: 20, fontSize: '0.66rem', fontWeight: 800,
-              bgcolor: `${origemMeta[2]}12`, color: origemMeta[2],
-              border: `1px solid ${origemMeta[2]}24`,
-            }} />
-          )}
+    <Box sx={{ p: 1.05, mb: .75, bgcolor: 'background.paper', border: '1px solid rgba(72,45,91,.08)', borderRadius: '15px', boxShadow: '0 4px 15px rgba(45,11,94,.035)', opacity: item.isPago && !isVirtual ? .78 : 1, position: 'relative', overflow: 'hidden', transition: 'all .16s ease' }}>
+      <Box sx={{ position: 'absolute', left: 0, top: 11, bottom: 11, width: 3, borderRadius: '0 3px 3px 0', bgcolor: item.isPago ? 'rgba(123,44,191,.14)' : cor }} />
+      <Box sx={{ display: 'grid', gridTemplateColumns: '38px minmax(0,1fr) auto', gap: .8, alignItems: 'center' }}>
+        <Box sx={{ width: 38, height: 38, borderRadius: '11px', bgcolor: isEntrada ? 'rgba(17,156,114,.07)' : 'rgba(123,44,191,.055)', display: 'grid', placeItems: 'center' }}><CategoryIcon categoria={item.categoria || (isAcordo ? 'Acordos/Dívidas' : 'Outros')} size={19} color={isEntrada ? '#119C72' : undefined} /></Box>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={{ fontWeight: 900, fontSize: '.82rem', lineHeight: 1.18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none' }}>{item.nome}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: .45, mt: .3, minWidth: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: .25, px: .5, py: .16, borderRadius: 99, bgcolor: `${origemMeta.color}0B`, color: origemMeta.color, flexShrink: 0 }}><OrigemIcon sx={{ fontSize: 12 }} /><Typography sx={{ fontSize: '.58rem', fontWeight: 900 }}>{origemMeta.label}</Typography></Box>
+            <Typography sx={{ fontSize: '.63rem', color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {isVirtual ? 'Saldo acumulado' : isMovimento ? `Pago dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}` : `Dia ${item.dia || '—'} · ${item.categoria || 'Geral'}`}{item.parcelaText ? ` · ${item.parcelaText}` : ''}
+            </Typography>
+          </Box>
         </Box>
-        <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', mt: 0.2, lineHeight: 1.25 }}>
-          {isVirtual ? 'Saldo Acumulado'
-            : isMovimento
-              ? `Pago dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}`
-              : `Dia ${item.dia || '—'} · ${item.categoria || 'Geral'}`}
-          {item.parcelaText ? ` · ${item.parcelaText}` : ''}
-        </Typography>
+        <Typography sx={{ fontWeight: 900, fontSize: '.9rem', color: cor, lineHeight: 1, whiteSpace: 'nowrap', textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none' }}>{isEntrada ? '+' : '-'}{money(item.valor)}</Typography>
       </Box>
 
-      {/* Valor */}
-      <Typography sx={{
-        fontWeight: 800, fontSize: '0.95rem',
-        color: cor,
-        textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none',
-        flexShrink: 0, mr: 0.5, ml: 'auto',
-      }}>
-        {isEntrada ? '+' : '-'}{money(item.valor)}
-      </Typography>
-
-      {/* Ações */}
       {!isVirtual && (
-        <Box sx={{
-          display: 'flex', gap: 0.55, flexShrink: 0,
-          width: { xs: (isAcordo || isLista) ? 'auto' : '100%', sm: 'auto' },
-          justifyContent: { xs: 'flex-end', sm: 'initial' },
-          pl: { xs: (isAcordo || isLista) ? 0 : '48px', sm: 0 },
-        }}>
-          {isAcordo ? (
-            <Box role="button" tabIndex={0} aria-label="Abrir acordo" onClick={() => setRoute('acordos')} onKeyDown={e => e.key === 'Enter' && setRoute('acordos')} sx={{
-              minWidth: 48, height: 40, px: 0.9, borderRadius: '10px', cursor: 'pointer',
-              bgcolor: 'rgba(123,44,191,0.09)', color: '#7B2CBF',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.7rem', fontWeight: 900,
-            }}>Abrir</Box>
-          ) : isLista ? (
-            <Box role="button" tabIndex={0} aria-label="Abrir lista de compras" onClick={() => setRoute('lista')} onKeyDown={e => e.key === 'Enter' && setRoute('lista')} sx={{
-              minWidth: 48, height: 40, px: 0.9, borderRadius: '10px', cursor: 'pointer',
-              bgcolor: 'rgba(139,92,246,0.09)', color: '#7C3AED',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.7rem', fontWeight: 900,
-            }}>Lista</Box>
-          ) : (
-            <>
-              <Box role="button" tabIndex={0} aria-label={item.isPago ? `Desfazer pagamento de ${item.nome}` : `Marcar ${item.nome} como pago`} onClick={() => onPago(item)} onKeyDown={e => e.key === 'Enter' && onPago(item)} sx={{
-                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
-                bgcolor: item.isPago ? 'rgba(16,185,129,0.1)' : '#10B981',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.75rem', transition: 'all 0.15s',
-                '&:active': { transform: 'scale(0.88)' },
-              }}>
-                {item.isPago ? '↩' : '✓'}
-              </Box>
-              <Box role="button" tabIndex={0} aria-label={`Editar ${item.nome}`} onClick={() => onEdit(item)} onKeyDown={e => e.key === 'Enter' && onEdit(item)} sx={{
-                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
-                bgcolor: 'rgba(123,44,191,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.75rem',
-              }}>✎</Box>
-              <Box role="button" tabIndex={0} aria-label={`Excluir ${item.nome}`} onClick={() => onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} onKeyDown={e => e.key === 'Enter' && onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} sx={{
-                width: 40, height: 40, borderRadius: '10px', cursor: 'pointer',
-                bgcolor: 'rgba(239,68,68,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.75rem', color: '#EF4444',
-              }}>✕</Box>
-            </>
-          )}
+        <Box sx={{ mt: .72, pt: .65, borderTop: '1px solid rgba(72,45,91,.055)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: .45 }}>
+          {isAcordo ? <Button size="small" variant="text" onClick={() => setRoute('acordos')} startIcon={<OpenInNewRoundedIcon sx={{ fontSize: '16px !important' }} />} sx={{ minHeight: 36, px: .75, fontSize: '.66rem' }}>Abrir acordo</Button>
+          : isLista ? <Button size="small" variant="text" onClick={() => setRoute('lista')} startIcon={<ShoppingCartRoundedIcon sx={{ fontSize: '16px !important' }} />} sx={{ minHeight: 36, px: .75, fontSize: '.66rem' }}>Abrir lista</Button>
+          : <>
+            <ActionButton label={item.isPago ? `Desfazer pagamento de ${item.nome}` : `Marcar ${item.nome} como pago`} onClick={() => onPago(item)} color={item.isPago ? '#7B2CBF' : '#119C72'} bg={item.isPago ? 'rgba(123,44,191,.06)' : 'rgba(17,156,114,.09)'}>{item.isPago ? <UndoRoundedIcon sx={{ fontSize: 18 }} /> : <CheckRoundedIcon sx={{ fontSize: 19 }} />}</ActionButton>
+            <ActionButton label={`Editar ${item.nome}`} onClick={() => onEdit(item)}><EditRoundedIcon sx={{ fontSize: 17 }} /></ActionButton>
+            <ActionButton label={`Excluir ${item.nome}`} onClick={() => onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} color="#E54862" bg="rgba(229,72,98,.06)"><DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} /></ActionButton>
+          </>}
         </Box>
       )}
     </Box>
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Seção colapsável (pendentes / liquidados)
-// ─────────────────────────────────────────────────────────────────────────────
 const Secao = ({ titulo, cor, itens, setRoute, onPago, onEdit, onDelete }) => {
   const [aberta, setAberta] = useState(true);
   if (itens.length === 0) return null;
   return (
-    <Box sx={{ mb: 2 }}>
-      <Box role="button" tabIndex={0} aria-expanded={aberta} onClick={() => setAberta(v => !v)}
-        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setAberta(v => !v)} sx={{
-        display: 'flex', alignItems: 'center', gap: 1, mb: 1, cursor: 'pointer',
-        userSelect: 'none',
-      }}>
-        <Box sx={{ flex: 1, height: 1, bgcolor: `${cor}30` }} />
-        <Typography sx={{
-          fontSize: '0.68rem', fontWeight: 800, color: cor,
-          letterSpacing: '1px', textTransform: 'uppercase',
-          px: 0.5,
-        }}>
-          {titulo} · {itens.length}
-        </Typography>
-        <Box sx={{ flex: 1, height: 1, bgcolor: `${cor}30` }} />
-        <Typography sx={{ fontSize: '0.69rem', color: cor, ml: 0.5 }}>
-          {aberta ? '▲' : '▼'}
-        </Typography>
+    <Box sx={{ mb: 1.25 }}>
+      <Box role="button" tabIndex={0} aria-expanded={aberta} onClick={() => setAberta(v => !v)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setAberta(v => !v)} sx={{ display: 'flex', alignItems: 'center', gap: .65, mb: .65, px: .7, py: .55, borderRadius: '11px', bgcolor: `${cor}08`, cursor: 'pointer', userSelect: 'none' }}>
+        <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: cor }} />
+        <Typography sx={{ flex: 1, fontSize: '.67rem', fontWeight: 900, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '.65px' }}>{titulo}</Typography>
+        <Box sx={{ minWidth: 23, height: 23, px: .45, borderRadius: 99, bgcolor: `${cor}12`, color: cor, display: 'grid', placeItems: 'center', fontSize: '.62rem', fontWeight: 900 }}>{itens.length}</Box>
+        {aberta ? <KeyboardArrowUpRoundedIcon sx={{ color: cor, fontSize: 19 }} /> : <KeyboardArrowDownRoundedIcon sx={{ color: cor, fontSize: 19 }} />}
       </Box>
-      {aberta && itens.map(item => (
-        <ItemCard
-          key={`${item.tipo}_${item.id}`}
-          item={item}
-          setRoute={setRoute}
-          onPago={onPago}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      ))}
+      {aberta && itens.map(item => <ItemCard key={`${item.tipo}_${item.id}`} item={item} setRoute={setRoute} onPago={onPago} onEdit={onEdit} onDelete={onDelete} />)}
     </Box>
   );
 };
@@ -364,7 +262,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
   const saldoPrevisto = resumo.ent - resumo.sai;
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', px: { xs: 1.5, sm: 2 }, pt: { xs: 1.25, sm: 2 }, pb: 1 }}>
+    <Box sx={{ maxWidth: 600, margin: 'auto', px: { xs: 1.25, sm: 2 }, pt: { xs: 1.05, sm: 1.6 }, pb: .7 }}>
 
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast(t => ({ ...t, open: false }))}
@@ -376,7 +274,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
 
       {/* ── HEADER MÊS ─────────────────────────────────────────────────── */}
       <Box sx={{
-        borderRadius: '20px', overflow: 'hidden', mb: 2,
+        borderRadius: '19px', overflow: 'hidden', mb: 1.35,
         background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 50%, #6B1FA8 100%)',
         boxShadow: '0 8px 28px rgba(107,31,168,0.35)',
         position: 'relative',
@@ -389,9 +287,9 @@ const Gastos = ({ setRoute, setEditItem }) => {
         }} />
 
         {/* Navegação de mês */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pt: 1.8, pb: 1.2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1.45, pt: 1.25, pb: .9 }}>
           <Box role="button" tabIndex={0} aria-label="Mês anterior" onClick={() => setMesOffset(v => v - 1)} onKeyDown={e => e.key === 'Enter' && setMesOffset(v => v - 1)} sx={{
-            width: 42, height: 42, borderRadius: '12px',
+            width: 38, height: 38, borderRadius: '11px',
             bgcolor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', color: '#fff', '&:active': { transform: 'scale(0.88)' },
           }}>
@@ -401,7 +299,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
             {nomeMes}
           </Typography>
           <Box role="button" tabIndex={0} aria-label="Próximo mês" onClick={() => setMesOffset(v => v + 1)} onKeyDown={e => e.key === 'Enter' && setMesOffset(v => v + 1)} sx={{
-            width: 42, height: 42, borderRadius: '12px',
+            width: 38, height: 38, borderRadius: '11px',
             bgcolor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', color: '#fff', '&:active': { transform: 'scale(0.88)' },
           }}>
@@ -410,20 +308,20 @@ const Gastos = ({ setRoute, setEditItem }) => {
         </Box>
 
         {/* Métricas em 3 colunas */}
-        <Box sx={{ display: 'flex', px: 1.5, pb: 1.8, gap: 1 }}>
+        <Box sx={{ display: 'flex', px: 1.15, pb: 1.1, gap: .6 }}>
           {[
             { label: 'ENTRADAS', valor: resumo.ent, cor: '#4ADE80', bg: 'rgba(74,222,128,0.12)', borda: 'rgba(74,222,128,0.3)' },
             { label: 'SAÍDAS',   valor: resumo.sai, cor: '#FB7185', bg: 'rgba(251,113,133,0.12)', borda: 'rgba(251,113,133,0.3)' },
             { label: 'FLUXO REAL', valor: saldoReal, cor: saldoReal >= 0 ? '#A78BFA' : '#FB7185', bg: 'rgba(167,139,250,0.12)', borda: 'rgba(167,139,250,0.3)' },
           ].map(m => (
             <Box key={m.label} sx={{
-              flex: 1, textAlign: 'center', py: 1, px: 0.5,
+              flex: 1, textAlign: 'center', py: .75, px: .35,
               bgcolor: m.bg, border: `1px solid ${m.borda}`, borderRadius: '12px',
             }}>
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 800, color: m.cor, letterSpacing: '0.6px', textTransform: 'uppercase', lineHeight: 1 }}>
+              <Typography sx={{ fontSize: '0.64rem', fontWeight: 800, color: m.cor, letterSpacing: '0.6px', textTransform: 'uppercase', lineHeight: 1 }}>
                 {m.label}
               </Typography>
-              <Typography sx={{ fontSize: '0.9rem', fontWeight: 900, color: '#fff', mt: 0.3, lineHeight: 1, letterSpacing: '-0.5px' }}>
+              <Typography sx={{ fontSize: '0.84rem', fontWeight: 900, color: '#fff', mt: 0.3, lineHeight: 1, letterSpacing: '-0.5px' }}>
                 {money(m.valor)}
               </Typography>
             </Box>
@@ -432,7 +330,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
 
         {/* Balanço previsto */}
         <Box sx={{
-          mx: 1.5, mb: 1.5, px: 1.2, py: 0.7,
+          mx: 1.15, mb: 1.15, px: 1, py: .58,
           bgcolor: 'rgba(255,255,255,0.06)', borderRadius: '10px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
@@ -449,26 +347,27 @@ const Gastos = ({ setRoute, setEditItem }) => {
       </Box>
 
       {/* ── RAZÃO FINANCEIRO ─────────────────────────────────────────────── */}
-      <Box sx={{ mb: 1.2 }}>
-        <Typography sx={{ fontWeight: 900, fontSize: '0.95rem', color: 'text.primary' }}>
+      <Box sx={{ mb: .8 }}>
+        <Typography sx={{ fontWeight: 900, fontSize: '.92rem', color: 'text.primary' }}>
           Razão financeiro
         </Typography>
-        <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', mt: 0.2 }}>
+        <Typography sx={{ fontSize: '.68rem', color: 'text.secondary', mt: .15 }}>
           Entradas, compras, pagamentos de acordos e lançamentos manuais em um só fluxo.
         </Typography>
       </Box>
       {/* Filtro do Razão por origem */}
-      <Box sx={{ display: 'flex', gap: 0.7, overflowX: 'auto', pb: 0.5, mb: 1.6, '&::-webkit-scrollbar': { display: 'none' } }}>
+      <Box sx={{ display: 'flex', gap: .55, overflowX: 'auto', pb: .35, mb: 1.05, '&::-webkit-scrollbar': { display: 'none' } }}>
         {[
-          ['todas', 'Tudo'], ['manual', '✍️ Manual'], ['lista_compras', '🛒 Compras'],
-          ['acordo', '🤝 Acordos'], ['renda', '💰 Renda'],
+          ['todas', 'Tudo'], ['manual', 'Manual'], ['lista_compras', 'Compras'],
+          ['acordo', 'Acordos'], ['renda', 'Renda'],
         ].map(([id, label]) => (
           <Chip key={id} label={label} onClick={() => setFiltroOrigem(id)}
             variant={filtroOrigem === id ? 'filled' : 'outlined'}
-            sx={{ flexShrink: 0, fontWeight: 800, fontSize: '0.68rem',
-              bgcolor: filtroOrigem === id ? 'rgba(123,44,191,0.12)' : 'transparent',
-              color: filtroOrigem === id ? 'primary.main' : 'text.secondary',
-              borderColor: filtroOrigem === id ? 'primary.main' : 'divider' }} />
+            sx={{ flexShrink: 0, fontWeight: 800, fontSize: '0.64rem',
+              bgcolor: filtroOrigem === id ? 'primary.main' : '#fff',
+              color: filtroOrigem === id ? '#fff' : 'text.secondary',
+              borderColor: filtroOrigem === id ? 'primary.main' : 'divider',
+              boxShadow: filtroOrigem === id ? '0 4px 12px rgba(123,44,191,.16)' : 'none' }} />
         ))}
       </Box>
 
@@ -492,9 +391,9 @@ const Gastos = ({ setRoute, setEditItem }) => {
       />
 
       {abertos.length === 0 && pagos.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 6 }}>
-          <Typography sx={{ fontSize: '3rem', mb: 1 }}>🎉</Typography>
-          <Typography sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1rem' }}>
+        <Box sx={{ textAlign: 'center', py: 2.8, px: 1.5, bgcolor: 'background.paper', borderRadius: '17px', border: '1px dashed rgba(123,44,191,.18)' }}>
+          <InboxRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main', opacity: .68, mb: .4 }} />
+          <Typography sx={{ fontWeight: 850, color: 'text.primary', fontSize: '.95rem' }}>
             Nenhum lançamento este mês
           </Typography>
           <Typography sx={{ color: 'text.secondary', fontSize: '0.8rem', mt: 0.5 }}>
@@ -508,9 +407,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
         onClose={() => setModalConfirmPag({ open: false, item: null })}
         fullWidth maxWidth="xs"
         PaperProps={{ sx: { borderRadius: '20px' } }}>
-        <DialogTitle sx={{ fontWeight: 800, textAlign: 'center', pb: 0.5 }}>
-          ✅ Confirmar Pagamento
-        </DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900, pb: .5, display: 'flex', alignItems: 'center', gap: .7 }}><PaymentsRoundedIcon color="success" /> Confirmar pagamento</DialogTitle>
         <DialogContent sx={{ textAlign: 'center', pt: 1.5 }}>
           {modalConfirmPag.item && (
             <>
@@ -519,8 +416,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
               </Typography>
               <Typography sx={{
                 fontWeight: 900, fontSize: '1.5rem', mb: 1,
-                background: 'linear-gradient(135deg, #10B981, #06D6A0)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                color: 'success.main',
               }}>
                 {money(modalConfirmPag.item.valor || 0)}
               </Typography>

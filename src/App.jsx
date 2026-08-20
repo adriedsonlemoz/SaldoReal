@@ -20,6 +20,13 @@ import Sobre       from './components/Sobre';
 import Backup      from './components/Backup';
 import Relatorio   from './components/Relatorio';
 import ListaCompras from './components/listaCompras';
+import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
+import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import ShieldRoundedIcon from '@mui/icons-material/ShieldRounded';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SVG Icons — mesmo conjunto da Home, copiados aqui para não criar dep circular
@@ -92,7 +99,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
         onClick={() => id === 'config' ? setRoute('__config__') : setRoute(id)}
         onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && (id === 'config' ? setRoute('__config__') : setRoute(id))}
         sx={{
-          flex: 1, py: 0.9, display: 'flex', flexDirection: 'column',
+          flex: 1, py: 0.75, display: 'flex', flexDirection: 'column',
           alignItems: 'center', gap: 0.35, cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent', position: 'relative',
           transition: 'all 0.15s',
@@ -101,7 +108,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       >
         <Icon active={active} />
         <Typography sx={{
-          fontSize: '0.69rem', fontWeight: active ? 800 : 600,
+          fontSize: '0.66rem', fontWeight: active ? 800 : 600,
           color: active ? activeColor(id) : '#9A92A1',
           letterSpacing: '0.1px', lineHeight: 1,
         }}>
@@ -124,7 +131,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       bgcolor: 'background.paper',
       borderTop: '1px solid rgba(0,0,0,0.07)',
       boxShadow: '0 -6px 24px rgba(45,11,94,0.08)',
-      display: 'flex', alignItems: 'center', minHeight: 64,
+      display: 'flex', alignItems: 'center', minHeight: 62,
       pb: 'env(safe-area-inset-bottom, 0px)',
     }}>
       {LEFT.map(item => <NavItem key={item.id} {...item} />)}
@@ -135,14 +142,14 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
           role="button" tabIndex={0} aria-label="Adicionar"
           onClick={onAddPress} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onAddPress()}
           sx={{
-            width: 50, height: 50, borderRadius: '16px',
+            width: 46, height: 46, borderRadius: '15px',
             background: 'linear-gradient(135deg, #7B2CBF 0%, #F72585 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 7px 24px rgba(123,44,191,0.34)',
+            boxShadow: '0 6px 20px rgba(123,44,191,0.28)',
             cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
             transition: 'all 0.18s ease',
-            '&:hover': { boxShadow: '0 8px 28px rgba(123,44,191,0.55)', transform: 'translateY(-2px)' },
+            '&:hover': { boxShadow: '0 8px 24px rgba(123,44,191,0.36)', transform: 'translateY(-2px)' },
             '&:active': { transform: 'scale(0.92)' },
           }}
         >
@@ -160,16 +167,14 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const ModalAddOpcoes = ({ open, onClose, setRoute }) => {
   const OPCOES = [
-    { icon: '💸', label: 'Novo Gasto',            sub: 'Registrar despesa ou entrada',   route: 'novaConta', cor: '#7B2CBF' },
-    { icon: '🤝', label: 'Novo Acordo',            sub: 'Parcelamento ou dívida',          route: 'acordos',   cor: '#7B2CBF' },
-    { icon: '🛒', label: 'Nova Lista de Compras',  sub: 'Criar lista para ir ao mercado',  route: 'lista',     cor: '#8B5CF6' },
+    { Icon: EditNoteRoundedIcon, label: 'Novo lançamento', sub: 'Registrar despesa ou entrada', route: 'novaConta', cor: '#7B2CBF' },
+    { Icon: HandshakeRoundedIcon, label: 'Novo acordo', sub: 'Parcelamento ou dívida', route: 'acordos', cor: '#7B2CBF' },
+    { Icon: ShoppingCartRoundedIcon, label: 'Nova lista de compras', sub: 'Criar uma compra planejada', route: 'lista', cor: '#8B5CF6' },
   ];
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs"
       PaperProps={{ sx: { borderRadius: '24px', pb: 1 } }}>
-      <DialogTitle sx={{ fontWeight: 900, fontSize: '1.1rem', pb: 0.5 }}>
-        ✨ O que deseja adicionar?
-      </DialogTitle>
+      <DialogTitle sx={{ fontWeight: 900, fontSize: '1.05rem', pb: .5, display: 'flex', alignItems: 'center', gap: .7 }}><AddCircleOutlineRoundedIcon color="primary" /> O que deseja adicionar?</DialogTitle>
       <DialogContent sx={{ pt: 1, pb: 0 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {OPCOES.map(op => (
@@ -189,7 +194,7 @@ const ModalAddOpcoes = ({ open, onClose, setRoute }) => {
                 bgcolor: `${op.cor}18`, display: 'flex', alignItems: 'center',
                 justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0,
               }}>
-                {op.icon}
+                {React.createElement(op.Icon, { sx: { fontSize: 21, color: op.cor } })}
               </Box>
               <Box>
                 <Typography sx={{ fontWeight: 800, fontSize: '0.88rem', lineHeight: 1.2 }}>
@@ -220,11 +225,11 @@ const ModalAddOpcoes = ({ open, onClose, setRoute }) => {
 const ModalConfig = ({ open, onClose, setRoute }) => (
   <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs"
     PaperProps={{ sx: { borderRadius: '24px', pb: 1 } }}>
-    <DialogTitle sx={{ fontWeight: 900, fontSize: '1.05rem', pb: 0.5 }}>⚙️ Configurações</DialogTitle>
+    <DialogTitle sx={{ fontWeight: 900, fontSize: '1.05rem', pb: .5, display: 'flex', alignItems: 'center', gap: .7 }}><SettingsRoundedIcon color="primary" /> Configurações</DialogTitle>
     <DialogContent sx={{ pt: 0.5, pb: 0 }}>
       {[
-        { icon: '📖', label: 'Sobre o App',    sub: 'Versão, créditos e informações',  route: 'sobre',  cor: '#7B2CBF' },
-        { icon: '🛡️', label: 'Backup & Dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#8B5CF6' },
+        { Icon: InfoRoundedIcon, label: 'Sobre o app', sub: 'Versão, créditos e informações', route: 'sobre', cor: '#7B2CBF' },
+        { Icon: ShieldRoundedIcon, label: 'Backup e dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#8B5CF6' },
       ].map(op => (
         <Box key={op.route}
           onClick={() => { onClose(); setRoute(op.route); }}
@@ -239,7 +244,7 @@ const ModalConfig = ({ open, onClose, setRoute }) => (
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '1.3rem', flexShrink: 0,
           }}>
-            {op.icon}
+            {React.createElement(op.Icon, { sx: { fontSize: 21, color: op.cor } })}
           </Box>
           <Box>
             <Typography sx={{ fontWeight: 800, fontSize: '0.88rem', lineHeight: 1.2 }}>{op.label}</Typography>
@@ -296,7 +301,7 @@ const App = () => {
     <>
       <Container maxWidth={false} disableGutters sx={{ minHeight: '100dvh' }}>
         {/* Wrapper com pb para não ficar atrás da navbar */}
-        <Box sx={{ pb: showNav ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : 0 }}>
+        <Box sx={{ pb: showNav ? 'calc(62px + env(safe-area-inset-bottom, 0px))' : 0 }}>
           {renderComponent()}
         </Box>
       </Container>

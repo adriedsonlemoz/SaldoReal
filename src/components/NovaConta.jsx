@@ -20,163 +20,115 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import LightbulbRoundedIcon from '@mui/icons-material/LightbulbRounded';
+import RestaurantRoundedIcon from '@mui/icons-material/RestaurantRounded';
+import DirectionsCarRoundedIcon from '@mui/icons-material/DirectionsCarRounded';
+import MovieRoundedIcon from '@mui/icons-material/MovieRounded';
+import LocalHospitalRoundedIcon from '@mui/icons-material/LocalHospitalRounded';
+import CategoryRoundedIcon from '@mui/icons-material/CategoryRounded';
+import WorkRoundedIcon from '@mui/icons-material/WorkRounded';
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
+import RocketLaunchRoundedIcon from '@mui/icons-material/RocketLaunchRounded';
+import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import ArrowDownwardRoundedIcon from '@mui/icons-material/ArrowDownwardRounded';
+import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
+import EventRoundedIcon from '@mui/icons-material/EventRounded';
+import LooksOneRoundedIcon from '@mui/icons-material/LooksOneRounded';
+import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
+import ViewWeekRoundedIcon from '@mui/icons-material/ViewWeekRounded';
 
 import FinanceiroService from '../services/FinanceiroService';
 import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../utils/moedaInput';
 
-// ── dados de categorias ───────────────────────────────────────────────────────
+// ── dados visuais de categorias ─────────────────────────────────────────────
 const categoriasDespesas = [
-  { id: 'Moradia',     label: 'Moradia',     emoji: '🏠' },
-  { id: 'Contas',      label: 'Contas',      emoji: '💡' },
-  { id: 'Alimentacao', label: 'Alimentação', emoji: '🍔' },
-  { id: 'Transporte',  label: 'Transporte',  emoji: '🚗' },
-  { id: 'Lazer',       label: 'Lazer',       emoji: '🍿' },
-  { id: 'Saude',       label: 'Saúde',       emoji: '🏥' },
-  { id: 'Outros',      label: 'Outros',      emoji: '🛒' },
+  { id: 'Moradia', label: 'Moradia', Icon: HomeRoundedIcon },
+  { id: 'Contas', label: 'Contas', Icon: LightbulbRoundedIcon },
+  { id: 'Alimentacao', label: 'Alimentação', Icon: RestaurantRoundedIcon },
+  { id: 'Transporte', label: 'Transporte', Icon: DirectionsCarRoundedIcon },
+  { id: 'Lazer', label: 'Lazer', Icon: MovieRoundedIcon },
+  { id: 'Saude', label: 'Saúde', Icon: LocalHospitalRoundedIcon },
+  { id: 'Outros', label: 'Outros', Icon: CategoryRoundedIcon },
 ];
 const categoriasEntradas = [
-  { id: 'Salario',      label: 'Salário',     emoji: '💼' },
-  { id: 'Investimento', label: 'Invest.',     emoji: '📈' },
-  { id: 'Renda Extra',  label: 'Renda Extra', emoji: '🚀' },
-  { id: 'Outros',       label: 'Outros',      emoji: '💰' },
+  { id: 'Salario', label: 'Salário', Icon: WorkRoundedIcon },
+  { id: 'Investimento', label: 'Invest.', Icon: TrendingUpRoundedIcon },
+  { id: 'Renda Extra', label: 'Renda Extra', Icon: RocketLaunchRoundedIcon },
+  { id: 'Outros', label: 'Outros', Icon: SavingsRoundedIcon },
 ];
-
 const FREQUENCIAS = [
-  { id: 'unica',     label: 'Única',     emoji: '1×', desc: 'Apenas este mês' },
-  { id: 'fixa',      label: 'Fixa',      emoji: '🔁', desc: 'Todo mês'       },
-  { id: 'parcelada', label: 'Parcelada', emoji: '📊', desc: 'Nº de vezes'    },
+  { id: 'unica', label: 'Única', Icon: LooksOneRoundedIcon, desc: 'Só este mês' },
+  { id: 'fixa', label: 'Fixa', Icon: RepeatRoundedIcon, desc: 'Todo mês' },
+  { id: 'parcelada', label: 'Parcelada', Icon: ViewWeekRoundedIcon, desc: 'Nº de vezes' },
 ];
 
-// ── Converte Date → "YYYY-MM-DD" para input type=date ────────────────────────
 const toInputDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-// ── "YYYY-MM-DD" → { dia, mesAno } para gravar no Dexie ──────────────────────
 const parseInputDate = (isoStr) => {
   if (!isoStr) return { dia: new Date().getDate(), mesAno: null };
   const [y, m, d] = isoStr.split('-').map(Number);
-  return {
-    dia:    d,
-    mesAno: `${String(m).padStart(2, '0')}/${y}`,
-  };
+  return { dia: d, mesAno: `${String(m).padStart(2, '0')}/${y}` };
 };
 
-// ── Seletor de data completa ──────────────────────────────────────────────────
-const SeletorData = ({ value, onChange, label, corAtiva }) => (
+const LabelSecao = ({ children }) => <Typography sx={{ fontSize: '.66rem', fontWeight: 850, color: 'text.secondary', mb: .65, letterSpacing: '.2px' }}>{children}</Typography>;
+
+const SeletorData = ({ value, onChange, label }) => (
   <Box>
-    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', mb: 0.8 }}>
-      {label || 'Data de vencimento'}
-    </Typography>
-    <TextField
-      fullWidth
-      type="date"
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      InputLabelProps={{ shrink: true }}
-      inputProps={{ style: { fontSize: '1rem', fontWeight: 700 } }}
-      sx={{
-        '& .MuiOutlinedInput-root': {
-          borderRadius: '12px',
-          bgcolor: 'rgba(255,255,255,0.8)',
-          '&.Mui-focused fieldset': { borderColor: corAtiva, borderWidth: 2 },
-        },
-      }}
-    />
-    {value && (
-      <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', mt: 0.5, fontWeight: 600 }}>
-        📅 {value.split('-').reverse().join('/')}
-      </Typography>
-    )}
+    <LabelSecao>{label || 'Data de vencimento'}</LabelSecao>
+    <TextField fullWidth type="date" value={value} onChange={e => onChange(e.target.value)} InputLabelProps={{ shrink: true }}
+      InputProps={{ startAdornment: <EventRoundedIcon sx={{ mr: .7, color: 'primary.main', fontSize: 19 }} /> }}
+      inputProps={{ style: { fontSize: '.92rem', fontWeight: 800 } }} />
   </Box>
 );
 
-// ── Seletor de categoria ──────────────────────────────────────────────────────
-const SeletorCategoria = ({ categorias, value, onChange, corAtiva, onAdd }) => (
+const SeletorCategoria = ({ categorias, value, onChange, onAdd }) => (
   <Box>
-    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', mb: 0.8 }}>
-      Categoria
-    </Typography>
-    <Grid container spacing={0.8}>
+    <LabelSecao>Categoria</LabelSecao>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(4,minmax(0,1fr))', '@media (max-width:360px)': 'repeat(3,minmax(0,1fr))' }, gap: .65 }}>
       {categorias.map(cat => {
         const ativo = value === cat.id;
-        return (
-          <Grid item key={cat.id} xs={4} sm={3}>
-            <Box role="button" tabIndex={0} aria-pressed={ativo} onClick={() => onChange(cat.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onChange(cat.id)} sx={{
-              p: 1, borderRadius: '12px', textAlign: 'center', cursor: 'pointer',
-              border: '2px solid', transition: 'all .15s',
-              borderColor: ativo ? corAtiva : 'rgba(0,0,0,0.08)',
-              bgcolor:     ativo ? `${corAtiva}15` : 'rgba(0,0,0,0.02)',
-            }}>
-              <Typography sx={{ fontSize: '1.35rem', mb: 0.3, lineHeight: 1 }}>{cat.emoji}</Typography>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, lineHeight: 1.2, wordBreak: 'break-word',
-                color: ativo ? corAtiva : 'text.secondary' }}>
-                {cat.label}
-              </Typography>
-            </Box>
-          </Grid>
-        );
+        const Icon = cat.Icon || CategoryRoundedIcon;
+        return <Box key={cat.id} role="button" tabIndex={0} aria-pressed={ativo} onClick={() => onChange(cat.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onChange(cat.id)} sx={{
+          minWidth: 0, minHeight: 64, px: .45, py: .65, borderRadius: '13px', textAlign: 'center', cursor: 'pointer',
+          border: `1.4px solid ${ativo ? '#7B2CBF' : 'rgba(72,45,91,.09)'}`, bgcolor: ativo ? 'rgba(123,44,191,.075)' : '#fff',
+          boxShadow: ativo ? '0 4px 12px rgba(123,44,191,.09)' : 'none', transition: 'all .15s', '&:active': { transform: 'scale(.97)' },
+        }}>
+          <Box sx={{ mx: 'auto', width: 29, height: 29, borderRadius: '9px', display: 'grid', placeItems: 'center', bgcolor: ativo ? 'rgba(123,44,191,.12)' : 'rgba(80,55,100,.045)', color: ativo ? 'primary.main' : 'text.secondary' }}><Icon sx={{ fontSize: 17 }} /></Box>
+          <Typography sx={{ mt: .35, fontSize: '.63rem', fontWeight: 850, lineHeight: 1.1, color: ativo ? 'primary.dark' : 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cat.label}</Typography>
+        </Box>;
       })}
-      {onAdd && (
-        <Grid item xs={4} sm={3}>
-          <Box role="button" tabIndex={0} aria-label="Criar nova categoria" onClick={onAdd} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onAdd()} sx={{
-            p: 1, minHeight: 74, borderRadius: '12px', textAlign: 'center', cursor: 'pointer',
-            border: '1.5px dashed', borderColor: 'rgba(123,44,191,.38)', bgcolor: 'rgba(123,44,191,.035)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            '&:active': { transform: 'scale(.97)' },
-          }}>
-            <Typography sx={{ fontSize: '1.05rem', lineHeight: 1, color: 'primary.main', fontWeight: 900 }}>＋</Typography>
-            <Typography sx={{ fontSize: '.7rem', fontWeight: 900, color: 'primary.main', mt: .35 }}>Nova</Typography>
-          </Box>
-        </Grid>
-      )}
-    </Grid>
+      {onAdd && <Box role="button" tabIndex={0} aria-label="Criar nova categoria" onClick={onAdd} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onAdd()} sx={{ minHeight: 64, px: .45, py: .65, borderRadius: '13px', textAlign: 'center', cursor: 'pointer', border: '1.4px dashed rgba(123,44,191,.28)', bgcolor: 'rgba(123,44,191,.025)', '&:active': { transform: 'scale(.97)' } }}>
+        <Box sx={{ mx: 'auto', width: 29, height: 29, borderRadius: '9px', display: 'grid', placeItems: 'center', bgcolor: 'rgba(123,44,191,.09)', color: 'primary.main' }}><AddRoundedIcon sx={{ fontSize: 18 }} /></Box>
+        <Typography sx={{ mt: .35, fontSize: '.63rem', fontWeight: 900, color: 'primary.main' }}>Nova</Typography>
+      </Box>}
+    </Box>
   </Box>
 );
 
-// ── Seletor de frequência ─────────────────────────────────────────────────────
 const SeletorFrequencia = ({ value, onChange }) => (
   <Box>
-    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', mb: 0.8 }}>
-      Frequência
-    </Typography>
-    <Grid container spacing={0.8}>
+    <LabelSecao>Frequência</LabelSecao>
+    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .65 }}>
       {FREQUENCIAS.map(f => {
-        const ativo = value === f.id;
-        return (
-          <Grid item xs={4} key={f.id}>
-            <Box role="button" tabIndex={0} aria-pressed={ativo} onClick={() => onChange(f.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onChange(f.id)} sx={{
-              p: 1.2, borderRadius: '12px', textAlign: 'center', cursor: 'pointer',
-              border: '2px solid', transition: 'all .15s',
-              borderColor: ativo ? 'primary.main' : 'rgba(0,0,0,0.08)',
-              bgcolor:     ativo ? 'rgba(123,44,191,0.08)' : 'rgba(0,0,0,0.02)',
-            }}>
-              <Typography sx={{ fontSize: '1.1rem', mb: 0.3, lineHeight: 1 }}>{f.emoji}</Typography>
-              <Typography sx={{ fontSize: '0.72rem', fontWeight: 800, mb: 0.1,
-                color: ativo ? 'primary.main' : 'text.primary' }}>{f.label}</Typography>
-              <Typography sx={{ fontSize: '0.66rem', color: 'text.secondary', lineHeight: 1.2 }}>{f.desc}</Typography>
-            </Box>
-          </Grid>
-        );
+        const ativo = value === f.id; const Icon = f.Icon;
+        return <Box key={f.id} role="button" tabIndex={0} aria-pressed={ativo} onClick={() => onChange(f.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onChange(f.id)} sx={{ minWidth: 0, p: .7, borderRadius: '13px', textAlign: 'center', cursor: 'pointer', border: `1.4px solid ${ativo ? '#7B2CBF' : 'rgba(72,45,91,.09)'}`, bgcolor: ativo ? 'rgba(123,44,191,.065)' : '#fff', transition: 'all .15s', '&:active': { transform: 'scale(.97)' } }}>
+          <Icon sx={{ fontSize: 18, color: ativo ? 'primary.main' : 'text.secondary' }} />
+          <Typography sx={{ fontSize: '.66rem', fontWeight: 900, color: ativo ? 'primary.dark' : 'text.primary', lineHeight: 1.1 }}>{f.label}</Typography>
+          <Typography sx={{ mt: .12, fontSize: '.59rem', color: 'text.disabled', lineHeight: 1.05 }}>{f.desc}</Typography>
+        </Box>;
       })}
-    </Grid>
+    </Box>
   </Box>
 );
 
-// ── Stepper de parcelas ───────────────────────────────────────────────────────
 const StepperParcelas = ({ value, onChange }) => (
   <Box>
-    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: 'text.secondary', mb: 0.8 }}>
-      Número de parcelas
-    </Typography>
-    <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(123,44,191,0.05)',
-      borderRadius: '12px', border: '1px solid rgba(0,0,0,0.12)', overflow: 'hidden', height: 46 }}>
-      <Button onClick={() => onChange(Math.max(2, value - 1))}
-        sx={{ minWidth: 44, height: '100%', p: 0, fontSize: '1.3rem', fontWeight: 900,
-          color: 'primary.main', '&:active': { transform: 'scale(0.8)' } }}>−</Button>
-      <Typography sx={{ flex: 1, textAlign: 'center', fontWeight: 800, fontSize: '1.1rem',
-        color: 'text.primary' }}>{value}×</Typography>
-      <Button onClick={() => onChange(value + 1)}
-        sx={{ minWidth: 44, height: '100%', p: 0, fontSize: '1.3rem', fontWeight: 900,
-          color: 'primary.main', '&:active': { transform: 'scale(0.8)' } }}>+</Button>
+    <LabelSecao>Número de parcelas</LabelSecao>
+    <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(123,44,191,.035)', borderRadius: '13px', border: '1px solid rgba(123,44,191,.12)', overflow: 'hidden', height: 44 }}>
+      <Button onClick={() => onChange(Math.max(2, value - 1))} sx={{ minWidth: 44, height: '100%', p: 0, fontSize: '1.2rem', fontWeight: 900 }}>−</Button>
+      <Typography sx={{ flex: 1, textAlign: 'center', fontWeight: 900, fontSize: '.96rem' }}>{value}×</Typography>
+      <Button onClick={() => onChange(value + 1)} sx={{ minWidth: 44, height: '100%', p: 0, fontSize: '1.2rem', fontWeight: 900 }}>+</Button>
     </Box>
   </Box>
 );
@@ -314,17 +266,17 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
   const cancelar = () => { if (setEditItem) setEditItem(null); setRoute('gastos'); };
 
   const isEntrada         = form.tipo === 'entrada';
-  const corTipo           = isEntrada ? '#22C55E' : '#EF4444';
+  const corTipo           = isEntrada ? '#119C72' : '#E54862';
   const categoriasBase = isEntrada ? categoriasEntradas : categoriasDespesas;
   const categoriasAtuais = [
     ...categoriasBase,
     ...categoriasCustom
       .filter(nome => !categoriasBase.some(cat => cat.id.toLocaleLowerCase('pt-BR') === String(nome).toLocaleLowerCase('pt-BR')))
-      .map(nome => ({ id: nome, label: nome, emoji: isEntrada ? '🏷️' : '🏷️' })),
+      .map(nome => ({ id: nome, label: nome, Icon: CategoryRoundedIcon })),
   ];
 
   return (
-    <Box sx={{ maxWidth: 500, margin: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1, pb: 2 }}>
+    <Box sx={{ maxWidth: 500, margin: 'auto', px: { xs: 1.25, sm: 2 }, pt: .8, pb: 1.2 }}>
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast({ ...toast, open: false })}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
@@ -333,65 +285,44 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
         </Box>
       </Snackbar>
 
-      <Card sx={{ p: { xs: 1.7, sm: 2.5 }, borderRadius: '20px', border: '1.5px solid', borderColor: 'rgba(123,44,191,.16)',
-        boxShadow: '0 8px 28px rgba(45,11,94,.06)' }}>
+      <Card sx={{ p: { xs: 1.25, sm: 1.8 }, borderRadius: '19px', border: '1px solid rgba(72,45,91,.08)', boxShadow: '0 8px 26px rgba(45,11,94,.055)' }}>
 
-        <Typography sx={{ fontWeight: 800, textAlign: 'center', mb: 2.5, fontSize: '1.05rem', color: 'text.primary' }}>
-          {editItem ? '📝 Editar Registro' : '➕ Novo Lançamento'}
+        <Typography sx={{ fontWeight: 900, textAlign: 'left', mb: 1.2, fontSize: '1rem', color: 'text.primary' }}>
+          {editItem ? 'Editar registro' : 'Novo lançamento'}
         </Typography>
 
         {/* ── toggle entrada / saída ──────────────────────────────── */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2.5 }}>
-          <ToggleButtonGroup
-            value={form.tipo} exclusive
-            onChange={(e, v) => v && setForm({ ...form, tipo: v, categoria: 'Outros' })}
-            sx={{ bgcolor: '#F8FAFC', border: '1.5px solid', borderColor: 'divider',
-              borderRadius: '14px', overflow: 'hidden', width: '100%' }}
-          >
-            <ToggleButton value="despesa" sx={{
-              flex: 1, fontWeight: 700, py: 1.2, border: 'none',
-              color:   form.tipo === 'despesa' ? '#fff !important' : '#EF4444',
-              bgcolor: form.tipo === 'despesa' ? '#EF4444 !important' : 'transparent',
-              borderRadius: '12px !important', transition: 'all .2s',
-            }}>
-              🔻 Saída
-            </ToggleButton>
-            <ToggleButton value="entrada" sx={{
-              flex: 1, fontWeight: 700, py: 1.2, border: 'none',
-              color:   form.tipo === 'entrada' ? '#fff !important' : '#22C55E',
-              bgcolor: form.tipo === 'entrada' ? '#22C55E !important' : 'transparent',
-              borderRadius: '12px !important', transition: 'all .2s',
-            }}>
-              🔺 Entrada
-            </ToggleButton>
+        <Box sx={{ mb: 1.15 }}>
+          <ToggleButtonGroup value={form.tipo} exclusive onChange={(e, v) => v && setForm({ ...form, tipo: v, categoria: 'Outros' })} sx={{ bgcolor: 'rgba(80,55,100,.035)', border: '1px solid rgba(72,45,91,.08)', borderRadius: '13px', p: .35, width: '100%', gap: .35, '& .MuiToggleButton-root': { border: 'none !important' } }}>
+            <ToggleButton value="despesa" sx={{ flex: 1, minHeight: 42, py: .65, borderRadius: '10px !important', fontWeight: 900, color: 'text.secondary', gap: .45, '&.Mui-selected': { bgcolor: '#fff !important', color: 'text.primary', boxShadow: '0 3px 10px rgba(45,11,94,.07)' } }}><ArrowDownwardRoundedIcon sx={{ fontSize: 18, color: '#E54862' }} />Saída</ToggleButton>
+            <ToggleButton value="entrada" sx={{ flex: 1, minHeight: 42, py: .65, borderRadius: '10px !important', fontWeight: 900, color: 'text.secondary', gap: .45, '&.Mui-selected': { bgcolor: '#fff !important', color: 'text.primary', boxShadow: '0 3px 10px rgba(45,11,94,.07)' } }}><ArrowUpwardRoundedIcon sx={{ fontSize: 18, color: '#119C72' }} />Entrada</ToggleButton>
           </ToggleButtonGroup>
         </Box>
 
         {/* ── descrição ──────────────────────────────────────────── */}
         <TextField fullWidth label="Descrição" value={form.nome}
           onChange={e => setForm({ ...form, nome: e.target.value })}
-          sx={{ mb: 2, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '12px' }}
+          sx={{ mb: 1.15, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '12px' }}
         />
 
         {/* ── valor ──────────────────────────────────────────────── */}
-        <Box sx={{ mb: 2.5, p: 2, bgcolor: `${corTipo}08`, borderRadius: '14px',
-          border: '1.5px solid', borderColor: `${corTipo}30`, transition: 'all .25s' }}>
+        <Box sx={{ mb: 1.25, p: 1.15, bgcolor: 'rgba(123,44,191,.025)', borderRadius: '14px', border: '1px solid rgba(72,45,91,.08)', transition: 'all .25s' }}>
           <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: corTipo,
             textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.8 }}>
-            {isEntrada ? '💰 Valor a receber' : '💸 Valor a pagar'}
+            {isEntrada ? 'Valor a receber' : 'Valor a pagar'}
           </Typography>
           <TextField fullWidth label="Valor (R$)"
             value={formatMoedaInput(form.valor, { comSimbolo: true })}
             onChange={handleValorChange} inputProps={propsInputMoeda}
             sx={{
-              '& .MuiInputBase-input': { fontWeight: 800, fontSize: '1.2rem', color: corTipo },
+              '& .MuiInputBase-input': { fontWeight: 800, fontSize: '1.12rem', color: 'text.primary' },
               '& .MuiOutlinedInput-root': { borderRadius: '10px', bgcolor: 'rgba(255,255,255,0.7)' },
             }}
           />
         </Box>
 
         {/* ── categoria ──────────────────────────────────────────── */}
-        <Box sx={{ mb: 2.5 }}>
+        <Box sx={{ mb: 1.25 }}>
           <SeletorCategoria
             categorias={categoriasAtuais}
             value={form.categoria}
@@ -402,7 +333,7 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
         </Box>
 
         {/* ── DATA COMPLETA (BUG FIX) ────────────────────────────── */}
-        <Box sx={{ mb: 2.5 }}>
+        <Box sx={{ mb: 1.25 }}>
           <SeletorData
             value={form.dataVenc}
             onChange={v => setForm({ ...form, dataVenc: v })}
@@ -414,10 +345,9 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
             const hoje2 = new Date();
             const mesAtual = `${String(hoje2.getMonth() + 1).padStart(2, '0')}/${hoje2.getFullYear()}`;
             if (mesAno !== mesAtual) return (
-              <Box sx={{ mt: 0.8, p: 1, bgcolor: 'rgba(255,183,3,0.1)', borderRadius: '10px',
-                border: '1px solid #FFB703', display: 'flex', gap: 1, alignItems: 'center' }}>
-                <Typography sx={{ fontSize: '0.85rem' }}>📅</Typography>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: '#B45309' }}>
+              <Box sx={{ mt: .7, p: .9, bgcolor: 'rgba(123,44,191,.045)', borderRadius: '11px', border: '1px solid rgba(123,44,191,.11)', display: 'flex', gap: .65, alignItems: 'center' }}>
+                <EventRoundedIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                <Typography sx={{ fontSize: '.7rem', fontWeight: 750, color: 'text.secondary' }}>
                   Este lançamento será registrado em {mesAno}
                 </Typography>
               </Box>
@@ -428,7 +358,7 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
 
         {/* ── frequência (somente no modo criação) ────────────────── */}
         {!editItem && (
-          <Box sx={{ mb: 2.5 }}>
+          <Box sx={{ mb: 1.25 }}>
             <SeletorFrequencia
               value={form.recorrencia}
               onChange={v => setForm({ ...form, recorrencia: v })}
@@ -438,7 +368,7 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
 
         {/* ── nº de parcelas ──────────────────────────────────────── */}
         <Collapse in={form.recorrencia === 'parcelada' && !editItem}>
-          <Box sx={{ mb: 2.5 }}>
+          <Box sx={{ mb: 1.25 }}>
             <StepperParcelas
               value={form.qtdVezes}
               onChange={v => setForm({ ...form, qtdVezes: Math.max(2, v) })}
@@ -447,13 +377,13 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
         </Collapse>
 
         {/* ── botões ──────────────────────────────────────────────── */}
-        <Box sx={{ display: 'flex', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', gap: .8 }}>
           <Button fullWidth variant="outlined" color="inherit" onClick={cancelar}
-            sx={{ fontWeight: 600, color: 'text.secondary', borderRadius: '12px', py: 1.2 }}>
+            sx={{ fontWeight: 600, color: 'text.secondary', borderRadius: '12px', py: .9 }}>
             Cancelar
           </Button>
           <Button fullWidth variant="contained" onClick={salvar}
-            sx={{ fontWeight: 900, borderRadius: '12px', py: 1.2,
+            sx={{ fontWeight: 900, borderRadius: '12px', py: .9,
               background: 'linear-gradient(135deg,#7B2CBF 0%,#C026D3 100%)',
               boxShadow: '0 8px 20px rgba(123,44,191,.2)', '&:hover': { opacity: .94 } }}>
             {editItem ? 'Atualizar' : 'Salvar'}

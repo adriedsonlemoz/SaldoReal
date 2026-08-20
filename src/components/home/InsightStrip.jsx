@@ -1,74 +1,46 @@
-// src/components/home/InsightStrip.jsx — REDESIGN
-// Faixa insight com ícone em pill, texto limpo, dot animado de "ao vivo".
-
 import React from 'react';
-import Box        from '@mui/material/Box';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import { insightColors } from './constants';
+
+const icons = {
+  sucesso: CheckCircleRoundedIcon,
+  success: CheckCircleRoundedIcon,
+  alerta: WarningAmberRoundedIcon,
+  warning: WarningAmberRoundedIcon,
+  economia: TrendingUpRoundedIcon,
+  info: InfoRoundedIcon,
+};
 
 const InsightStrip = ({ insight }) => {
   if (!insight) return null;
   const c = insightColors[insight.tipo] || insightColors.info;
+  const Icon = icons[insight.tipo] || InfoRoundedIcon;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: .9,
-        px: 1.15,
-        py: .72,
-        mb: 1,
-        bgcolor: c.bg,
-        border: `1px solid ${c.border}`,
-        borderRadius: '13px',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'all 0.2s',
-        '&:hover': { transform: 'translateX(2px)' },
-      }}
-    >
-      {/* Pill emoji */}
+    <Box sx={{
+      display: 'flex', alignItems: 'center', gap: 1,
+      px: 1.2, py: .82, mb: 1,
+      bgcolor: c.bg, border: `1px solid ${c.border}`,
+      borderRadius: '14px', minHeight: 48,
+    }}>
       <Box sx={{
-        flexShrink: 0,
-        width: 29, height: 29,
-        borderRadius: '10px',
-        bgcolor: `${c.border}25`,
-        border: `1px solid ${c.border}40`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '0.88rem',
+        width: 32, height: 32, borderRadius: '10px', flexShrink: 0,
+        bgcolor: 'rgba(255,255,255,.65)', display: 'grid', placeItems: 'center',
+        color: c.text,
       }}>
-        {insight.emoji}
+        <Icon sx={{ fontSize: '1.08rem' }} />
       </Box>
-
       <Typography sx={{
-        fontSize: '0.74rem', fontWeight: 600, color: c.text,
-        lineHeight: 1.45, flex: 1,
-        overflow: 'hidden', display: '-webkit-box',
-        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+        fontSize: '.76rem', fontWeight: 700, color: c.text,
+        lineHeight: 1.4, flex: 1,
       }}>
         {insight.texto}
       </Typography>
-
-      {/* Dot pulsante */}
-      <Box sx={{ flexShrink: 0, position: 'relative', width: 8, height: 8 }}>
-        <Box sx={{
-          width: 8, height: 8, borderRadius: '50%',
-          bgcolor: c.border,
-          position: 'absolute',
-        }} />
-        <Box sx={{
-          width: 8, height: 8, borderRadius: '50%',
-          bgcolor: c.border, opacity: 0.4,
-          position: 'absolute',
-          animation: 'pingDot 2s ease-in-out infinite',
-          '@keyframes pingDot': {
-            '0%': { transform: 'scale(1)', opacity: 0.4 },
-            '70%': { transform: 'scale(2.2)', opacity: 0 },
-            '100%': { transform: 'scale(1)', opacity: 0 },
-          },
-        }} />
-      </Box>
     </Box>
   );
 };

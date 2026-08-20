@@ -2,22 +2,26 @@ html {
   font-size: 16px !important;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background: #F6F3FA;
+  background: #F7F4FA;
 }
 html, body, #root { margin: 0; width: 100%; min-height: 100%; }
 body {
-  padding: 0; background-color: #F6F3FA; color: #241A31;
+  padding: 0; background-color: #F7F4FA; color: #241A31;
   font-family: 'Nunito', 'Segoe UI', sans-serif; font-size: 1rem;
   overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
 * { box-sizing: border-box; -webkit-text-size-adjust: inherit; }
 button, input, textarea, select { font: inherit; }
+button, [role="button"] { touch-action: manipulation; }
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D8CFE2; border-radius: 999px; }
-@media (max-width: 380px) { html { font-size: 15px !important; } }
+@media (max-width: 380px) { html { font-size: 15.5px !important; } }
 @media (min-width: 600px) { html { font-size: 16px !important; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
 @media print {
   .d-print-none { display: none !important; }
   body { background: white !important; color: black !important; }

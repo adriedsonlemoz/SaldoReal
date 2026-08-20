@@ -21,6 +21,21 @@ import MenuItem    from '@mui/material/MenuItem';
 import Divider     from '@mui/material/Divider';
 import Snackbar    from '@mui/material/Snackbar';
 import Collapse    from '@mui/material/Collapse';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';
+import InboxRoundedIcon from '@mui/icons-material/InboxRounded';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+import FastForwardRoundedIcon from '@mui/icons-material/FastForwardRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import DescriptionRoundedIcon from '@mui/icons-material/DescriptionRounded';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 
 import FinanceiroUtils   from '../utils/financeiro';
 import { useAcordos }    from '../hooks/useAcordos';
@@ -191,10 +206,10 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
     <Box>
       {/* ── Modal Excluir ── */}
       <Dialog open={modalDelete.open} onClose={() => setModalDelete({ open: false, id: null })}>
-        <DialogTitle sx={{ color: 'error.main', fontWeight: 900, textAlign: 'center' }}>⚠️ Excluir Registro</DialogTitle>
+        <DialogTitle sx={{ color: 'error.main', fontWeight: 900, display: 'flex', alignItems: 'center', gap: .7 }}><WarningAmberRoundedIcon /> Excluir registro</DialogTitle>
         <DialogContent sx={{ textAlign: 'center' }}>
           <Typography sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-            Tem a certeza que deseja apagar permanentemente este registo?
+            Tem certeza de que deseja excluir permanentemente este registro?
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2, justifyContent: 'center', gap: 2 }}>
@@ -217,9 +232,8 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
         {modalView.acordo && (
           <>
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider', pb: 1 }}>
-              <Typography sx={{ fontWeight: 900, fontSize: '1.4rem', color: 'text.primary' }}>📄 Dossiê</Typography>
-              <Button variant="contained" color="primary" sx={{ fontWeight: 900, minWidth: 'auto', p: '6px 12px' }}
-                onClick={() => copiarResumo(modalView.acordo)}>📋 COPIAR</Button>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: .65 }}><DescriptionRoundedIcon color="primary" /><Typography sx={{ fontWeight: 900, fontSize: '.92rem', color: 'text.primary' }}>Dossiê</Typography></Box>
+              <Button variant="outlined" startIcon={<ContentCopyRoundedIcon />} sx={{ fontWeight: 850, minWidth: 'auto', px: 1 }} onClick={() => copiarResumo(modalView.acordo)}>Copiar</Button>
             </DialogTitle>
             <DialogContent sx={{ mt: 2 }}>
               <Box sx={{ textAlign: 'center', mb: 2 }}>
@@ -308,7 +322,7 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
 
       <Dialog open={modalEstorno.open} onClose={() => setModalEstorno({ open: false, acordoId: null, pagamento: null })}
         fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: '18px' } }}>
-        <DialogTitle sx={{ fontWeight: 900, color: 'warning.main' }}>↩️ Estornar pagamento</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900, color: 'warning.main', display: 'flex', alignItems: 'center', gap: .7 }}><UndoRoundedIcon /> Estornar pagamento</DialogTitle>
         <DialogContent>
           <Typography sx={{ color: 'text.secondary', fontSize: '0.88rem' }}>
             Este estorno remove somente este pagamento do acordo e do Razão financeiro. As demais parcelas permanecem intactas.
@@ -339,21 +353,21 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
       </Snackbar>
 
       {/* Dashboard 3 em 1 */}
-      <Card sx={{ p: { xs: 1.5, sm: 2 }, mb: 3, borderColor: 'primary.main', border: '1.5px solid' }}>
+      <Card sx={{ p: { xs: 1.1, sm: 1.4 }, mb: 1.2, boxShadow: 'none' }}>
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={4} sx={{ borderRight: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
-            <Typography sx={{ fontWeight: 900, color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.8rem' }, textTransform: 'uppercase' }}>🤝 Acordos</Typography>
+            <Typography sx={{ fontWeight: 900, color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.8rem' }, textTransform: 'uppercase' }}>Acordos</Typography>
             <Typography sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.4rem' }, color: 'primary.main', mt: 0.5 }}>{money(totalNegociado)}</Typography>
           </Grid>
           <Grid item xs={4} sx={{ borderRight: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
-            <Typography sx={{ fontWeight: 900, color: 'error.main', fontSize: { xs: '0.65rem', sm: '0.8rem' }, textTransform: 'uppercase' }}>🔴 Vencidas</Typography>
+            <Typography sx={{ fontWeight: 900, color: 'error.main', fontSize: { xs: '0.65rem', sm: '0.8rem' }, textTransform: 'uppercase' }}>Vencidas</Typography>
             <Typography sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.4rem' }, color: 'error.main', mt: 0.5 }}>{money(totalVencido)}</Typography>
           </Grid>
           <Grid item xs={4} sx={{ textAlign: 'center' }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
-              <Button onClick={() => setMesOffset(prev => Math.max(0, prev - 1))} disabled={mesOffset === 0} sx={{ ...btnRadar, color: 'primary.main' }}>◀</Button>
-              <Typography sx={{ fontWeight: 900, color: 'primary.main', fontSize: { xs: '0.65rem', sm: '0.8rem' }, textTransform: 'uppercase' }}>📅 {nomeDoMes(mesOffset)}</Typography>
-              <Button onClick={() => setMesOffset(prev => prev + 1)} sx={{ ...btnRadar, color: 'primary.main' }}>▶</Button>
+              <Button aria-label="Mês anterior" onClick={() => setMesOffset(prev => Math.max(0, prev - 1))} disabled={mesOffset === 0} sx={{ ...btnRadar, color: 'primary.main', width: 32, height: 32 }}><ArrowBackIosNewRoundedIcon sx={{ fontSize: 13 }} /></Button>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: .3, minWidth: 0 }}><CalendarMonthRoundedIcon sx={{ fontSize: 14, color: 'primary.main' }} /><Typography sx={{ fontWeight: 900, color: 'primary.main', fontSize: { xs: '.61rem', sm: '.72rem' }, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{nomeDoMes(mesOffset)}</Typography></Box>
+              <Button aria-label="Próximo mês" onClick={() => setMesOffset(prev => prev + 1)} sx={{ ...btnRadar, color: 'primary.main', width: 32, height: 32 }}><ArrowForwardIosRoundedIcon sx={{ fontSize: 13 }} /></Button>
             </Box>
             <Typography sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.4rem' },
               color: totalMesCalculado === 0 && mesOffset === 0 ? 'success.main' : 'primary.main', mt: 0.5 }}>
@@ -364,28 +378,26 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
       </Card>
 
       {/* Busca + Ordenação */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+      <Box sx={{ display: 'flex', gap: .7, mb: 1 }}>
         <TextField fullWidth size="small" placeholder="Buscar credor, categoria, adm..."
           value={busca} onChange={e => setBusca(e.target.value)}
-          sx={{ bgcolor: 'rgba(123,44,191,0.05)', '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
-          InputProps={{ startAdornment: <Typography sx={{ mr: 0.5, fontSize: '1rem' }}>🔍</Typography> }}
+          sx={{ flex: 1 }} InputProps={{ startAdornment: <SearchRoundedIcon sx={{ mr: .6, color: 'text.secondary', fontSize: 18 }} /> }}
         />
         <TextField select size="small" value={ordenacao} onChange={e => setOrdenacao(e.target.value)}
-          sx={{ minWidth: 130, bgcolor: 'rgba(123,44,191,0.05)', '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}>
+          sx={{ minWidth: { xs: 112, sm: 140 } }}>
           {[
-            { value: 'vencimento', label: '📅 Vencimento' },
-            { value: 'valor',      label: '💰 Valor'      },
-            { value: 'nome',       label: '🔤 Nome'       },
+            { value: 'vencimento', label: 'Vencimento' },
+            { value: 'valor', label: 'Valor' },
+            { value: 'nome', label: 'Nome' },
           ].map(op => <MenuItem key={op.value} value={op.value}>{op.label}</MenuItem>)}
         </TextField>
       </Box>
 
       {/* Abas filtro */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+      <Box sx={{ display: 'flex', gap: .5, mb: 1.1, p: .35, borderRadius: '14px', bgcolor: 'rgba(123,44,191,.035)', border: '1px solid rgba(123,44,191,.07)' }}>
         {['ativos', 'vencidas', 'quitados'].map(t => (
           <Button key={t} fullWidth
-            variant={abaFiltro === t ? 'contained' : 'outlined'} color="primary"
-            sx={{ fontWeight: 900, textTransform: 'uppercase', fontSize: { xs: '0.7rem', sm: '0.85rem' } }}
+            variant={abaFiltro === t ? 'contained' : 'text'} color="primary" sx={{ minHeight: 40, fontWeight: 900, textTransform: 'capitalize', fontSize: { xs: '.69rem', sm: '.78rem' }, boxShadow: abaFiltro === t ? '0 4px 12px rgba(123,44,191,.15)' : 'none' }}
             onClick={() => setAbaFiltro(t)}>
             {t}
           </Button>
@@ -394,10 +406,7 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
 
       {/* Lista */}
       {listaFiltrada.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 5, opacity: 0.7 }}>
-          <Typography sx={{ fontSize: '3rem' }}>📭</Typography>
-          <Typography sx={{ fontWeight: 'bold', color: 'text.secondary' }}>Nenhum registo nesta aba.</Typography>
-        </Box>
+        <Box sx={{ textAlign: 'center', py: 2.8, opacity: .8 }}><InboxRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main', opacity: .65 }} /><Typography sx={{ mt: .45, fontWeight: 800, color: 'text.secondary' }}>Nenhum registro nesta aba.</Typography></Box>
       ) : (
         listaFiltrada.map(acordo => {
           const valorFaltaPagar      = (acordo.parcelas - acordo.parcelasPagas) * acordo.valorParcela;
@@ -407,14 +416,10 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
 
           return (
             <Card key={acordo.id} sx={{
-              mb: 2, p: 0, border: '1.5px solid',
-              borderColor: acordo.situacao === 'vencida' ? 'error.main'
-                : parseInt(acordo.parcelasPagas || 0) >= parseInt(acordo.parcelas || 0) ? 'success.main'
-                : 'primary.main',
-              borderRadius: '14px', overflow: 'hidden',
+              mb: .85, p: 0, border: '1px solid rgba(72,45,91,.08)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(45,11,94,.035)', position: 'relative', '&:before': { content: '""', position: 'absolute', left: 0, top: 10, bottom: 10, width: 3, borderRadius: '0 3px 3px 0', bgcolor: acordo.situacao === 'vencida' ? 'error.main' : parseInt(acordo.parcelasPagas || 0) >= parseInt(acordo.parcelas || 0) ? 'success.main' : 'primary.main' },
             }}>
               <Box role="button" tabIndex={0} aria-expanded={isExpanded} onClick={() => toggleExpandir(acordo.id)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && toggleExpandir(acordo.id)} sx={{
-                p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                p: 1.25, pl: 1.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 cursor: 'pointer', bgcolor: isExpanded ? 'rgba(123,44,191,0.05)' : 'background.paper',
               }}>
                 <Box sx={{ flex: 1, pr: 1 }}>
@@ -425,11 +430,11 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
                     fontWeight: 'bold', textTransform: 'uppercase',
                     color: acordo.situacao === 'acordo' ? 'success.main' : acordo.situacao === 'quitado' ? 'primary.main' : 'error.main',
                   }}>
-                    {acordo.situacao === 'acordo' ? '🤝 Acordo Ativo' : acordo.situacao === 'quitado' ? '✅ Quitado' : '🔴 Vencida'}
+                    {acordo.situacao === 'acordo' ? 'Acordo ativo' : acordo.situacao === 'quitado' ? 'Quitado' : 'Vencida'}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Typography sx={{ fontWeight: 800, fontSize: '1.3rem',
+                  <Typography sx={{ fontWeight: 800, fontSize: '1rem',
                     color: acordo.situacao === 'quitado' ? 'primary.main' : 'error.main', lineHeight: 1 }}>
                     {money(acordo.situacao === 'vencida' ? acordo.valorNegociado : acordo.valorTotalReal)}
                   </Typography>
@@ -472,11 +477,11 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
                           sx={{ fontWeight: 900 }}
                           onClick={() => iniciarPagamento(acordo)}
                           disabled={parseInt(acordo.parcelasPagas || 0) >= parseInt(acordo.parcelas || 0)}>
-                          {parseInt(acordo.parcelasPagas || 0) >= parseInt(acordo.parcelas || 0) ? 'QUITADO 🎉' : (estaAdiantado ? '⭐ ADIANTAR' : '✅ PAGAR')}
+                          {parseInt(acordo.parcelasPagas || 0) >= parseInt(acordo.parcelas || 0) ? <><CheckCircleRoundedIcon sx={{ mr: .4, fontSize: 17 }} /> Quitado</> : estaAdiantado ? <><FastForwardRoundedIcon sx={{ mr: .4, fontSize: 17 }} /> Adiantar</> : <><PaidRoundedIcon sx={{ mr: .4, fontSize: 17 }} /> Pagar</>}
                         </Button>
-                        <Button variant="contained" color="primary"  sx={{ fontWeight: 900, minWidth: 40 }} onClick={() => setModalView({ open: true, acordo })}>👁️</Button>
-                        <Button variant="contained" color="info"     sx={{ fontWeight: 900, minWidth: 40 }} onClick={() => abrirEditar && abrirEditar(acordo)}>✏️</Button>
-                        <Button variant="contained" color="error"    sx={{ minWidth: 40 }} onClick={() => setModalDelete({ open: true, id: acordo.id })}>🗑️</Button>
+                        <Button aria-label="Ver detalhes" variant="outlined" sx={{ minWidth: 44, px: 0 }} onClick={() => setModalView({ open: true, acordo })}><VisibilityRoundedIcon /></Button>
+                        <Button aria-label="Editar acordo" variant="outlined" sx={{ minWidth: 44, px: 0 }} onClick={() => abrirEditar && abrirEditar(acordo)}><EditRoundedIcon /></Button>
+                        <Button aria-label="Excluir acordo" variant="outlined" color="error" sx={{ minWidth: 44, px: 0 }} onClick={() => setModalDelete({ open: true, id: acordo.id })}><DeleteOutlineRoundedIcon /></Button>
                       </Box>
                     </Box>
                   ) : (
@@ -498,9 +503,9 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
                         </Box>
                       )}
                       <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                        <Button fullWidth variant="contained" color="primary" sx={{ fontWeight: 900 }} onClick={() => abrirEditar && abrirEditar(acordo)}>✏️ EDITAR</Button>
-                        <Button variant="contained" color="info"  sx={{ fontWeight: 900, minWidth: 40 }} onClick={() => setModalView({ open: true, acordo })}>👁️</Button>
-                        <Button variant="contained" color="error" sx={{ minWidth: 40 }} onClick={() => setModalDelete({ open: true, id: acordo.id })}>🗑️</Button>
+                        <Button fullWidth variant="contained" startIcon={<EditRoundedIcon />} sx={{ fontWeight: 900 }} onClick={() => abrirEditar && abrirEditar(acordo)}>Editar</Button>
+                        <Button aria-label="Ver detalhes" variant="outlined" sx={{ minWidth: 44, px: 0 }} onClick={() => setModalView({ open: true, acordo })}><VisibilityRoundedIcon /></Button>
+                        <Button aria-label="Excluir acordo" variant="outlined" color="error" sx={{ minWidth: 44, px: 0 }} onClick={() => setModalDelete({ open: true, id: acordo.id })}><DeleteOutlineRoundedIcon /></Button>
                       </Box>
                     </Box>
                   )}

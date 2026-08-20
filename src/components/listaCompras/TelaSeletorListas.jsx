@@ -9,14 +9,17 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
-import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/moedaInput';
 import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
+import ShoppingBasketRoundedIcon from '@mui/icons-material/ShoppingBasketRounded';
+import AccountBalanceWalletRoundedIcon from '@mui/icons-material/AccountBalanceWalletRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
+import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/moedaInput';
 import CardLista from './CardLista';
 import { money } from './constants';
 
 const sectionTitle = {
-  fontSize: '.7rem', fontWeight: 900, color: '#64748B', textTransform: 'uppercase',
-  letterSpacing: '.8px', mb: 1,
+  fontSize: '.72rem', fontWeight: 900, color: 'text.secondary', textTransform: 'uppercase',
+  letterSpacing: '.75px', mb: .85,
 };
 
 const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcluir, onReabrir }) => {
@@ -46,37 +49,38 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
     }
   };
 
+  const stats = [
+    { label: 'Em andamento', valor: abertas.length, Icon: ShoppingBasketRoundedIcon },
+    { label: 'Planejado', valor: money(resumo.planejado), Icon: AccountBalanceWalletRoundedIcon },
+    { label: 'Já pago', valor: money(resumo.pago), Icon: ReceiptLongRoundedIcon },
+  ];
+
   return (
-    <Box sx={{ maxWidth: 560, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.2, pb: 2, minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))' }}>
+    <Box sx={{ maxWidth: 560, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 1.5, minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))' }}>
       <Box sx={{
-        borderRadius: '22px', p: 1.8, mb: 1.4,
-        background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 55%,#7B2CBF 100%)',
-        color: '#fff', boxShadow: '0 11px 30px rgba(45,11,94,.20)', overflow: 'hidden', position: 'relative',
+        borderRadius: '22px', p: 1.65, mb: 1.15,
+        background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 58%,#7B2CBF 100%)',
+        color: '#fff', boxShadow: '0 10px 26px rgba(45,11,94,.18)', overflow: 'hidden', position: 'relative',
       }}>
-        <Box sx={{ position: 'absolute', width: 120, height: 120, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.08)', right: -35, top: -55 }} />
-        <Typography sx={{ fontSize: '.7rem', fontWeight: 900, letterSpacing: '1px', opacity: .8, textTransform: 'uppercase' }}>
-          SaldoReal · Compras
+        <Box sx={{ position: 'absolute', width: 115, height: 115, borderRadius: '50%', bgcolor: 'rgba(255,255,255,.07)', right: -35, top: -50 }} />
+        <Typography sx={{ fontSize: '.68rem', fontWeight: 900, letterSpacing: '.9px', opacity: .72, textTransform: 'uppercase' }}>
+          Compras
         </Typography>
-        <Typography sx={{ fontWeight: 900, fontSize: '1.28rem', mt: .25, lineHeight: 1.15 }}>
-          Seu mercado, sem bagunçar as contas.
+        <Typography sx={{ fontWeight: 900, fontSize: '1.18rem', mt: .2, lineHeight: 1.2 }}>
+          Planeje antes, pague com controle.
         </Typography>
-        <Typography sx={{ fontSize: '.76rem', mt: .7, opacity: .88, maxWidth: 360, lineHeight: 1.45 }}>
-          Planeje a compra e registre cada pagamento no fluxo financeiro na hora em que acontecer.
+        <Typography sx={{ fontSize: '.75rem', mt: .5, opacity: .82, maxWidth: 390, lineHeight: 1.4 }}>
+          Cada item pago entra no fluxo financeiro automaticamente.
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 1, mt: 1.4 }}>
-          <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Em andamento</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '1.05rem' }}>{abertas.length}</Typography>
-          </Box>
-          <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Planejado</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.planejado)}</Typography>
-          </Box>
-          <Box sx={{ flex: 1, bgcolor: 'rgba(255,255,255,.13)', border: '1px solid rgba(255,255,255,.16)', borderRadius: '14px', p: 1.1 }}>
-            <Typography sx={{ fontSize: '.66rem', fontWeight: 800, opacity: .75, textTransform: 'uppercase' }}>Já pago</Typography>
-            <Typography sx={{ fontWeight: 900, fontSize: '.96rem' }}>{money(resumo.pago)}</Typography>
-          </Box>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .7, mt: 1.15 }}>
+          {stats.map(({ label, valor, Icon }) => (
+            <Box key={label} sx={{ minWidth: 0, bgcolor: 'rgba(255,255,255,.10)', border: '1px solid rgba(255,255,255,.12)', borderRadius: '13px', p: .85 }}>
+              <Icon sx={{ fontSize: '1rem', opacity: .78, mb: .2 }} />
+              <Typography sx={{ fontSize: '.61rem', fontWeight: 800, opacity: .7, textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</Typography>
+              <Typography sx={{ fontWeight: 900, fontSize: '.87rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{valor}</Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
 
@@ -84,61 +88,53 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
         fullWidth variant="contained" onClick={() => setModalNova(true)}
         startIcon={<AddShoppingCartRoundedIcon />}
         sx={{
-          py: 1.15, mb: 1.7, borderRadius: '16px', fontWeight: 900,
+          minHeight: 46, mb: 1.35, borderRadius: '14px', fontWeight: 900,
           background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)',
-          boxShadow: '0 7px 20px rgba(123,44,191,.20)',
+          boxShadow: '0 6px 18px rgba(123,44,191,.18)',
         }}
       >
         Nova lista de compras
       </Button>
 
-      {loading && <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}><CircularProgress /></Box>}
+      {loading && <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>}
 
       {!loading && listas.length === 0 && (
-        <Box sx={{ p: 3.2, textAlign: 'center', bgcolor: 'background.paper', borderRadius: '20px', border: '1px dashed #CBD5E1' }}>
-          <Typography sx={{ fontSize: '2.2rem' }}>🧾</Typography>
-          <Typography sx={{ fontWeight: 900, mt: 1 }}>Comece pela próxima compra</Typography>
-          <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mt: .4 }}>
-            Crie uma lista, defina um orçamento e pague os itens conforme passar no caixa.
+        <Box sx={{ py: 2.8, px: 2, textAlign: 'center', bgcolor: 'background.paper', borderRadius: '18px', border: '1px dashed rgba(123,44,191,.20)' }}>
+          <Box sx={{ width: 46, height: 46, mx: 'auto', borderRadius: '15px', bgcolor: 'rgba(123,44,191,.07)', display: 'grid', placeItems: 'center', color: 'primary.main' }}>
+            <ShoppingBasketRoundedIcon />
+          </Box>
+          <Typography sx={{ fontWeight: 900, mt: .9 }}>Comece pela próxima compra</Typography>
+          <Typography sx={{ fontSize: '.77rem', color: 'text.secondary', mt: .3, maxWidth: 360, mx: 'auto' }}>
+            Crie uma lista, defina um orçamento e registre os valores reais conforme pagar.
           </Typography>
         </Box>
       )}
 
       {!loading && abertas.length > 0 && (
-        <>
+        <Box sx={{ mb: 1.45 }}>
           <Typography sx={sectionTitle}>Em andamento · {abertas.length}</Typography>
           {abertas.map(lista => (
-            <CardLista
-              key={lista.id} lista={lista} onClick={() => onAbrirLista(lista)}
-              onExcluir={() => setConfirmExcId(lista.id)} onReabrir={() => onReabrir(lista.id)}
-            />
+            <CardLista key={lista.id} lista={lista} onClick={() => onAbrirLista(lista)} onExcluir={() => setConfirmExcId(lista.id)} onReabrir={() => onReabrir(lista.id)} />
           ))}
-        </>
+        </Box>
       )}
 
       {!loading && concluidas.length > 0 && (
-        <>
-          <Typography sx={{ ...sectionTitle, mt: 3 }}>Histórico · {concluidas.length}</Typography>
+        <Box>
+          <Typography sx={sectionTitle}>Histórico · {concluidas.length}</Typography>
           {concluidas.map(lista => (
-            <CardLista
-              key={lista.id} lista={lista}
-              onExcluir={() => setConfirmExcId(lista.id)} onReabrir={() => onReabrir(lista.id)}
-            />
+            <CardLista key={lista.id} lista={lista} onExcluir={() => setConfirmExcId(lista.id)} onReabrir={() => onReabrir(lista.id)} />
           ))}
-        </>
+        </Box>
       )}
 
       <Dialog open={modalNova} onClose={() => !salvando && setModalNova(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 900 }}>🛒 Nova compra</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: .8 }}><AddShoppingCartRoundedIcon color="primary" /> Nova compra</DialogTitle>
         <DialogContent>
-          <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mb: 2 }}>
-            Dê um nome simples. O orçamento é opcional e serve só como limite de referência.
+          <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mb: 1.6 }}>
+            Dê um nome simples. O orçamento é opcional e serve como limite de referência.
           </Typography>
-          <TextField
-            fullWidth autoFocus label="Nome da lista" placeholder="Ex: Mercado da semana"
-            value={nomeLista} onChange={(e) => setNomeLista(e.target.value)} sx={{ mb: 1.5 }}
-            onKeyDown={(e) => e.key === 'Enter' && criar()}
-          />
+          <TextField fullWidth autoFocus label="Nome da lista" placeholder="Ex: Mercado da semana" value={nomeLista} onChange={(e) => setNomeLista(e.target.value)} sx={{ mb: 1.3 }} onKeyDown={(e) => e.key === 'Enter' && criar()} />
           <TextField
             fullWidth label="Orçamento (opcional)" value={formatMoedaInput(orcamento)}
             onChange={(e) => setOrcamento(parseMoedaInput(e.target.value))}
@@ -148,9 +144,7 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button color="inherit" onClick={() => setModalNova(false)}>Cancelar</Button>
-          <Button variant="contained" disabled={!nomeLista.trim() || salvando} onClick={criar}>
-            {salvando ? 'Criando…' : 'Criar lista'}
-          </Button>
+          <Button variant="contained" disabled={!nomeLista.trim() || salvando} onClick={criar}>{salvando ? 'Criando…' : 'Criar lista'}</Button>
         </DialogActions>
       </Dialog>
 
@@ -163,11 +157,7 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button color="inherit" onClick={() => setConfirmExcId(null)}>Cancelar</Button>
-          <Button color="error" variant="contained" onClick={async () => {
-            const id = confirmExcId;
-            setConfirmExcId(null);
-            await onExcluir(id);
-          }}>Excluir lista</Button>
+          <Button color="error" variant="contained" onClick={async () => { const id = confirmExcId; setConfirmExcId(null); await onExcluir(id); }}>Excluir lista</Button>
         </DialogActions>
       </Dialog>
     </Box>

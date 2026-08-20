@@ -1,21 +1,11 @@
-// src/components/home/GraficoMensal.jsx — beta.6
-// Distribuição das saídas do mês em formato horizontal, otimizado para celular.
-// Usa exclusivamente o Razão financeiro efetivado.
-
 import React, { useEffect, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import FinanceiroService from '../../services/FinanceiroService';
+import CategoryIcon, { categoriaMeta } from '../../ui/categoryIcons';
 import { money } from './constants';
 
-const ICONE_CAT = {
-  Mercado: '🛒', Alimentação: '🍽️', Alimentacao: '🍽️', Transporte: '🚗',
-  Saúde: '💊', Saude: '💊', Lazer: '🎬', Educação: '📚', Educacao: '📚',
-  Casa: '🏠', Moradia: '🏠', Contas: '💡', Vestuário: '👗', Carnes: '🥩',
-  'Acordos/Dívidas': '🤝', Outros: '📦',
-};
-
-const CORES = ['#7B2CBF', '#9D4EDD', '#C04CCF', '#F72585', '#6D5BD0'];
+const SHADES = ['#7B2CBF', '#9150C7', '#A563CE', '#BA79D5', '#C98CDC'];
 
 const GraficoMensal = () => {
   const [dados, setDados] = useState([]);
@@ -34,16 +24,10 @@ const GraficoMensal = () => {
           const categoria = m.categoria || 'Outros';
           totais[categoria] = (totais[categoria] || 0) + Number(m.valor || 0);
         });
-        const lista = Object.entries(totais)
-          .map(([categoria, total]) => ({ categoria, total }))
-          .sort((a, b) => b.total - a.total)
-          .slice(0, 5);
+        const lista = Object.entries(totais).map(([categoria, total]) => ({ categoria, total })).sort((a, b) => b.total - a.total).slice(0, 5);
         if (ativo) setDados(lista);
-      } catch {
-        if (ativo) setDados([]);
-      } finally {
-        if (ativo) setLoading(false);
-      }
+      } catch { if (ativo) setDados([]); }
+      finally { if (ativo) setLoading(false); }
     })();
     return () => { ativo = false; };
   }, []);
@@ -52,67 +36,43 @@ const GraficoMensal = () => {
   const principal = dados[0] || null;
 
   return (
-    <Box sx={{
-      bgcolor: 'background.paper', borderRadius: '18px', border: '1px solid rgba(80,55,100,.07)',
-      boxShadow: '0 5px 20px rgba(45,11,94,.055)', mb: 1.05, overflow: 'hidden',
-    }}>
-      <Box sx={{ px: 1.45, pt: 1.2, pb: .9, display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'flex-start' }}>
+    <Box sx={{ bgcolor: 'background.paper', borderRadius: '18px', border: '1px solid rgba(72,45,91,.075)', boxShadow: '0 5px 20px rgba(45,11,94,.045)', mb: .9, overflow: 'hidden' }}>
+      <Box sx={{ px: 1.3, pt: 1.05, pb: .75, display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center' }}>
         <Box sx={{ minWidth: 0 }}>
-          <Typography sx={{ fontWeight: 900, fontSize: '.92rem', lineHeight: 1.15 }}>Para onde foi seu dinheiro</Typography>
-          <Typography sx={{ fontSize: '.69rem', color: 'text.secondary', mt: .2, fontWeight: 600 }}>saídas pagas neste mês</Typography>
+          <Typography sx={{ fontWeight: 900, fontSize: '.88rem', lineHeight: 1.15 }}>Despesas por categoria</Typography>
+          <Typography sx={{ fontSize: '.65rem', color: 'text.secondary', mt: .12, fontWeight: 650 }}>o que mais pesou no mês</Typography>
         </Box>
-        {total > 0 && (
-          <Box sx={{ px: 1, py: .45, borderRadius: '10px', bgcolor: 'rgba(123,44,191,.08)', border: '1px solid rgba(123,44,191,.14)', flexShrink: 0 }}>
-            <Typography sx={{ fontSize: '.7rem', color: 'primary.main', fontWeight: 900 }}>{money(total)}</Typography>
-          </Box>
-        )}
+        {total > 0 && <Typography sx={{ px: .8, py: .35, borderRadius: 999, bgcolor: 'rgba(123,44,191,.07)', color: 'primary.main', fontSize: '.67rem', fontWeight: 900, flexShrink: 0 }}>{money(total)}</Typography>}
       </Box>
 
       {loading ? (
-        <Box sx={{ minHeight: 112, display: 'grid', placeItems: 'center' }}>
-          <Typography sx={{ color: 'text.disabled', fontSize: '.78rem' }}>Carregando…</Typography>
-        </Box>
+        <Box sx={{ minHeight: 104, display: 'grid', placeItems: 'center' }}><Typography sx={{ color: 'text.disabled', fontSize: '.76rem' }}>Carregando…</Typography></Box>
       ) : !dados.length ? (
-        <Box sx={{ minHeight: 112, px: 2, pb: 1.4, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: .4 }}>
-          <Typography sx={{ fontSize: '1.35rem' }}>📊</Typography>
-          <Typography sx={{ fontSize: '.78rem', fontWeight: 800, color: 'text.secondary' }}>Nenhuma saída paga este mês</Typography>
-          <Typography sx={{ fontSize: '.67rem', color: 'text.disabled', textAlign: 'center' }}>Quando você pagar uma conta ou compra, a distribuição aparece aqui.</Typography>
+        <Box sx={{ minHeight: 104, px: 1.7, pb: 1.25, display: 'grid', placeItems: 'center', textAlign: 'center' }}>
+          <Box><Box sx={{ mx: 'auto', width: 40, height: 40, borderRadius: '13px', bgcolor: 'rgba(123,44,191,.07)', display: 'grid', placeItems: 'center', mb: .55 }}><CategoryIcon categoria="Outros" size={21} /></Box><Typography sx={{ fontSize: '.74rem', fontWeight: 850, color: 'text.secondary' }}>Nenhuma saída paga este mês</Typography><Typography sx={{ fontSize: '.64rem', color: 'text.disabled', mt: .18 }}>O resumo aparece assim que houver movimentações.</Typography></Box>
         </Box>
       ) : (
-        <Box sx={{ px: 1.45, pb: 1.35 }}>
-          {principal && (
-            <Box sx={{ mb: 1.05, p: 1, borderRadius: '13px', background: 'linear-gradient(135deg, rgba(123,44,191,.08), rgba(247,37,133,.045))', border: '1px solid rgba(123,44,191,.11)', display: 'flex', alignItems: 'center', gap: .85 }}>
-              <Box sx={{ width: 34, height: 34, borderRadius: '11px', bgcolor: 'rgba(123,44,191,.10)', display: 'grid', placeItems: 'center', fontSize: '1rem', flexShrink: 0 }}>
-                {ICONE_CAT[principal.categoria] || '📦'}
-              </Box>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography sx={{ fontSize: '.66rem', color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.5px' }}>Maior categoria</Typography>
-                <Typography sx={{ fontSize: '.8rem', fontWeight: 900, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{principal.categoria}</Typography>
-              </Box>
-              <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-                <Typography sx={{ fontSize: '.8rem', fontWeight: 900, color: 'primary.main' }}>{money(principal.total)}</Typography>
-                <Typography sx={{ fontSize: '.65rem', color: 'text.secondary', fontWeight: 800 }}>{Math.round((principal.total / total) * 100)}% do total</Typography>
-              </Box>
-            </Box>
-          )}
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: .85 }}>
+        <Box sx={{ px: 1.3, pb: 1.15 }}>
+          {principal && (() => {
+            const meta = categoriaMeta(principal.categoria);
+            return <Box sx={{ mb: .85, p: .82, borderRadius: '13px', bgcolor: 'rgba(123,44,191,.045)', border: '1px solid rgba(123,44,191,.085)', display: 'flex', alignItems: 'center', gap: .75 }}>
+              <Box sx={{ width: 32, height: 32, borderRadius: '10px', bgcolor: `${meta.color}12`, display: 'grid', placeItems: 'center', flexShrink: 0 }}><CategoryIcon categoria={principal.categoria} size={18} /></Box>
+              <Box sx={{ flex: 1, minWidth: 0 }}><Typography sx={{ fontSize: '.61rem', color: 'text.secondary', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.4px' }}>Maior categoria</Typography><Typography sx={{ fontSize: '.76rem', fontWeight: 900, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{principal.categoria}</Typography></Box>
+              <Box sx={{ textAlign: 'right' }}><Typography sx={{ fontSize: '.76rem', fontWeight: 900, color: 'primary.main' }}>{money(principal.total)}</Typography><Typography sx={{ fontSize: '.62rem', color: 'text.secondary', fontWeight: 800 }}>{Math.round((principal.total / total) * 100)}%</Typography></Box>
+            </Box>;
+          })()}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: .7 }}>
             {dados.map((d, i) => {
-              const pct = total > 0 ? Math.max(2, (d.total / total) * 100) : 0;
-              const cor = CORES[i % CORES.length];
-              return (
-                <Box key={d.categoria}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: .65, mb: .38 }}>
-                    <Typography sx={{ fontSize: '.82rem', width: 18, lineHeight: 1 }}>{ICONE_CAT[d.categoria] || '📦'}</Typography>
-                    <Typography sx={{ flex: 1, minWidth: 0, fontSize: '.7rem', fontWeight: 800, color: 'text.primary', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{d.categoria}</Typography>
-                    <Typography sx={{ fontSize: '.68rem', fontWeight: 900, color: 'text.secondary' }}>{money(d.total)}</Typography>
-                    <Typography sx={{ width: 30, textAlign: 'right', fontSize: '.66rem', fontWeight: 900, color }}>{Math.round((d.total / total) * 100)}%</Typography>
-                  </Box>
-                  <Box sx={{ ml: '25px', height: 7, borderRadius: 999, bgcolor: '#EFEAF4', overflow: 'hidden' }}>
-                    <Box sx={{ height: '100%', width: `${pct}%`, borderRadius: 999, background: `linear-gradient(90deg, ${cor}, ${cor}B8)`, transition: 'width .6s ease' }} />
-                  </Box>
+              const pct = total > 0 ? (d.total / total) * 100 : 0;
+              const shade = SHADES[i % SHADES.length];
+              return <Box key={d.categoria}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: '22px minmax(0,1fr) auto', alignItems: 'center', gap: .55, mb: .3 }}>
+                  <Box sx={{ width: 22, height: 22, borderRadius: '7px', bgcolor: `${shade}0C`, display: 'grid', placeItems: 'center' }}><CategoryIcon categoria={d.categoria} size={14} color={shade} /></Box>
+                  <Typography sx={{ fontSize: '.67rem', fontWeight: 800, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{d.categoria}</Typography>
+                  <Typography sx={{ fontSize: '.66rem', fontWeight: 900, color: 'text.secondary' }}>{money(d.total)} · {Math.round(pct)}%</Typography>
                 </Box>
-              );
+                <Box sx={{ ml: '27px', height: 7, borderRadius: 99, bgcolor: '#F0EBF4', overflow: 'hidden' }}><Box sx={{ width: `${Math.max(2, pct)}%`, height: '100%', borderRadius: 99, bgcolor: shade, transition: 'width .5s ease' }} /></Box>
+              </Box>;
             })}
           </Box>
         </Box>

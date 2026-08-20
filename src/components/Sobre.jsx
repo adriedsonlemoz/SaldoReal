@@ -82,6 +82,12 @@ const Sobre = ({ setRoute }) => {
 
   const changelog = [
     {
+      v: 'beta.7',
+      icon: '✨',
+      title: 'Polimento visual e consistência',
+      desc: 'Home, Fluxo, lançamentos, compras, acordos e relatórios agora compartilham a mesma linguagem visual, com identidade roxa, cards mais leves, ícones consistentes, melhor tipografia, espaçamento e responsividade.',
+    },
+    {
       v: 'beta.6',
       icon: '🧩',
       title: 'Sincronização e experiência refinada',
@@ -203,12 +209,12 @@ const Sobre = ({ setRoute }) => {
       {/* Cabeçalho do app */}
       <Card sx={{ mb: 3, overflow: 'hidden' }}>
         <Box sx={{ background: 'linear-gradient(135deg, #2D0B5E 0%, #7B2CBF 58%, #F72585 100%)', p: 3, textAlign: 'center' }}>
-          <Typography sx={{ fontSize: '3.5rem', lineHeight: 1, mb: 1 }}>💜</Typography>
-          <Typography sx={{ fontWeight: 800, color: '#fff', fontSize: '1.5rem' }}>SaldoReal</Typography>
+          <Box component="img" src="/saldoreal-icon.png" alt="SaldoReal" sx={{ width: 70, height: 70, borderRadius: '20px', objectFit: 'cover', mb: 1, boxShadow: '0 10px 24px rgba(20,4,42,.22)' }} />
+          <Typography sx={{ fontWeight: 900, color: '#fff', fontSize: '1.45rem' }}>SaldoReal</Typography>
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 6" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 7" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>

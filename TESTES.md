@@ -197,3 +197,16 @@ A suíte passou a cobrir também:
 - entrada monetária por centavos (`1990` → `19,90`) em teclado numérico;
 - fluxo E2E Lista → pagar item → Fluxo → remover item → confirmar ausência no Fluxo.
 
+
+
+## Revisão visual beta.7
+
+A beta.7 preserva as regras de negócio e concentra alterações em componentes visuais. Validar principalmente:
+
+- Home em telas Android estreitas (360 px e similares);
+- Novo Lançamento com teclado aberto e categorias;
+- Fluxo com nomes longos, valores altos e filtros;
+- Lista de Compras vazia e com muitos itens;
+- Relatório e Acordos em telas pequenas;
+- barra inferior com safe-area;
+- foco visível, contraste e áreas de toque.

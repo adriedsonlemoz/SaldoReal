@@ -7,6 +7,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RestoreRoundedIcon from '@mui/icons-material/RestoreRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { money } from './constants';
 
 const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
@@ -24,37 +26,37 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
       onClick={aberta ? onClick : undefined}
       onKeyDown={aberta ? (e) => (e.key === 'Enter' || e.key === ' ') && onClick() : undefined}
       sx={{
-        p: 1.45, mb: 1, borderRadius: '18px', bgcolor: 'background.paper',
+        p: 1.25, mb: .85, borderRadius: '18px', bgcolor: 'background.paper',
         border: '1px solid rgba(15,23,42,.07)', cursor: aberta ? 'pointer' : 'default',
-        boxShadow: '0 5px 18px rgba(15,23,42,.045)', transition: 'all .16s',
+        boxShadow: '0 4px 14px rgba(45,11,94,.045)', transition: 'all .16s',
         '&:active': aberta ? { transform: 'scale(.985)' } : undefined,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
         <Box sx={{
-          width: 42, height: 42, borderRadius: '14px', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
+          width: 40, height: 40, borderRadius: '13px', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: aberta
             ? 'linear-gradient(135deg,rgba(123,44,191,.11),rgba(157,78,221,.10))'
             : 'rgba(100,116,139,.09)',
         }}>
-          {aberta ? '🛒' : '✓'}
+          {aberta ? <ShoppingCartRoundedIcon sx={{ color: 'primary.main', fontSize: '1.2rem' }} /> : <CheckCircleRoundedIcon sx={{ color: 'text.secondary', fontSize: '1.2rem' }} />}
         </Box>
 
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Box sx={{ display: 'flex', gap: .7, alignItems: 'center' }}>
-            <Typography sx={{ fontWeight: 900, fontSize: '.92rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography sx={{ fontWeight: 900, fontSize: '.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {lista.nome}
             </Typography>
             <Box sx={{
               px: .7, py: .15, borderRadius: '7px', flexShrink: 0,
               bgcolor: aberta ? 'rgba(123,44,191,.09)' : 'rgba(100,116,139,.10)',
-              color: aberta ? '#7B2CBF' : '#64748B', fontSize: '.68rem', fontWeight: 900,
+              color: aberta ? '#7B2CBF' : '#64748B', fontSize: '.61rem', fontWeight: 900,
             }}>
               {aberta ? 'EM ANDAMENTO' : 'FINALIZADA'}
             </Box>
           </Box>
-          <Typography sx={{ fontSize: '.72rem', color: 'text.secondary', mt: .3, fontWeight: 600 }}>
+          <Typography sx={{ fontSize: '.71rem', color: 'text.secondary', mt: .3, fontWeight: 600 }}>
             Planejado {money(planejado)} · Pago {money(pago)}
           </Typography>
         </Box>
@@ -81,7 +83,7 @@ const CardLista = ({ lista, onClick, onExcluir, onReabrir }) => {
       </Box>
 
       {orcamento > 0 && (
-        <Box sx={{ mt: 1.25 }}>
+        <Box sx={{ mt: 1 }}>
           <LinearProgress
             variant="determinate" value={pctPago}
             sx={{

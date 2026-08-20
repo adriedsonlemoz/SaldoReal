@@ -1,9 +1,16 @@
-// src/components/home/CardHero.jsx — resumo financeiro principal.
-
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
+import VisibilityOffRoundedIcon from '@mui/icons-material/VisibilityOffRounded';
 import { money } from './constants';
+
+const Metric = ({ label, value, color = 'rgba(255,255,255,.94)' }) => (
+  <Box sx={{ minWidth: 0 }}>
+    <Typography sx={{ color: 'rgba(255,255,255,.52)', fontSize: '.64rem', fontWeight: 800, letterSpacing: '.25px' }}>{label}</Typography>
+    <Typography sx={{ color, fontSize: '.76rem', fontWeight: 900, mt: .08, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</Typography>
+  </Box>
+);
 
 const CardHero = ({
   debito = 0,
@@ -15,123 +22,52 @@ const CardHero = ({
   receitaConsiderada = 0,
 }) => {
   const [mostrar, setMostrar] = useState(true);
-
   const pctPago = Math.max(0, Math.min(100, percentual || 0));
-  const barColor = pctPago >= 80 ? '#FF4D6D' : pctPago >= 60 ? '#FFB703' : '#4DFFC3';
   const positivo = saldoDisponivel >= 0;
-  const projetadoPositivo = saldoProjetado >= 0;
   const temRenda = receitaConsiderada > 0 || renda > 0;
+  const statusColor = positivo ? '#67E8B8' : '#FF9BAA';
+  const projectColor = saldoProjetado >= 0 ? '#67E8B8' : '#FF9BAA';
 
   return (
     <Box sx={{
-      position: 'relative', mb: 1, borderRadius: '22px', overflow: 'hidden',
-      background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 40%, #4A0E8F 70%, #6B1FA8 100%)',
-      boxShadow: '0 12px 34px rgba(77,25,133,0.28), 0 3px 10px rgba(45,11,94,0.12)',
+      position: 'relative', mb: .9, borderRadius: '22px', overflow: 'hidden',
+      background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 48%, #5A1691 100%)',
+      boxShadow: '0 13px 34px rgba(62,18,109,.24)',
+      border: '1px solid rgba(255,255,255,.08)',
     }}>
-      <Box sx={{
-        position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(247,37,133,0.45) 0%, transparent 70%)',
-        filter: 'blur(20px)', animation: 'pulse1 4s ease-in-out infinite', pointerEvents: 'none',
-        '@keyframes pulse1': {
-          '0%, 100%': { opacity: 0.7, transform: 'scale(1)' },
-          '50%': { opacity: 1, transform: 'scale(1.15)' },
-        },
-      }} />
-      <Box sx={{
-        position: 'absolute', bottom: -20, left: -20, width: 90, height: 90, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(157,78,221,0.34) 0%, transparent 70%)',
-        filter: 'blur(16px)', animation: 'pulse2 5s ease-in-out infinite', pointerEvents: 'none',
-        '@keyframes pulse2': {
-          '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
-          '50%': { opacity: 0.9, transform: 'scale(1.2)' },
-        },
-      }} />
-      <Box sx={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
-        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)',
-        pointerEvents: 'none',
-      }} />
-
-      <Box sx={{ px: 2, pt: 1.45, pb: 1.45, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: .7 }}>
-          <Typography sx={{
-            color: 'rgba(255,255,255,0.5)', fontSize: '0.66rem', fontWeight: 800,
-            letterSpacing: '1.5px', textTransform: 'uppercase',
-          }}>
-            Saldo disponível
-          </Typography>
-          <Box role="button" tabIndex={0} aria-label={mostrar ? 'Ocultar saldo' : 'Mostrar saldo'} onClick={() => setMostrar(v => !v)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setMostrar(v => !v)} sx={{
-            cursor: 'pointer', width: 44, height: 44, display: 'grid', placeItems: 'center', bgcolor: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', px: 0, py: 0,
-            fontSize: '0.68rem', lineHeight: 1, userSelect: 'none', transition: 'all 0.2s',
-            '&:active': { transform: 'scale(0.9)' },
-          }}>
-            {mostrar ? '👁' : '🙈'}
+      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(circle at 90% 12%, rgba(247,37,133,.28), transparent 34%), radial-gradient(circle at 12% 100%, rgba(157,78,221,.20), transparent 31%)' }} />
+      <Box sx={{ px: 1.7, py: 1.35, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ color: 'rgba(255,255,255,.55)', fontSize: '.64rem', fontWeight: 900, letterSpacing: '1.2px', textTransform: 'uppercase' }}>Saldo disponível</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: .7, mt: .35, minWidth: 0 }}>
+              <Typography sx={{ fontSize: { xs: '1.95rem', sm: '2.15rem' }, fontWeight: 900, color: '#fff', letterSpacing: '-1px', lineHeight: 1, minWidth: 0 }}>
+                {mostrar ? money(saldoDisponivel) : '••••••'}
+              </Typography>
+              <Box sx={{ px: .72, py: .22, borderRadius: 999, bgcolor: positivo ? 'rgba(17,156,114,.16)' : 'rgba(229,72,98,.17)', border: `1px solid ${positivo ? 'rgba(103,232,184,.28)' : 'rgba(255,155,170,.32)'}`, flexShrink: 0 }}>
+                <Typography sx={{ fontSize: '.62rem', fontWeight: 900, color: statusColor }}>{positivo ? 'NO AZUL' : 'ATENÇÃO'}</Typography>
+              </Box>
+            </Box>
           </Box>
-        </Box>
-
-        <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: .9, mb: 1.05 }}>
-          <Typography sx={{
-            fontSize: { xs: '1.95rem', sm: '2.15rem' }, fontWeight: 900, lineHeight: 1, letterSpacing: '-1px', color: '#fff',
-            textShadow: '0 2px 20px rgba(255,255,255,0.2)',
-          }}>
-            {mostrar ? money(saldoDisponivel) : '••••••'}
-          </Typography>
-          <Box sx={{
-            mb: 0.15, px: .9, py: .25, borderRadius: '20px',
-            background: positivo
-              ? 'linear-gradient(135deg, rgba(4,210,161,0.25), rgba(4,210,161,0.1))'
-              : 'linear-gradient(135deg, rgba(239,35,60,0.3), rgba(239,35,60,0.1))',
-            border: `1px solid ${positivo ? 'rgba(4,210,161,0.4)' : 'rgba(239,35,60,0.4)'}`,
-          }}>
-            <Typography sx={{ fontSize: '0.66rem', fontWeight: 900, color: positivo ? '#4DFFC3' : '#FF8FA3' }}>
-              {positivo ? '✓ NO AZUL' : '⚠ ATENÇÃO'}
-            </Typography>
+          <Box role="button" tabIndex={0} aria-label={mostrar ? 'Ocultar saldo' : 'Mostrar saldo'} onClick={() => setMostrar(v => !v)} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setMostrar(v => !v)} sx={{ width: 38, height: 38, borderRadius: '12px', bgcolor: 'rgba(255,255,255,.09)', border: '1px solid rgba(255,255,255,.11)', display: 'grid', placeItems: 'center', cursor: 'pointer', color: 'rgba(255,255,255,.80)', flexShrink: 0, '&:active': { transform: 'scale(.92)' } }}>
+            {mostrar ? <VisibilityRoundedIcon sx={{ fontSize: 18 }} /> : <VisibilityOffRoundedIcon sx={{ fontSize: 18 }} />}
           </Box>
         </Box>
 
         {temRenda ? (
           <>
-            <Box sx={{ position: 'relative', height: 5, borderRadius: 8, bgcolor: 'rgba(255,255,255,0.12)', mb: .55, overflow: 'hidden' }}>
-              <Box sx={{
-                position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pctPago}%`, borderRadius: 8,
-                background: `linear-gradient(90deg, ${barColor}bb, ${barColor})`, boxShadow: `0 0 10px ${barColor}88`,
-                transition: 'width 0.8s ease',
-              }} />
+            <Box sx={{ height: 4, borderRadius: 99, bgcolor: 'rgba(255,255,255,.10)', mt: 1.05, overflow: 'hidden' }}>
+              <Box sx={{ height: '100%', width: `${pctPago}%`, borderRadius: 99, background: pctPago >= 90 ? 'linear-gradient(90deg,#F72585,#FF7DAE)' : 'linear-gradient(90deg,#9D4EDD,#D46BD4)', transition: 'width .55s ease' }} />
             </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
-              <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.66rem', fontWeight: 600 }}>
-                Pago {mostrar ? money(despesasPagas) : '••••'}{debito > 0 ? ` · Pendente ${mostrar ? money(debito) : '••••'}` : ''}
-              </Typography>
-              <Typography sx={{ color: barColor, fontSize: '0.66rem', fontWeight: 900 }}>
-                {pctPago}% gasto
-              </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .7, mt: .85, p: .85, borderRadius: '12px', bgcolor: 'rgba(255,255,255,.065)', border: '1px solid rgba(255,255,255,.085)' }}>
+              <Metric label="Pago" value={mostrar ? money(despesasPagas) : '••••'} />
+              <Metric label="Pendente" value={mostrar ? money(debito) : '••••'} />
+              <Metric label="Projetado" value={mostrar ? money(saldoProjetado) : '••••'} color={projectColor} />
             </Box>
-
-            <Box sx={{
-              mt: .85, px: 1.1, py: .65, borderRadius: '10px',
-              bgcolor: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-              display: 'flex', justifyContent: 'space-between', gap: 1,
-            }}>
-              <Typography sx={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.68rem', fontWeight: 700 }}>
-                Após pagar pendências
-              </Typography>
-              <Typography sx={{ color: projetadoPositivo ? '#4DFFC3' : '#FF8FA3', fontSize: '0.69rem', fontWeight: 900 }}>
-                {mostrar ? money(saldoProjetado) : '••••••'}
-              </Typography>
-            </Box>
+            <Typography sx={{ mt: .55, color: 'rgba(255,255,255,.52)', fontSize: '.64rem', fontWeight: 750, textAlign: 'right' }}>{pctPago}% da renda utilizada</Typography>
           </>
         ) : (
-          <Box sx={{
-            display: 'flex', alignItems: 'center', gap: 0.8, px: 1.5, py: 0.8,
-            bgcolor: 'rgba(255,255,255,0.07)', borderRadius: '10px', border: '1px dashed rgba(255,255,255,0.2)',
-          }}>
-            <Typography sx={{ fontSize: '0.7rem' }}>💡</Typography>
-            <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.68rem', fontStyle: 'italic' }}>
-              Configure sua renda para ver o progresso
-            </Typography>
-          </Box>
+          <Typography sx={{ mt: .9, px: .9, py: .65, borderRadius: '10px', bgcolor: 'rgba(255,255,255,.06)', color: 'rgba(255,255,255,.65)', fontSize: '.68rem', fontWeight: 700 }}>Configure sua renda para acompanhar o ritmo do mês.</Typography>
         )}
       </Box>
     </Box>

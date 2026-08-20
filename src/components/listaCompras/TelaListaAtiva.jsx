@@ -17,6 +17,8 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
+import ShoppingBasketRoundedIcon from '@mui/icons-material/ShoppingBasketRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import ItemRow from './ItemRow';
 import ModalAdicionarItem from './ModalAdicionarItem';
 import { money } from './constants';
@@ -24,9 +26,9 @@ import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/
 
 const SummaryBox = ({ label, value, tone = 'neutral', caption }) => {
   const tones = {
-    teal: { bg: 'rgba(17,156,114,.08)', color: '#087A58' },
-    cyan: { bg: 'rgba(123,44,191,.075)', color: '#7B2CBF' },
-    neutral: { bg: '#F8FAFC', color: '#334155' },
+    paid: { bg: 'rgba(17,156,114,.07)', color: '#087A58' },
+    primary: { bg: 'rgba(123,44,191,.07)', color: '#6F22AE' },
+    neutral: { bg: 'rgba(45,11,94,.035)', color: '#40384A' },
   };
   const c = tones[tone] || tones.neutral;
   return (
@@ -115,7 +117,7 @@ const TelaListaAtiva = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 620, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 2, minHeight: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))' }}>
+    <Box sx={{ maxWidth: 620, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 2, minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))' }}>
       <Snackbar
         open={toast.open} autoHideDuration={4500}
         onClose={() => setToast(t => ({ ...t, open: false }))}
@@ -176,8 +178,8 @@ const TelaListaAtiva = ({
 
       <Box sx={{ bgcolor: 'background.paper', borderRadius: '17px', p: 1.15, mb: 1.1, border: '1px solid rgba(15,23,42,.06)' }}>
         <Box sx={{ display: 'flex', gap: .8 }}>
-          <SummaryBox label="Planejado" value={dados.planejado} tone="cyan" caption="todos os itens" />
-          <SummaryBox label="Pago" value={dados.totalPago} tone="teal" caption="já no financeiro" />
+          <SummaryBox label="Planejado" value={dados.planejado} tone="primary" caption="todos os itens" />
+          <SummaryBox label="Pago" value={dados.totalPago} tone="paid" caption="já no financeiro" />
           <SummaryBox label="A comprar" value={dados.restantePlanejado} caption="estimativa restante" />
         </Box>
 
@@ -196,9 +198,12 @@ const TelaListaAtiva = ({
               sx={{ height: 7, bgcolor: '#EEF2F7', '& .MuiLinearProgress-bar': { bgcolor: acima ? '#E54862' : '#7B2CBF' } }}
             />
             {dados.planejado > orcamento && (
-              <Typography sx={{ fontSize: '.68rem', color: '#F59E0B', mt: .55, fontWeight: 700 }}>
-                ⚠️ O total planejado está {money(dados.planejado - orcamento)} acima do orçamento.
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: .45, mt: .55, color: '#B26A00' }}>
+              <WarningAmberRoundedIcon sx={{ fontSize: '.9rem' }} />
+              <Typography sx={{ fontSize: '.68rem', color: 'inherit', fontWeight: 700 }}>
+                O total planejado está {money(dados.planejado - orcamento)} acima do orçamento.
               </Typography>
+            </Box>
             )}
           </Box>
         )}
@@ -213,7 +218,7 @@ const TelaListaAtiva = ({
 
       {itens.length === 0 && (
         <Box sx={{ textAlign: 'center', py: 2.4, px: 1.4, border: '1px dashed #D8CDE2', borderRadius: '20px', bgcolor: 'rgba(255,255,255,.72)' }}>
-          <Typography sx={{ fontSize: '2rem' }}>🧺</Typography>
+          <ShoppingBasketRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />
           <Typography sx={{ fontWeight: 900, mt: .55 }}>Sua lista está vazia</Typography>
           <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mt: .25 }}>Adicione o primeiro produto para começar.</Typography>
           <Box sx={{ mt: 1.4, display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .6, textAlign: 'left' }}>
@@ -233,7 +238,7 @@ const TelaListaAtiva = ({
       )}
 
       {dados.pendentes.length > 0 && (
-        <Box sx={{ mb: 2.4 }}>
+        <Box sx={{ mb: 1.35 }}>
           <SectionTitle title="A comprar" count={dados.pendentes.length} />
           {dados.pendentes.map(item => (
             <ItemRow key={item.id} item={item} onPagar={abrirPagamento} onDesfazer={() => {}} onRemove={setItemRemover} />
@@ -242,7 +247,7 @@ const TelaListaAtiva = ({
       )}
 
       {dados.pagos.length > 0 && (
-        <Box sx={{ mb: 2.4 }}>
+        <Box sx={{ mb: 1.35 }}>
           <SectionTitle title="Pago e lançado" count={dados.pagos.length} paid />
           <Typography sx={{ fontSize: '.7rem', color: 'text.secondary', mb: 1, mt: -.5 }}>
             Estes valores já fazem parte da Home, Fluxo, Relatório e gráficos do SaldoReal.
@@ -254,9 +259,9 @@ const TelaListaAtiva = ({
       )}
 
       {itens.length > 0 && (
-        <Box sx={{ mt: 2.5, p: 1.5, borderRadius: '18px', bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+        <Box sx={{ mt: 1.45, p: 1.3, borderRadius: '16px', bgcolor: 'rgba(123,44,191,.035)', border: '1px solid rgba(123,44,191,.10)' }}>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <ReceiptLongRoundedIcon sx={{ color: '#64748B' }} />
+            <ReceiptLongRoundedIcon sx={{ color: 'primary.main' }} />
             <Box sx={{ flex: 1 }}>
               <Typography sx={{ fontWeight: 900, fontSize: '.82rem' }}>Terminou a compra?</Typography>
               <Typography sx={{ fontSize: '.67rem', color: 'text.secondary' }}>Finalizar só arquiva a lista. Os itens pagos já estão no financeiro.</Typography>
@@ -271,7 +276,7 @@ const TelaListaAtiva = ({
       <ModalAdicionarItem open={modalAdd} onClose={() => setModalAdd(false)} onAdicionar={onAdicionar} />
 
       <Dialog open={!!itemPagamento} onClose={() => !processando && setItemPagamento(null)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 900 }}>💳 Registrar pagamento</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: .8 }}><PaymentsRoundedIcon color="primary" /> Registrar pagamento</DialogTitle>
         <DialogContent>
           <Typography sx={{ fontWeight: 800, mb: .3 }}>{itemPagamento?.nome}</Typography>
           <Typography sx={{ fontSize: '.76rem', color: 'text.secondary', mb: 2 }}>
@@ -356,9 +361,12 @@ const TelaListaAtiva = ({
             A lista será arquivada no histórico. <strong>{dados.pagos.length} item(ns) pagos, total de {money(dados.totalPago)}, já estão registrados no financeiro.</strong>
           </Typography>
           {dados.pendentes.length > 0 && (
-            <Typography sx={{ fontSize: '.74rem', color: '#F59E0B', fontWeight: 700, mt: 1.2 }}>
-              ⚠️ {dados.pendentes.length} item(ns) ainda estão em “A comprar” e não entram nas finanças.
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: .5, mt: 1.2, color: '#B26A00' }}>
+              <WarningAmberRoundedIcon sx={{ fontSize: '1rem', mt: .05 }} />
+              <Typography sx={{ fontSize: '.74rem', color: 'inherit', fontWeight: 700 }}>
+                {dados.pendentes.length} item(ns) ainda estão em “A comprar” e não entram nas finanças.
+              </Typography>
+            </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
