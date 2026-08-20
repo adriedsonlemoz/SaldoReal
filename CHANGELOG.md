@@ -1,22 +1,29 @@
 # Changelog
 
-## 1.0.0-beta.8.2
+
+## 1.0.0-beta.8.3 — Android CI com Java 21
+
+- Corrige a compilação Android do Capacitor 8 usando JDK 21 no GitHub Actions.
+- Atualiza `actions/cache` para v5, compatível com o runtime Node.js 24 das Actions atuais.
+- Mantém os 112 testes unitários e o build Vite sem alterações de regra de negócio.
+- Incrementa o `versionCode` Android para 10.
+
+## 1.0.0-beta.8.2 — Correção do build Vite
 
 - Corrige o build de produção substituindo o ícone `EcoRounded`, ausente no pacote Material Icons resolvido, por `LocalFloristRounded`.
 - Inclui o `package-lock.json` gerado pelo GitHub Actions para instalações reproduzíveis com `npm ci`.
 - Atualiza `actions/upload-artifact` para v7, eliminando o aviso de runtime Node.js 20 no runner atual.
 - Mantém os 112 testes unitários da beta.8.1 sem alteração de regras financeiras.
 
- — SaldoReal
 
-## 1.0.0-beta.8.2 — Correção do CI de pré-publicação
+## 1.0.0-beta.8.1 — Correção do CI de pré-publicação
 
 - Atualiza os testes legados de acordos para a regra atual de primeiro vencimento.
 - Torna os testes financeiros determinísticos, sem depender do dia em que o CI é executado.
 - Evita tentativa de abrir IndexedDB em ambientes de teste sem essa API.
 - Atualiza checkout/setup-java/setup-node para Actions v5.
 - Publica o `package-lock.json` gerado como artefato quando o repositório ainda não possui lockfile.
-- Android passa a usar `versionCode 9` e `versionName 1.0.0-beta.8.2`.
+- Android passa a usar `versionCode 9` e `versionName 1.0.0-beta.8.1`.
 
 
 ## 1.0.0-beta.8 — Preparação para Google Play
