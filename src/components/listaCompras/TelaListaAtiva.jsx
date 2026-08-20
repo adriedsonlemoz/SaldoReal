@@ -117,7 +117,7 @@ const TelaListaAtiva = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 620, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 2, minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))' }}>
+    <Box sx={{ maxWidth: 620, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 2, minHeight: 'calc(100dvh - 62px - var(--app-safe-bottom))' }}>
       <Snackbar
         open={toast.open} autoHideDuration={4500}
         onClose={() => setToast(t => ({ ...t, open: false }))}

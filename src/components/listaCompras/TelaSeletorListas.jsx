@@ -56,7 +56,7 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
   ];
 
   return (
-    <Box sx={{ maxWidth: 560, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 1.5, minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))' }}>
+    <Box sx={{ maxWidth: 560, mx: 'auto', px: { xs: 1.5, sm: 2 }, pt: 1.1, pb: 1.5, minHeight: 'calc(100dvh - 62px - var(--app-safe-bottom))' }}>
       <Box sx={{
         borderRadius: '22px', p: 1.65, mb: 1.15,
         background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 58%,#7B2CBF 100%)',

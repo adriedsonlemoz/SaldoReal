@@ -16,7 +16,7 @@ Aceite a permissão exibida pelo Android.
 **Como trabalhar com o projeto?**
 ```bash
 cd ~/projetos/saldoreal
-npm ci
+npm install
 npm run dev
 ```
 

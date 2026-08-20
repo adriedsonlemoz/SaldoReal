@@ -6,8 +6,11 @@
     "androidScheme": "https"
   },
   "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 0
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "DARK",
+      "hidden": false,
+      "animation": "NONE"
     }
   }
 }

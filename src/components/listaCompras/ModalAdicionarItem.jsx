@@ -63,7 +63,7 @@ const ModalAdicionarItem = ({ open, onClose, onAdicionar }) => {
   return (
     <Dialog fullScreen open={open} onClose={onClose} TransitionComponent={Transition} PaperProps={{ sx: { bgcolor: 'background.default', backgroundImage: 'none' } }}>
       <AppBar position="sticky" elevation={0} sx={{ background: 'linear-gradient(135deg,#2D0B5E 0%,#5A189A 58%,#7B2CBF 100%)', color: '#fff', borderBottom: '1px solid rgba(255,255,255,.08)' }}>
-        <Toolbar sx={{ minHeight: '58px !important', px: '12px !important', pt: 'env(safe-area-inset-top, 0px)' }}>
+        <Toolbar sx={{ minHeight: '58px !important', px: '12px !important', pt: 'var(--app-safe-top)' }}>
           <IconButton edge="start" onClick={onClose} aria-label="Fechar" sx={{ color: '#fff', width: 40, height: 40, bgcolor: 'rgba(255,255,255,.08)' }}><CloseIcon /></IconButton>
           <Box sx={{ flex: 1, ml: 1.25, minWidth: 0 }}>
             <Typography sx={{ fontSize: '.61rem', fontWeight: 800, opacity: .72, lineHeight: 1.05 }}>LISTA DE COMPRAS</Typography>
@@ -76,7 +76,7 @@ const ModalAdicionarItem = ({ open, onClose, onAdicionar }) => {
           }}>{saving ? 'Salvando…' : 'Adicionar'}</Button>
         </Toolbar>
       </AppBar>
-      <DialogContent sx={{ px: { xs: 1.25, sm: 2.5 }, py: 1.35, pb: 'calc(16px + env(safe-area-inset-bottom, 0px))', maxWidth: 560, mx: 'auto', width: '100%' }}>
+      <DialogContent sx={{ px: { xs: 1.25, sm: 2.5 }, py: 1.35, pb: 'calc(16px + var(--app-safe-bottom))', maxWidth: 560, mx: 'auto', width: '100%' }}>
         <Typography sx={sectionLabel}>Produto</Typography>
         <TextField fullWidth autoFocus placeholder="Ex.: arroz, carne moída, detergente…" value={form.nome} onChange={setField('nome')} onKeyDown={(e) => e.key === 'Enter' && podeSalvar && handleAdicionar()} sx={inputSx} inputProps={{ maxLength: 80 }} />
         <Divider sx={{ my: 1.35 }} />

@@ -1,4 +1,4 @@
-// src/components/Home.jsx — beta.7
+// src/components/Home.jsx — beta.8
 // Navbar e modais Add/Config removidos daqui — vivem no App.jsx global.
 // Home mantém apenas: TelaPerfil, modal de alertas, conteúdo do dashboard.
 
@@ -92,7 +92,7 @@ const TelaPerfil = ({
     <Dialog open={open} onClose={onClose} fullScreen TransitionComponent={Slide}
       TransitionProps={{ direction: 'up' }} PaperProps={{ sx: { bgcolor: 'background.default' } }}>
       <Box sx={{
-        px: { xs: 2, sm: 2.5 }, pt: 'calc(18px + env(safe-area-inset-top, 0px))', pb: 2,
+        px: { xs: 2, sm: 2.5 }, pt: '18px', pb: 2,
         background: 'linear-gradient(145deg,#1A0533 0%,#2D0B5E 55%,#6B1FA8 100%)', color: '#fff',
       }}>
         <Box sx={{ maxWidth: 500, mx: 'auto' }}>
@@ -110,7 +110,7 @@ const TelaPerfil = ({
         </Box>
       </Box>
 
-      <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', px: { xs: 1.5, sm: 2 }, py: 1.5, pb: 'calc(24px + env(safe-area-inset-bottom, 0px))' }}>
+      <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', px: { xs: 1.5, sm: 2 }, py: 1.5, pb: 'calc(24px + var(--app-safe-bottom))' }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: .7, mb: 1.35 }}>
           {stats.map(st => (
             <Paper key={st.label} elevation={0} sx={{ p: .9, borderRadius: '14px', border: '1px solid rgba(80,55,100,.08)', minWidth: 0 }}>
@@ -231,7 +231,7 @@ const Home = ({ setRoute }) => {
   }, [usuario, renda, carregando]);
 
   if (carregando) return (
-    <Box sx={{ minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: 'calc(100dvh - 62px - var(--app-safe-bottom))', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
       <Box sx={{ textAlign: 'center' }}>
         <Box sx={{ width: 44, height: 44, mx: 'auto', mb: 1, borderRadius: '14px', bgcolor: 'rgba(123,44,191,.08)', color: 'primary.main', display: 'grid', placeItems: 'center' }}><AccountBalanceWalletRoundedIcon /></Box>
         <Typography sx={{ color: 'text.secondary', fontSize: '.8rem', fontWeight: 700 }}>Carregando…</Typography>
@@ -252,7 +252,7 @@ const Home = ({ setRoute }) => {
   const primeiroNome = usuario.split(' ')[0];
 
   return (
-    <Box sx={{ minHeight: 'calc(100dvh - 62px - env(safe-area-inset-bottom, 0px))', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: 'calc(100dvh - 62px - var(--app-safe-bottom))', bgcolor: 'background.default' }}>
       <Snackbar open={toast.open} autoHideDuration={3000}
         onClose={() => setToast(t => ({ ...t, open: false }))}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>

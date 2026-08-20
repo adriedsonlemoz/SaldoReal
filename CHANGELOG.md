@@ -1,5 +1,19 @@
 # Changelog — SaldoReal
 
+## 1.0.0-beta.8 — Preparação para Google Play
+
+- Capacitor atualizado de 5 para 8.5.0 e pipeline migrado para Node 22;
+- Android configurado para compile/target API 36 e minSdk 24;
+- workflow passa a validar testes unitários, lint Android, APK debug e AAB release assinado quando a chave de upload estiver configurada;
+- suporte a Play App Signing por chave de upload armazenada somente em GitHub Secrets;
+- SystemBars/safe areas preparados para edge-to-edge do Android 16;
+- tráfego HTTP em claro e backup automático do Android desativados;
+- política de privacidade adicionada dentro do app e como página pública;
+- restauração de backup recebe confirmação adicional e conta também as movimentações do Razão;
+- tela de erro do banco informa preservação dos dados e evita orientar exclusão destrutiva;
+- placeholders de PIX/e-mail de suporte foram removidos da interface de publicação;
+- documentação de release e checklist do Play Console adicionados.
+
 ## 1.0.0-beta.7 — Polimento visual e consistência de interface
 
 - identidade visual consolidada em roxo/violeta, reservando verde e vermelho para significado financeiro;

@@ -4,3 +4,9 @@ android/
 .env
 .env.local
 *.local
+# Android release signing (nunca versionar)
+*.jks
+*.keystore
+android/keystore.properties
+android/saldoreal-upload.jks
+# Dependências / build nativo

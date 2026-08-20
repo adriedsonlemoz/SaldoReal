@@ -10,10 +10,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -30,9 +26,7 @@ const gravarLog = (entrada) => {
 };
 
 const Sobre = ({ setRoute }) => {
-  const [openApoio,   setOpenApoio]   = useState(false);
-  const [openContato, setOpenContato] = useState(false);
-  const [toast, setToast]             = useState({ open: false, message: '', severity: 'success' });
+    const [toast, setToast]             = useState({ open: false, message: '', severity: 'success' });
   const [logErros, setLogErros]       = useState([]);
 
   const recarregarLogs = useCallback(() => setLogErros(lerLogs()), []);
@@ -81,6 +75,12 @@ const Sobre = ({ setRoute }) => {
   };
 
   const changelog = [
+    {
+      v: 'beta.8',
+      icon: '🚀',
+      title: 'Preparação para publicação',
+      desc: 'Camada Android atualizada para API 36, AAB de release, assinatura por secrets, privacidade no app, hardening, safe areas modernas e recuperação mais segura.',
+    },
     {
       v: 'beta.7',
       icon: '✨',
@@ -167,45 +167,6 @@ const Sobre = ({ setRoute }) => {
         <Alert onClose={closeToast} severity={toast.severity} variant="filled" sx={{ width: '100%', fontWeight: 'bold' }}>{toast.message}</Alert>
       </Snackbar>
 
-      {/* Modais de apoio */}
-      <Dialog open={openApoio} onClose={() => setOpenApoio(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700, color: '#D97706' }}>💎 Apoiar o Projeto</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 2 }}>
-            Este app é mantido de forma independente e 100% gratuita. Se ele te ajuda, considere apoiar!
-          </Typography>
-          <Box sx={{ p: 2, bgcolor: '#FFFBEB', borderRadius: '12px', border: '1.5px dashed #FCD34D', textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#92400E', mb: 0.5 }}>Chave PIX</Typography>
-            <Typography sx={{ color: '#D97706', fontSize: '1.2rem', fontWeight: 800, fontFamily: 'monospace' }}>[INSERIR PIX AQUI]</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
-          <Button onClick={() => setOpenApoio(false)} color="inherit">Fechar</Button>
-          <Button variant="contained" color="warning" onClick={() => { navigator.clipboard.writeText('[INSERIR PIX AQUI]'); showToast('Chave PIX copiada!'); }}>
-            Copiar PIX
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openContato} onClose={() => setOpenContato(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>📬 Fale Conosco</DialogTitle>
-        <DialogContent>
-          <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 2 }}>
-            Encontrou algum bug ou tem uma sugestão? Manda mensagem!
-          </Typography>
-          <Box sx={{ p: 2, bgcolor: 'rgba(123,44,191,.055)', borderRadius: '12px', border: '1.5px dashed rgba(123,44,191,.28)', textAlign: 'center' }}>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#5A189A', mb: 0.5 }}>E-mail de suporte</Typography>
-            <Typography sx={{ color: '#7B2CBF', fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace' }}>suporte@saldoreal.app</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
-          <Button onClick={() => setOpenContato(false)} color="inherit">Fechar</Button>
-          <Button variant="contained" color="info" onClick={() => { navigator.clipboard.writeText('suporte@saldoreal.app'); showToast('E-mail copiado!'); }}>
-            Copiar e-mail
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Cabeçalho do app */}
       <Card sx={{ mb: 3, overflow: 'hidden' }}>
         <Box sx={{ background: 'linear-gradient(135deg, #2D0B5E 0%, #7B2CBF 58%, #F72585 100%)', p: 3, textAlign: 'center' }}>
@@ -214,7 +175,7 @@ const Sobre = ({ setRoute }) => {
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 7" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 8" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>
@@ -298,27 +259,21 @@ const Sobre = ({ setRoute }) => {
         </Box>
       </Card>
 
-      {/* Suporte */}
+      {/* Dados e privacidade */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={6}>
-          <Card
-            sx={{ height: '100%', cursor: 'pointer', '&:active': { transform: 'scale(0.95)' }, '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }, transition: 'all 0.15s' }}
-            onClick={() => setOpenApoio(true)}
-          >
+          <Card sx={{ height: '100%', cursor: 'pointer', transition: 'all .15s', '&:active': { transform: 'scale(.97)' } }} onClick={() => setRoute('backup')}>
             <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>💎</Typography>
-              <Typography sx={{ color: '#D97706', fontWeight: 700, fontSize: '0.9rem' }}>Apoiar</Typography>
+              <Typography sx={{ fontSize: '1.6rem', mb: .5 }}>🛡️</Typography>
+              <Typography sx={{ color: '#6A23A7', fontWeight: 800, fontSize: '.86rem' }}>Backup e dados</Typography>
             </Box>
           </Card>
         </Grid>
         <Grid item xs={6}>
-          <Card
-            sx={{ height: '100%', cursor: 'pointer', '&:active': { transform: 'scale(0.95)' }, '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }, transition: 'all 0.15s' }}
-            onClick={() => setOpenContato(true)}
-          >
+          <Card sx={{ height: '100%', cursor: 'pointer', transition: 'all .15s', '&:active': { transform: 'scale(.97)' } }} onClick={() => setRoute('privacidade')}>
             <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Typography sx={{ fontSize: '2rem', mb: 0.5 }}>📬</Typography>
-              <Typography sx={{ color: '#7B2CBF', fontWeight: 700, fontSize: '0.9rem' }}>Contato</Typography>
+              <Typography sx={{ fontSize: '1.6rem', mb: .5 }}>🔐</Typography>
+              <Typography sx={{ color: '#6A23A7', fontWeight: 800, fontSize: '.86rem' }}>Privacidade</Typography>
             </Box>
           </Card>
         </Grid>

@@ -2,7 +2,7 @@
 // Navbar global + modal "Adicionar" centralizados aqui.
 // Nenhuma tela interna foi alterada.
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container  from '@mui/material/Container';
 import Box        from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -18,6 +18,7 @@ import Gastos      from './components/Gastos';
 import NovaConta   from './components/NovaConta';
 import Sobre       from './components/Sobre';
 import Backup      from './components/Backup';
+import Privacidade  from './components/Privacidade';
 import Relatorio   from './components/Relatorio';
 import ListaCompras from './components/listaCompras';
 import EditNoteRoundedIcon from '@mui/icons-material/EditNoteRounded';
@@ -25,6 +26,9 @@ import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import ShieldRoundedIcon from '@mui/icons-material/ShieldRounded';
+import PrivacyTipRoundedIcon from '@mui/icons-material/PrivacyTipRounded';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import { dbReady } from './db/db';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 
@@ -76,7 +80,7 @@ const IcoAdd = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Rotas que recebem nav — "home" já tem sua própria, mas vamos unificar aqui.
 // Rotas modais (novaConta) não recebem nav pois são "telas de formulário".
-const ROTAS_COM_NAV = ['home', 'gastos', 'relatorio', 'acordos', 'lista', 'sobre', 'backup'];
+const ROTAS_COM_NAV = ['home', 'gastos', 'relatorio', 'acordos', 'lista', 'sobre', 'backup', 'privacidade'];
 
 const BottomNav = ({ route, setRoute, onAddPress }) => {
   const LEFT  = [
@@ -92,7 +96,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
   const activeColor = () => '#7B2CBF';
 
   const NavItem = ({ id, label, Icon }) => {
-    const active = route === id || (id === 'config' && (route === 'sobre' || route === 'backup'));
+    const active = route === id || (id === 'config' && (route === 'sobre' || route === 'backup' || route === 'privacidade'));
     return (
       <Box
         role="button" tabIndex={0} aria-label={label}
@@ -132,7 +136,7 @@ const BottomNav = ({ route, setRoute, onAddPress }) => {
       borderTop: '1px solid rgba(0,0,0,0.07)',
       boxShadow: '0 -6px 24px rgba(45,11,94,0.08)',
       display: 'flex', alignItems: 'center', minHeight: 62,
-      pb: 'env(safe-area-inset-bottom, 0px)',
+      pb: 'var(--app-safe-bottom)',
     }}>
       {LEFT.map(item => <NavItem key={item.id} {...item} />)}
 
@@ -230,6 +234,7 @@ const ModalConfig = ({ open, onClose, setRoute }) => (
       {[
         { Icon: InfoRoundedIcon, label: 'Sobre o app', sub: 'Versão, créditos e informações', route: 'sobre', cor: '#7B2CBF' },
         { Icon: ShieldRoundedIcon, label: 'Backup e dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#8B5CF6' },
+        { Icon: PrivacyTipRoundedIcon, label: 'Privacidade', sub: 'Como o SaldoReal trata seus dados', route: 'privacidade', cor: '#6A23A7' },
       ].map(op => (
         <Box key={op.route}
           onClick={() => { onClose(); setRoute(op.route); }}
@@ -271,6 +276,14 @@ const App = () => {
   const [editItem, setEditItem] = useState(null);
   const [modalAdd,    setModalAdd]    = useState(false);
   const [modalConfig, setModalConfig] = useState(false);
+  const [dbError, setDbError] = useState(false);
+
+  useEffect(() => {
+    dbReady.then((result) => { if (!result) setDbError(true); });
+    const onDbError = () => setDbError(true);
+    window.addEventListener('saldoreal:db-error', onDbError);
+    return () => window.removeEventListener('saldoreal:db-error', onDbError);
+  }, []);
 
   // Intercepta rota especial __config__
   const handleSetRoute = (r) => {
@@ -291,6 +304,7 @@ const App = () => {
       case 'novaConta': return <NovaConta setRoute={handleSetRoute} editItem={editItem} setEditItem={setEditItem} />;
       case 'sobre':     return <Sobre setRoute={handleSetRoute} />;
       case 'backup':    return <Backup setRoute={handleSetRoute} />;
+      case 'privacidade': return <Privacidade setRoute={handleSetRoute} />;
       case 'relatorio': return <Relatorio setRoute={handleSetRoute} />;
       case 'lista':     return <ListaCompras setRoute={handleSetRoute} />;
       default:          return <Home setRoute={handleSetRoute} />;
@@ -299,9 +313,10 @@ const App = () => {
 
   return (
     <>
-      <Container maxWidth={false} disableGutters sx={{ minHeight: '100dvh' }}>
+      <Box aria-hidden sx={{ position: 'fixed', inset: '0 0 auto 0', height: 'var(--app-safe-top)', bgcolor: '#2D0B5E', zIndex: 1200, pointerEvents: 'none' }} />
+      <Container maxWidth={false} disableGutters sx={{ minHeight: '100dvh', pt: 'var(--app-safe-top)' }}>
         {/* Wrapper com pb para não ficar atrás da navbar */}
-        <Box sx={{ pb: showNav ? 'calc(62px + env(safe-area-inset-bottom, 0px))' : 0 }}>
+        <Box sx={{ pb: showNav ? 'calc(62px + var(--app-safe-bottom))' : 0 }}>
           {renderComponent()}
         </Box>
       </Container>
@@ -326,6 +341,20 @@ const App = () => {
         onClose={() => setModalConfig(false)}
         setRoute={handleSetRoute}
       />
+
+      <Dialog open={dbError} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningAmberRoundedIcon color="warning" /> Problema ao acessar seus dados
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'text.secondary', fontSize: '.84rem', lineHeight: 1.55 }}>
+            O SaldoReal não apagou o banco local. Reinicie o aplicativo e não desinstale enquanto o problema persistir, pois a desinstalação remove os dados armazenados neste aparelho.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2 }}>
+          <Button variant="contained" onClick={() => window.location.reload()}>Reiniciar</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

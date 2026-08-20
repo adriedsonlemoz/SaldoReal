@@ -210,3 +210,14 @@ A beta.7 preserva as regras de negócio e concentra alterações em componentes 
 - Relatório e Acordos em telas pequenas;
 - barra inferior com safe-area;
 - foco visível, contraste e áreas de toque.
+
+
+## Pré-publicação beta.8
+
+Validar adicionalmente:
+- build com Node 22 e Capacitor 8;
+- Android target API 36;
+- safe areas/status/navigation bars no Android 16;
+- política de privacidade acessível em Configurações;
+- confirmação antes de restaurar backup;
+- workflow gerando APK debug e AAB release quando a chave de upload estiver configurada.

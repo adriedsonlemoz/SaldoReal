@@ -66,27 +66,17 @@ class ErrorBoundary extends React.Component {
             </Typography>
 
             <Typography variant="body2" color="text.secondary" mb={3}>
-              O aplicativo encontrou um erro inesperado. Tente reiniciar ou limpar o cache.
+              O aplicativo encontrou um erro inesperado. Seus lançamentos no banco local não são apagados por esta tela.
             </Typography>
 
             {this.state.error && (
-              <Box
-                sx={{
-                  bgcolor: 'grey.100',
-                  borderRadius: 2,
-                  p: 1.5,
-                  mb: 3,
-                  textAlign: 'left',
-                  overflowX: 'auto',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  component="pre"
-                  sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'error.dark', m: 0 }}
-                >
-                  {this.state.error.message}
-                </Typography>
+              <Box component="details" sx={{ mb: 3, textAlign: 'left', color: 'text.secondary', fontSize: '.78rem' }}>
+                <Box component="summary" sx={{ cursor: 'pointer', fontWeight: 800 }}>Detalhes técnicos</Box>
+                <Box sx={{ bgcolor: 'grey.100', borderRadius: 2, p: 1.5, mt: 1, overflowX: 'auto' }}>
+                  <Typography variant="caption" component="pre" sx={{ fontFamily: 'monospace', fontSize: '0.7rem', color: 'error.dark', m: 0 }}>
+                    {this.state.error.message}
+                  </Typography>
+                </Box>
               </Box>
             )}
 
@@ -97,7 +87,7 @@ class ErrorBoundary extends React.Component {
                 fullWidth
                 onClick={this.handleReload}
               >
-                🔄 Reiniciar
+                Reiniciar aplicativo
               </Button>
               <Button
                 variant="outlined"
@@ -105,7 +95,7 @@ class ErrorBoundary extends React.Component {
                 fullWidth
                 onClick={this.handleClearCache}
               >
-                🗑️ Limpar Cache e Reiniciar
+                Limpar dados temporários e reiniciar
               </Button>
             </Stack>
           </Paper>

@@ -7,6 +7,10 @@ import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 
 import FinanceiroService from '../services/FinanceiroService';
 
@@ -14,6 +18,7 @@ const Backup = ({ setRoute }) => {
   const [backupCode,  setBackupCode]  = useState('');
   const [restoreCode, setRestoreCode] = useState('');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [confirmRestore, setConfirmRestore] = useState(false);
 
   const showToast  = (message, severity = 'success') => setToast({ open: true, message, severity });
   const closeToast = () => setToast({ ...toast, open: false });
@@ -23,7 +28,7 @@ const Backup = ({ setRoute }) => {
       const dados = await FinanceiroService.exportarTudo();
 
       const tabelas = dados.data || {};
-      const totalRegistros = ['gastos', 'acordos', 'configuracoes', 'listas', 'itensLista']
+      const totalRegistros = ['gastos', 'acordos', 'configuracoes', 'listas', 'itensLista', 'movimentacoes']
         .reduce((total, nome) => total + (Array.isArray(tabelas[nome]) ? tabelas[nome].length : 0), 0);
 
       if (totalRegistros === 0)
@@ -50,7 +55,7 @@ const Backup = ({ setRoute }) => {
     }
   };
 
-  const handleRestoreBackup = async () => {
+  const executarRestoreBackup = async () => {
     const codeLimpo = restoreCode.trim();
     if (!codeLimpo) return showToast('Cole o código primeiro!', 'warning');
     try {
@@ -64,6 +69,7 @@ const Backup = ({ setRoute }) => {
         throw new Error('Formato inválido.');
       }
       setRestoreCode('');
+      setConfirmRestore(false);
       showToast('Dados restaurados com sucesso! Recarregando...', 'success');
       setTimeout(() => window.location.reload(), 2000);
     } catch (e) {
@@ -77,6 +83,19 @@ const Backup = ({ setRoute }) => {
       <Snackbar open={toast.open} autoHideDuration={4000} onClose={closeToast} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert severity={toast.severity} variant="filled" sx={{ width: '100%', fontWeight: 600, borderRadius: '12px' }}>{toast.message}</Alert>
       </Snackbar>
+
+      <Dialog open={confirmRestore} onClose={() => setConfirmRestore(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 900 }}>Confirmar restauração</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ color: 'text.secondary', fontSize: '.84rem', lineHeight: 1.55 }}>
+            Os dados atuais deste aparelho serão substituídos pelo conteúdo do backup. Esta ação deve ser usada somente quando você tiver certeza de que o código está correto.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2 }}>
+          <Button onClick={() => setConfirmRestore(false)} color="inherit">Cancelar</Button>
+          <Button variant="contained" color="error" onClick={executarRestoreBackup}>Restaurar agora</Button>
+        </DialogActions>
+      </Dialog>
 
       <Card sx={{ overflow: 'hidden', borderRadius: '18px' }}>
         <Box sx={{ bgcolor: 'primary.main', p: 1.5, textAlign: 'center' }}>
@@ -128,7 +147,7 @@ const Backup = ({ setRoute }) => {
             sx={{ mb: 2, '& .MuiOutlinedInput-root': { fontFamily: 'monospace', fontSize: '0.72rem', borderRadius: '12px' } }}
           />
 
-          <Button fullWidth variant="contained" color="error" size="large" onClick={handleRestoreBackup}
+          <Button fullWidth variant="contained" color="error" size="large" onClick={() => { if (!restoreCode.trim()) return showToast('Cole o código primeiro!', 'warning'); setConfirmRestore(true); }}
             sx={{ fontWeight: 700, borderRadius: '12px' }}>
             Restaurar backup
           </Button>

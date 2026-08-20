@@ -1,4 +1,4 @@
-name: Build APK Android
+name: Android — APK de teste + AAB Play Store
 
 on:
   push:
@@ -6,9 +6,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-apk:
-    name: Build APK
+  android:
+    name: Validar e empacotar Android
     runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout do repositório
@@ -20,31 +25,54 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Configurar Node.js 20
+      - name: Configurar Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 22
 
+      # O projeto migrou do Capacitor 5 para o 8 nesta versão. O lockfile deve
+      # ser regenerado/commitado após o primeiro npm install local bem-sucedido.
       - name: Instalar dependências
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            echo "::warning::package-lock.json ainda não existe; usando npm install nesta execução. Gere e versione o lockfile antes da produção."
+            npm install --no-audit --no-fund
+          fi
 
-      - name: Build de produção (Vite)
+      - name: Testes unitários
+        run: npm run test:unit
+
+      - name: Build web de produção
         run: npm run build
 
-      - name: Inicializar plataforma Android
+      - name: Criar e sincronizar projeto Android
         run: |
           npx cap add android
-          npx cap copy android
           npx cap sync android
 
-      - name: Gerar ícones Android (Capacitor Assets)
+      - name: Gerar ícones e splash Android
         run: |
-          npm install -D @capacitor/assets --legacy-peer-deps
-          npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#2D0B5E' --iconBackgroundColorDark '#160B2A'
+          npx @capacitor/assets generate --android --assetPath assets \
+            --iconBackgroundColor '#2D0B5E' \
+            --iconBackgroundColorDark '#160B2A' \
+            --splashBackgroundColor '#2D0B5E' \
+            --splashBackgroundColorDark '#160B2A'
 
-      - name: Aplicar identidade visual Android
+      - name: Aplicar configuração Android do SaldoReal
         run: node scripts/configure-android.mjs
+
+      - name: Preparar chave de upload para release
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/saldoreal-upload.jks
+          cat > android/keystore.properties <<PROPS
+          storeFile=saldoreal-upload.jks
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          PROPS
 
       - name: Dar permissão ao Gradlew
         run: chmod +x android/gradlew
@@ -58,13 +86,35 @@ jobs:
           key: gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: gradle-
 
-      - name: Build APK debug
+      - name: Lint Android
+        working-directory: android
+        run: ./gradlew lintDebug --no-daemon
+
+      - name: Build APK debug para testes
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Publicar APK
+      - name: Build AAB release assinado
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
+        working-directory: android
+        run: ./gradlew bundleRelease --no-daemon
+
+      - name: Publicar APK de teste
         uses: actions/upload-artifact@v4
         with:
-          name: saldoreal-debug
+          name: saldoreal-beta8-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Publicar AAB para Play Store
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: saldoreal-beta8-play-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+      - name: Avisar quando a assinatura ainda não foi configurada
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 == '' }}
+        run: |
+          echo "::warning::APK de teste gerado, mas o AAB de release não foi criado porque os secrets da chave de upload ainda não foram configurados. Consulte RELEASE_ANDROID.md."
