@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Slide from '@mui/material/Slide';
@@ -20,6 +21,7 @@ import Inventory2RoundedIcon from '@mui/icons-material/Inventory2Rounded';
 import SeletorCategoria from './SeletorCategoria';
 import { UNIDADES, money, calcularValorItem } from './constants';
 import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../../utils/moedaInput';
+import ListaComprasService from '../../services/ListaComprasService';
 
 const Transition = React.forwardRef(function Transition(props, ref) { return <Slide direction="up" ref={ref} {...props} />; });
 const FORM_VAZIO = { nome: '', categoria: 'Outros', quantidade: '1', unidade: 'un', precoPorMedida: '' };
@@ -36,7 +38,12 @@ const ModalAdicionarItem = ({ open, onClose, onAdicionar }) => {
   const [form, setForm] = useState(FORM_VAZIO);
   const [saving, setSaving] = useState(false);
   const [grupoUnidade, setGrupoUnidade] = useState('Contagem');
-  useEffect(() => { if (open) { setForm(FORM_VAZIO); setGrupoUnidade('Contagem'); } }, [open]);
+  const [sugestoes, setSugestoes] = useState([]);
+  useEffect(() => {
+    if (!open) return;
+    setForm(FORM_VAZIO); setGrupoUnidade('Contagem');
+    ListaComprasService.sugestoesProdutos().then(setSugestoes).catch(() => setSugestoes([]));
+  }, [open]);
   const setField = (key) => (e) => setForm(prev => ({ ...prev, [key]: e.target.value }));
   const setQuantidade = (e) => {
     const valor = e.target.value.replace(',', '.').replace(/[^0-9.]/g, '');
@@ -78,7 +85,24 @@ const ModalAdicionarItem = ({ open, onClose, onAdicionar }) => {
       </AppBar>
       <DialogContent sx={{ px: { xs: 1.25, sm: 2.5 }, py: 1.35, pb: 'calc(16px + var(--app-safe-bottom))', maxWidth: 560, mx: 'auto', width: '100%' }}>
         <Typography sx={sectionLabel}>Produto</Typography>
-        <TextField fullWidth autoFocus placeholder="Ex.: arroz, carne moída, detergente…" value={form.nome} onChange={setField('nome')} onKeyDown={(e) => e.key === 'Enter' && podeSalvar && handleAdicionar()} sx={inputSx} inputProps={{ maxLength: 80 }} />
+        <Autocomplete
+          freeSolo autoSelect options={sugestoes}
+          getOptionLabel={(op) => typeof op === 'string' ? op : op.nome}
+          filterOptions={(options, state) => {
+            const q = state.inputValue.trim().toLocaleLowerCase('pt-BR');
+            return options.filter(op => !q || op.nome.toLocaleLowerCase('pt-BR').includes(q)).slice(0, 5);
+          }}
+          onInputChange={(_, value) => setForm(prev => ({ ...prev, nome: value }))}
+          onChange={(_, op) => {
+            if (!op || typeof op === 'string') return;
+            const unidade = op.unidade || 'un';
+            const meta = UNIDADES.find(u => u.id === unidade);
+            setForm(prev => ({ ...prev, nome: op.nome, categoria: op.categoria || 'Outros', unidade }));
+            if (meta?.grupo) setGrupoUnidade(meta.grupo);
+          }}
+          ListboxProps={{ style: { maxHeight: 220 } }}
+          renderInput={(params) => <TextField {...params} autoFocus placeholder="Ex.: arroz, carne moída, detergente…" sx={inputSx} inputProps={{ ...params.inputProps, maxLength: 80, autoComplete: 'off' }} helperText={sugestoes.length ? 'Sugestões aprendidas com seus itens anteriores.' : 'Digite o produto normalmente.'} />}
+        />
         <Divider sx={{ my: 1.35 }} />
         <Typography sx={sectionLabel}>Categoria</Typography>
         <Box sx={{ mt: .8 }}><SeletorCategoria value={form.categoria} onChange={(id) => setForm(prev => ({ ...prev, categoria: id }))} /></Box>

@@ -1,8 +1,8 @@
-# Política de Privacidade — SaldoReal
+# Política de Privacidade — Saldo Real
 
 **Última atualização:** 20 de agosto de 2026
 
-O SaldoReal é um aplicativo de organização financeira pessoal com funcionamento principal offline.
+O Saldo Real é um aplicativo de organização financeira pessoal com funcionamento principal offline.
 
 ## Dados armazenados
 Lançamentos, acordos, listas de compras, configurações e movimentações financeiras ficam armazenados localmente no dispositivo. Esta versão não exige conta e não envia esses dados ao desenvolvedor.

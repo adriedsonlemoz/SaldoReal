@@ -2,7 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const packageJsonPath = path.resolve('package.json');
+const capacitorConfigPath = path.resolve('capacitor.config.json');
 const packageVersion = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).version;
+const capacitorConfig = JSON.parse(fs.readFileSync(capacitorConfigPath, 'utf8'));
+const appName = String(capacitorConfig.appName || '').trim();
+if (!appName) throw new Error('capacitor.config.json precisa definir appName.');
 
 const root = path.resolve('android');
 const appRoot = path.join(root, 'app');
@@ -10,6 +14,7 @@ const resRoot = path.join(appRoot, 'src/main/res');
 const valuesDir = path.join(resRoot, 'values');
 const stylesPath = path.join(valuesDir, 'styles.xml');
 const colorsPath = path.join(valuesDir, 'colors.xml');
+const stringsPath = path.join(valuesDir, 'strings.xml');
 const manifestPath = path.join(appRoot, 'src/main/AndroidManifest.xml');
 const variablesPath = path.join(root, 'variables.gradle');
 const appGradlePath = path.join(appRoot, 'build.gradle');
@@ -31,6 +36,21 @@ const ensureColor = (name, value) => {
 ensureColor('saldoreal_system_bar', '#2D0B5E');
 ensureColor('saldoreal_primary', '#7B2CBF');
 fs.writeFileSync(colorsPath, colors);
+
+// Nome visível do Android: a fonte de verdade é capacitor.config.json.
+// Isso evita nomes copiados/hardcoded entre projetos diferentes.
+if (fs.existsSync(stringsPath)) {
+  let strings = fs.readFileSync(stringsPath, 'utf8');
+  const escapedName = appName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const appNameRe = /<string\s+name=["']app_name["'][^>]*>[^<]*<\/string>/;
+  const titleActivityRe = /<string\s+name=["']title_activity_main["'][^>]*>[^<]*<\/string>/;
+  const appNameLine = `<string name="app_name">${escapedName}</string>`;
+  const titleLine = `<string name="title_activity_main">${escapedName}</string>`;
+  strings = appNameRe.test(strings) ? strings.replace(appNameRe, appNameLine) : strings.replace('</resources>', `    ${appNameLine}\n</resources>`);
+  strings = titleActivityRe.test(strings) ? strings.replace(titleActivityRe, titleLine) : strings.replace('</resources>', `    ${titleLine}\n</resources>`);
+  fs.writeFileSync(stringsPath, strings);
+}
+
 
 // O minSdk do Capacitor 8 é 24. Atributos introduzidos depois da API 24
 // precisam ficar em resources versionados para o Android Lint e para o
@@ -105,7 +125,7 @@ setGradleVar('targetSdkVersion', '36');
 fs.writeFileSync(variablesPath, vars);
 
 // Versionamento Play Store.
-const versionCode = 11;
+const versionCode = 12;
 let appGradle = fs.readFileSync(appGradlePath, 'utf8');
 appGradle = appGradle
   .replace(/versionCode\s*(?:=\s*)?\d+/, `versionCode ${versionCode}`)
@@ -127,6 +147,7 @@ manifest = manifest.replace(/<application\b([^>]*)>/, (full, attrs) => {
     const re = new RegExp(`\\s${name}=["'][^"']*["']`);
     a = re.test(a) ? a.replace(re, ` ${name}="${value}"`) : `${a} ${name}="${value}"`;
   };
+  upsertAttr('android:label', '@string/app_name');
   upsertAttr('android:usesCleartextTraffic', 'false');
   upsertAttr('android:allowBackup', 'false');
   upsertAttr('android:fullBackupContent', 'false');
@@ -134,4 +155,4 @@ manifest = manifest.replace(/<application\b([^>]*)>/, (full, attrs) => {
 });
 fs.writeFileSync(manifestPath, manifest);
 
-console.log(`Android do SaldoReal preparado: API 36, minSdk 24, versionCode ${versionCode}, versionName ${packageVersion}, system bars compatíveis por nível de API e hardening aplicados.`);
+console.log(`Android de ${appName} preparado: API 36, minSdk 24, versionCode ${versionCode}, versionName ${packageVersion}, nome visível sincronizado com capacitor.config.json, system bars compatíveis por nível de API e hardening aplicados.`);

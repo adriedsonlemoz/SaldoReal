@@ -250,7 +250,7 @@ const TelaListaAtiva = ({
         <Box sx={{ mb: 1.35 }}>
           <SectionTitle title="Pago e lançado" count={dados.pagos.length} paid />
           <Typography sx={{ fontSize: '.7rem', color: 'text.secondary', mb: 1, mt: -.5 }}>
-            Estes valores já fazem parte da Home, Fluxo, Relatório e gráficos do SaldoReal.
+            Estes valores já fazem parte da Home, Fluxo, Relatório e gráficos do Saldo Real.
           </Typography>
           {dados.pagos.map(item => (
             <ItemRow key={item.id} item={item} onPagar={() => {}} onDesfazer={setItemDesfazer} onRemove={setItemRemover} />

@@ -7,10 +7,11 @@
 - [x] Chave de upload suportada por Secrets do GitHub
 - [x] Ícone oficial usado na geração dos recursos Android
 - [x] Splash derivado do mesmo ícone aprovado, sem redesenho
-- [x] Barras do sistema e safe areas preparadas para edge-to-edge moderno
+- [x] Barras do sistema e safe areas preparadas globalmente para edge-to-edge moderno
+- [x] `appName` / `app_name` Android configurados como **Saldo Real** sem nome visível hardcoded no workflow
 - [x] Tráfego HTTP em claro desativado
 - [x] Backup automático do Android desativado; o app usa seu próprio backup local
-- [ ] Gerar novo `package-lock.json` com Node 22 e validar `npm ci` antes da produção
+- [ ] Validar `npm ci` com Node 22 no CI antes da produção
 - [ ] Rodar o workflow e instalar o APK em pelo menos Android 8, 12, 14, 15 e 16 quando possível
 - [ ] Enviar o AAB primeiro para **Teste interno** / **Teste fechado**, não direto para produção
 
@@ -25,14 +26,14 @@
 - [ ] Preencher o formulário **Segurança dos dados** mesmo declarando que não há coleta/compartilhamento
 
 ## Conteúdo do app / políticas
-- [ ] Preencher **Declaração de recursos financeiros**. O SaldoReal gerencia finanças pessoais, mas não concede empréstimos, não movimenta dinheiro, não funciona como banco/carteira e não vende investimentos. Revise no formulário se a classificação apropriada é **Outro** para gerenciamento financeiro pessoal.
+- [ ] Preencher **Declaração de recursos financeiros**. O Saldo Real gerencia finanças pessoais, mas não concede empréstimos, não movimenta dinheiro, não funciona como banco/carteira e não vende investimentos. Revise no formulário se a classificação apropriada é **Outro** para gerenciamento financeiro pessoal.
 - [ ] Declarar que o app não contém anúncios, se continuar sem publicidade
 - [ ] Informar que não há login/restrição de acesso para a equipe de revisão
 - [ ] Preencher classificação indicativa e público-alvo
 - [ ] Informar e-mail de suporte real na ficha da loja
 
 ## Ficha da loja
-- [x] Nome do app: SaldoReal
+- [x] Nome do app: Saldo Real
 - [x] Ícone-base aprovado presente no projeto
 - [x] Ícone da Play Store 512×512 derivado sem redesenho em `store-assets/icon-512-approved.png`
 - [ ] Validar a prévia do ícone no Play Console antes do envio

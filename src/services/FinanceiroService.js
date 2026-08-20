@@ -255,7 +255,7 @@ const FinanceiroService = {
   },
 
   async dadosDashboard() {
-    const [alertas, resumo] = await Promise.all([this.alertasDeVencimento(), this.resumoSaldoDoMes()]);
+    const [alertas, resumo] = await Promise.all([this.alertasDeVencimento(30), this.resumoSaldoDoMes()]);
     return { debito: resumo.pendencias, alertas, ...resumo };
   },
 
@@ -671,7 +671,7 @@ const FinanceiroService = {
   async importarTudo(payload) {
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Backup inválido.');
     const versao = Number(payload.formatVersion || 0);
-    if (versao > 3) throw new Error('Backup criado por uma versão mais nova do SaldoReal.');
+    if (versao > 3) throw new Error('Backup criado por uma versão mais nova do Saldo Real.');
     const versionado = versao >= 2;
     if (versionado && (!payload.data || typeof payload.data !== 'object' || Array.isArray(payload.data)))
       throw new Error(`Estrutura do backup v${versao} inválida.`);

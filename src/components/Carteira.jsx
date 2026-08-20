@@ -45,7 +45,7 @@ import confetti from 'canvas-confetti';
 const money = (v) => FinanceiroUtils.money(v);
 
 // ─────────────────────────────────────────────────────────────────────────────
-const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
+const Carteira = ({ acordos, carregarDados, abrirEditar, abrirNovo }) => {
   const { registrarPagamento, estornarPagamento, excluir } = useAcordos();
 
   const [abaFiltro,   setAbaFiltro]   = useState('ativos');
@@ -406,7 +406,7 @@ const Carteira = ({ acordos, carregarDados, abrirEditar }) => {
 
       {/* Lista */}
       {listaFiltrada.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 2.8, opacity: .8 }}><InboxRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main', opacity: .65 }} /><Typography sx={{ mt: .45, fontWeight: 800, color: 'text.secondary' }}>Nenhum registro nesta aba.</Typography></Box>
+        <Box sx={{ textAlign: 'center', py: 3, px: 1 }}><InboxRoundedIcon sx={{ fontSize: '2rem', color: 'primary.main', opacity: .65 }} /><Typography sx={{ mt: .45, fontWeight: 850, color: 'text.secondary' }}>Nenhum registro nesta aba.</Typography>{abrirNovo && <Button variant="contained" onClick={abrirNovo} sx={{ mt: 1.2, px: 2 }}>+ Criar primeiro acordo</Button>}</Box>
       ) : (
         listaFiltrada.map(acordo => {
           const valorFaltaPagar      = (acordo.parcelas - acordo.parcelasPagas) * acordo.valorParcela;

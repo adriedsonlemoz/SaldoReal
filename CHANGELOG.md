@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.0-beta.9 — UX Android, recebimentos e autocompletes
+
+- Corrige o nome visível do Android para **Saldo Real** usando `capacitor.config.json` como fonte de verdade e sincronização de `strings.xml` no script Android.
+- Incrementa o Android `versionCode` para **12**; `versionName` continua vindo automaticamente do `package.json`.
+- Consolida safe areas, `100dvh`, barra inferior e telas fullscreen para Android edge-to-edge.
+- Refina o wizard de acordos: cabeçalho compacto, progresso discreto, menos margens, conteúdo adaptável ao teclado e melhor centralização.
+- Substitui listas gigantes de banco/empresa e administradora por autocomplete com no máximo 5 sugestões visíveis e entrada manual livre.
+- Home passa a exibir **Próx. recebimento** com data, dia da semana e prazo restante.
+- Alertas ficam compactos, com altura baseada no conteúdo, rolagem quando necessário e grupos Hoje / Próximos 7 dias / Mais tarde.
+- “Média/dia” vira **Gasto médio/dia** e “Disponível/dia” vira **Pode gastar/dia**, com explicação do período considerado.
+- Próximos compromissos passam a mostrar nome, valor, dia/data e prazo.
+- Tela Sobre destaca apenas 5 versões recentes, com detalhes expansíveis e opção de histórico completo.
+- Lista de compras aprende localmente com produtos já cadastrados e reaproveita categoria/unidade ao selecionar uma sugestão.
+- Modais gerais recebem limite de altura e comportamento de rolagem mais consistente.
+- Estado vazio de Acordos oferece ação **+ Criar primeiro acordo** e o cabeçalho foi compactado.
+- Regras financeiras, schema do banco, backup e compatibilidade de dados foram preservados.
+
 
 ## 1.0.0-beta.8.4 — Compatibilidade de temas Android
 

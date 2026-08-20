@@ -234,7 +234,7 @@ const ModalConfig = ({ open, onClose, setRoute }) => (
       {[
         { Icon: InfoRoundedIcon, label: 'Sobre o app', sub: 'Versão, créditos e informações', route: 'sobre', cor: '#7B2CBF' },
         { Icon: ShieldRoundedIcon, label: 'Backup e dados', sub: 'Exportar ou importar seus dados', route: 'backup', cor: '#8B5CF6' },
-        { Icon: PrivacyTipRoundedIcon, label: 'Privacidade', sub: 'Como o SaldoReal trata seus dados', route: 'privacidade', cor: '#6A23A7' },
+        { Icon: PrivacyTipRoundedIcon, label: 'Privacidade', sub: 'Como o Saldo Real trata seus dados', route: 'privacidade', cor: '#6A23A7' },
       ].map(op => (
         <Box key={op.route}
           onClick={() => { onClose(); setRoute(op.route); }}
@@ -348,7 +348,7 @@ const App = () => {
         </DialogTitle>
         <DialogContent>
           <Typography sx={{ color: 'text.secondary', fontSize: '.84rem', lineHeight: 1.55 }}>
-            O SaldoReal não apagou o banco local. Reinicie o aplicativo e não desinstale enquanto o problema persistir, pois a desinstalação remove os dados armazenados neste aparelho.
+            O Saldo Real não apagou o banco local. Reinicie o aplicativo e não desinstale enquanto o problema persistir, pois a desinstalação remove os dados armazenados neste aparelho.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 2, pb: 2 }}>

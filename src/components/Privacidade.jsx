@@ -34,7 +34,7 @@ const Privacidade = ({ setRoute }) => (
       <Box sx={{ p: 2 }}>
         <Chip label="Dados ficam no aparelho" color="success" size="small" sx={{ mb: 1 }} />
         <Bloco Icon={StorageRoundedIcon} titulo="Armazenamento local">
-          Seus lançamentos, acordos, listas de compras, configurações e movimentações ficam armazenados localmente no dispositivo. O SaldoReal não exige conta e não envia esses dados ao desenvolvedor.
+          Seus lançamentos, acordos, listas de compras, configurações e movimentações ficam armazenados localmente no dispositivo. O Saldo Real não exige conta e não envia esses dados ao desenvolvedor.
         </Bloco>
         <Divider />
         <Bloco Icon={CloudOffRoundedIcon} titulo="Sem analytics, anúncios ou rastreamento">

@@ -15,6 +15,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Fade from '@mui/material/Fade';
 import IconButton from '@mui/material/IconButton';
 import Alert from '@mui/material/Alert';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import FinanceiroService from '../services/FinanceiroService';
 import FinanceiroUtils   from '../utils/financeiro';
@@ -108,15 +109,13 @@ const MoneyInput = ({ label, value, onChange, placeholder, helper }) => (
 );
 
 const StepWrapper = ({ emoji, pergunta, sub, children }) => (
-  <Box>
-    <Box sx={{ textAlign: 'center', mb: 3 }}>
-      <Typography sx={{ fontSize: '3rem', mb: 1, lineHeight: 1 }}>{emoji}</Typography>
-      <Typography sx={{ fontWeight: 800, fontSize: '1.25rem', color: 'text.primary', lineHeight: 1.3, mb: 0.6 }}>
+  <Box sx={{ width: '100%', maxWidth: 520, mx: 'auto' }}>
+    <Box sx={{ textAlign: 'center', mb: { xs: 1.6, sm: 2.2 } }}>
+      {emoji && <Typography sx={{ fontSize: { xs: '1.55rem', sm: '1.8rem' }, mb: .55, lineHeight: 1 }}>{emoji}</Typography>}
+      <Typography sx={{ fontWeight: 900, fontSize: { xs: '1.08rem', sm: '1.2rem' }, color: 'text.primary', lineHeight: 1.25, mb: .45 }}>
         {pergunta}
       </Typography>
-      {sub && (
-        <Typography sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>{sub}</Typography>
-      )}
+      {sub && <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', lineHeight: 1.35 }}>{sub}</Typography>}
     </Box>
     {children}
   </Box>
@@ -329,34 +328,36 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
           <StepWrapper emoji="🏷️"
             pergunta={form.isAdministradora ? 'Qual banco originou essa dívida?' : 'Com qual banco/empresa você tem essa dívida?'}
             sub="Digite o nome ou escolha abaixo">
-            <TextField fullWidth autoFocus value={form.empresa}
-              onChange={e => update('empresa', e.target.value)}
-              placeholder="Ex: Nubank, Magazine Luiza..."
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '14px', fontSize: '1.1rem', fontWeight: 700, bgcolor: 'rgba(255,255,255,0.7)' } }}
-              inputProps={{ list: 'bancos-list' }} />
-            <datalist id="bancos-list">{BANCOS.map(b => <option key={b} value={b} />)}</datalist>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {BANCOS.map(b => (
-                <ChipOption key={b} label={b} selected={form.empresa === b} onClick={() => update('empresa', b)} />
-              ))}
-            </Box>
+            <Autocomplete
+              freeSolo autoSelect options={BANCOS} value={form.empresa || ''}
+              onInputChange={(_, value) => update('empresa', value)}
+              onChange={(_, value) => update('empresa', value || '')}
+              filterOptions={(options, state) => {
+                const q = state.inputValue.trim().toLocaleLowerCase('pt-BR');
+                const filtradas = q ? options.filter(v => v.toLocaleLowerCase('pt-BR').includes(q)) : options.slice(0, 5);
+                return filtradas.slice(0, 5);
+              }}
+              ListboxProps={{ style: { maxHeight: 220 } }}
+              renderInput={(params) => <TextField {...params} autoFocus placeholder="Digite Nubank, Itaú, Magazine Luiza..." helperText="Digite qualquer empresa ou selecione uma sugestão." />}
+            />
           </StepWrapper>
         );
 
       case 'adm_nome':
         return (
           <StepWrapper emoji="📋" pergunta="Qual é a administradora responsável?" sub="Digite ou escolha abaixo">
-            <TextField fullWidth autoFocus value={form.adm}
-              onChange={e => update('adm', e.target.value)}
-              placeholder="Ex: Recovery, Serasa..."
-              sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '14px', fontSize: '1.1rem', fontWeight: 700, bgcolor: 'rgba(255,255,255,0.7)' } }}
-              inputProps={{ list: 'adms-list' }} />
-            <datalist id="adms-list">{ADMS.map(a => <option key={a} value={a} />)}</datalist>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {ADMS.map(a => (
-                <ChipOption key={a} label={a} selected={form.adm === a} onClick={() => update('adm', a)} />
-              ))}
-            </Box>
+            <Autocomplete
+              freeSolo autoSelect options={ADMS} value={form.adm || ''}
+              onInputChange={(_, value) => update('adm', value)}
+              onChange={(_, value) => update('adm', value || '')}
+              filterOptions={(options, state) => {
+                const q = state.inputValue.trim().toLocaleLowerCase('pt-BR');
+                const filtradas = q ? options.filter(v => v.toLocaleLowerCase('pt-BR').includes(q)) : options.slice(0, 5);
+                return filtradas.slice(0, 5);
+              }}
+              ListboxProps={{ style: { maxHeight: 220 } }}
+              renderInput={(params) => <TextField {...params} autoFocus placeholder="Digite Recovery, Serasa..." helperText="Você também pode informar outra administradora." />}
+            />
           </StepWrapper>
         );
 
@@ -678,33 +679,33 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
 
   return (
     <Box sx={{
-      position: 'fixed', inset: 0, zIndex: 1300,
+      position: 'fixed', left: 0, right: 0, top: 'var(--app-safe-top)', bottom: 'var(--app-safe-bottom)', zIndex: 1300,
       bgcolor: 'background.default',
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
       {/* header */}
       <Box sx={{
-        px: 2, pt: 2, pb: 1.5,
+        px: { xs: 1.25, sm: 2 }, pt: .8, pb: .8,
         bgcolor: 'background.paper',
         borderBottom: '1px solid', borderColor: 'divider',
-        display: 'flex', alignItems: 'center', gap: 1.5,
+        display: 'flex', alignItems: 'center', gap: { xs: .75, sm: 1.2 },
       }}>
         <IconButton onClick={step === 0 ? onCancelar : back} size="small"
-          sx={{ bgcolor: 'rgba(0,0,0,0.05)', borderRadius: '10px', width: 42, height: 42 }}>
+          sx={{ bgcolor: 'rgba(0,0,0,0.05)', borderRadius: '10px', width: 40, height: 40 }}>
           ←
         </IconButton>
         <Box sx={{ flex: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'text.secondary' }}>
-              {editandoId ? 'Editando registro' : 'Novo acordo'} — Passo {step + 1} de {steps.length}
+              {editandoId ? 'Editando registro' : 'Novo acordo'} · Passo {step + 1} de {steps.length}
             </Typography>
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'primary.main' }}>
               {Math.round(progress)}%
             </Typography>
           </Box>
           <LinearProgress variant="determinate" value={progress}
-            sx={{ height: 6, borderRadius: 3, bgcolor: 'rgba(123,44,191,0.1)',
+            sx={{ height: 4, borderRadius: 3, bgcolor: 'rgba(123,44,191,0.1)',
               '& .MuiLinearProgress-bar': { bgcolor: 'primary.main', borderRadius: 3 } }} />
         </Box>
         <Button size="small" variant="text" onClick={onCancelar}
@@ -714,9 +715,9 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
       </Box>
 
       {/* conteúdo */}
-      <Box sx={{ flex: 1, overflowY: 'auto', px: 2.5, py: 3 }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', px: { xs: 1.25, sm: 2 }, py: { xs: 1.2, sm: 2 }, display: 'flex', flexDirection: 'column', justifyContent: { xs: 'flex-start', sm: 'center' }, '@media (min-height: 650px)': { justifyContent: 'center' }, '@media (max-height: 649px)': { justifyContent: 'flex-start' } }}>
         <Fade in={show} timeout={180}>
-          <Box>{renderStep()}</Box>
+          <Box sx={{ width: '100%', my: 'auto' }}>{renderStep()}</Box>
         </Fade>
         {toast && (
           <Box sx={{ mt: 2, p: 1.5, bgcolor: 'error.light', borderRadius: '12px', textAlign: 'center' }}>
@@ -727,15 +728,15 @@ const NovoAcordoWizard = ({ onConcluir, onCancelar, editandoId, editForm }) => {
 
       {/* footer */}
       {!isAutoAdvance && (
-        <Box sx={{ px: 2.5, pb: 3, pt: 1.5, bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ px: { xs: 1.25, sm: 2 }, pb: 1.2, pt: .8, bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider' }}>
           {isLastStep ? (
             <Button fullWidth variant="contained" size="large" onClick={salvar} disabled={saving}
-              sx={{ fontWeight: 900, borderRadius: '16px', py: 1.8, fontSize: '1rem', letterSpacing: 0.5 }}>
+              sx={{ fontWeight: 900, borderRadius: '16px', py: 1.15, fontSize: '.92rem', letterSpacing: 0.5 }}>
               {saving ? '💾 Salvando...' : (editandoId ? '💾 Salvar alterações' : '✅ Salvar na carteira')}
             </Button>
           ) : (
             <Button fullWidth variant="contained" size="large" onClick={next} disabled={!canAdvance()}
-              sx={{ fontWeight: 900, borderRadius: '16px', py: 1.8, fontSize: '1rem' }}>
+              sx={{ fontWeight: 900, borderRadius: '16px', py: 1.15, fontSize: '.92rem' }}>
               Continuar →
             </Button>
           )}

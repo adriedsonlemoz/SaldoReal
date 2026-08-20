@@ -9,6 +9,24 @@ import MovimentacaoService from './MovimentacaoService';
 const mesAnoDaData = (data = new Date()) =>
   `${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
 
+const PRODUTOS_COMUNS = [
+  { nome: 'Arroz', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Arroz integral', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Arroz parboilizado', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Feijão', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Macarrão', categoria: 'Mercearia', unidade: 'pct' },
+  { nome: 'Açúcar', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Café', categoria: 'Mercearia', unidade: 'pct' },
+  { nome: 'Leite', categoria: 'Bebidas', unidade: 'L' },
+  { nome: 'Óleo', categoria: 'Mercearia', unidade: 'L' },
+  { nome: 'Sal', categoria: 'Mercearia', unidade: 'kg' },
+  { nome: 'Pão', categoria: 'Padaria', unidade: 'un' },
+  { nome: 'Ovos', categoria: 'Laticinios', unidade: 'dz' },
+  { nome: 'Detergente', categoria: 'Limpeza', unidade: 'un' },
+  { nome: 'Sabão em pó', categoria: 'Limpeza', unidade: 'kg' },
+  { nome: 'Papel higiênico', categoria: 'Higiene', unidade: 'pct' },
+];
+
 const valorRealDoItem = (item, informado = null) => {
   const valor = informado !== null && informado !== undefined && informado !== ''
     ? Number(informado)
@@ -17,6 +35,22 @@ const valorRealDoItem = (item, informado = null) => {
 };
 
 const ListaComprasService = {
+  async sugestoesProdutos(limite = 40) {
+    const itens = await db.itensLista.toArray();
+    const mapa = new Map();
+    [...itens].sort((a, b) => Number(b.id || 0) - Number(a.id || 0)).forEach(item => {
+      const nome = String(item.nome || '').trim();
+      if (!nome) return;
+      const chave = nome.toLocaleLowerCase('pt-BR');
+      if (!mapa.has(chave)) mapa.set(chave, { nome, categoria: item.categoria || 'Outros', unidade: item.unidade || 'un' });
+    });
+    for (const item of PRODUTOS_COMUNS) {
+      const chave = item.nome.toLocaleLowerCase('pt-BR');
+      if (!mapa.has(chave)) mapa.set(chave, item);
+    }
+    return [...mapa.values()].slice(0, limite);
+  },
+
   async carregarListas() {
     return db.listas.orderBy('dataCriacao').reverse().toArray();
   },

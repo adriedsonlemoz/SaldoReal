@@ -104,7 +104,7 @@ const Relatorio = ({ setRoute }) => {
         txt += `  ${a._p ? '✅' : '⏳'} ${a.empresa} — ${money(a.valorFluxo ?? a.valorParcela)} (${a._p ? `${a.pagamentosMes || 1} pagamento(s) no mês` : `${a.parcelasDevidas || 1} parcela(s) devida(s)`})\n`;
       });
     }
-    txt += '\n📱 Gerado por SaldoReal';
+    txt += '\n📱 Gerado por Saldo Real';
     navigator.clipboard.writeText(txt)
       .then(() => setToast({ open: true, texto: 'Relatório copiado!' }))
       .catch(() => setToast({ open: true, texto: 'Não foi possível copiar.' }));

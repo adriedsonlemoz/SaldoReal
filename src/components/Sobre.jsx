@@ -28,6 +28,8 @@ const gravarLog = (entrada) => {
 const Sobre = ({ setRoute }) => {
     const [toast, setToast]             = useState({ open: false, message: '', severity: 'success' });
   const [logErros, setLogErros]       = useState([]);
+  const [versaoAberta, setVersaoAberta] = useState('beta.9');
+  const [mostrarHistorico, setMostrarHistorico] = useState(false);
 
   const recarregarLogs = useCallback(() => setLogErros(lerLogs()), []);
 
@@ -75,6 +77,12 @@ const Sobre = ({ setRoute }) => {
   };
 
   const changelog = [
+    {
+      v: 'beta.9',
+      icon: '✨',
+      title: 'Experiência Android e uso diário',
+      desc: 'Nome Android corrigido para Saldo Real, safe areas globais, fluxo de acordos mais compacto, autocomplete de credores e produtos, alertas com próximo recebimento e cards da Home mais claros.',
+    },
     {
       v: 'beta.8.4',
       icon: '🤖',
@@ -157,7 +165,7 @@ const Sobre = ({ setRoute }) => {
       v: 'beta.1',
       icon: '🤝',
       title: 'Finanças, acordos e compras',
-      desc: 'Base do SaldoReal com lançamentos, acordos parcelados, relatórios, alertas, lista de compras e funcionamento offline.',
+      desc: 'Base do Saldo Real com lançamentos, acordos parcelados, relatórios, alertas, lista de compras e funcionamento offline.',
     },
   ];
 
@@ -176,12 +184,12 @@ const Sobre = ({ setRoute }) => {
       {/* Cabeçalho do app */}
       <Card sx={{ mb: 3, overflow: 'hidden' }}>
         <Box sx={{ background: 'linear-gradient(135deg, #2D0B5E 0%, #7B2CBF 58%, #F72585 100%)', p: 3, textAlign: 'center' }}>
-          <Box component="img" src="/saldoreal-icon.png" alt="SaldoReal" sx={{ width: 70, height: 70, borderRadius: '20px', objectFit: 'cover', mb: 1, boxShadow: '0 10px 24px rgba(20,4,42,.22)' }} />
-          <Typography sx={{ fontWeight: 900, color: '#fff', fontSize: '1.45rem' }}>SaldoReal</Typography>
+          <Box component="img" src="/saldoreal-icon.png" alt="Saldo Real" sx={{ width: 70, height: 70, borderRadius: '20px', objectFit: 'cover', mb: 1, boxShadow: '0 10px 24px rgba(20,4,42,.22)' }} />
+          <Typography sx={{ fontWeight: 900, color: '#fff', fontSize: '1.45rem' }}>Saldo Real</Typography>
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 8.4" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 9" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>
@@ -191,34 +199,22 @@ const Sobre = ({ setRoute }) => {
       {/* Changelog */}
       <Card sx={{ mb: 3, overflow: 'hidden' }}>
         <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-          <Typography sx={{ fontWeight: 700, fontSize: '1rem' }}>📋 O que há de novo</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: '1rem' }}>📋 O que há de novo</Typography>
+          <Typography sx={{ fontSize: '.74rem', color: 'text.secondary', mt: .2 }}>As 5 versões mais recentes ficam em destaque.</Typography>
         </Box>
-        <Box sx={{ p: 2 }}>
-          <List disablePadding>
-            {changelog.map((item, idx) => (
-              <React.Fragment key={idx}>
-                <ListItem sx={{ alignItems: 'flex-start', px: 0, pb: 2 }}>
-                  <ListItemIcon sx={{ minWidth: 40, mt: 0.5 }}>
-                    <Typography sx={{ fontSize: '1.4rem' }}>{item.icon}</Typography>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Chip label={item.v} size="small" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, height: 20, fontSize: '0.65rem' }} />
-                        <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: 'text.primary' }}>{item.title}</Typography>
-                      </Box>
-                    }
-                    secondary={
-                      <Typography component="span" sx={{ fontSize: '0.8rem', color: 'text.secondary', lineHeight: 1.5 }}>
-                        {item.desc}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-                {idx < changelog.length - 1 && <Divider sx={{ mb: 2 }} />}
-              </React.Fragment>
-            ))}
-          </List>
+        <Box sx={{ p: 1.2 }}>
+          {(mostrarHistorico ? changelog : changelog.slice(0, 5)).map((item, idx) => {
+            const aberta = versaoAberta === `${item.v}-${idx}` || (idx === 0 && versaoAberta === 'beta.9');
+            const chave = `${item.v}-${idx}`;
+            return <Box key={chave} sx={{ borderBottom: idx < (mostrarHistorico ? changelog.length : Math.min(5, changelog.length)) - 1 ? '1px solid' : 0, borderColor: 'divider' }}>
+              <Button fullWidth color="inherit" onClick={() => setVersaoAberta(aberta ? '' : chave)} sx={{ justifyContent: 'space-between', textAlign: 'left', px: .8, py: 1, minHeight: 48 }}>
+                <Box sx={{ minWidth: 0 }}><Chip label={item.v} size="small" sx={{ mr: .8, bgcolor: 'rgba(123,44,191,.10)', color: '#6A23A7', height: 21, fontSize: '.64rem' }} /><Typography component="span" sx={{ fontWeight: 850, fontSize: '.83rem' }}>{item.title}</Typography></Box>
+                <Typography sx={{ color: 'text.secondary', flexShrink: 0 }}>{aberta ? '−' : '+'}</Typography>
+              </Button>
+              {aberta && <Box sx={{ px: 1, pb: 1.15, display: 'flex', gap: .8 }}><Typography sx={{ fontSize: '1rem' }}>{item.icon}</Typography><Typography sx={{ fontSize: '.78rem', color: 'text.secondary', lineHeight: 1.5 }}>{item.desc}</Typography></Box>}
+            </Box>;
+          })}
+          {changelog.length > 5 && <Button fullWidth variant="text" onClick={() => setMostrarHistorico(v => !v)} sx={{ mt: .6, fontSize: '.78rem' }}>{mostrarHistorico ? 'Mostrar apenas versões recentes' : 'Ver histórico completo'}</Button>}
         </Box>
       </Card>
 

@@ -1,13 +1,13 @@
-# Rascunho da ficha da Play Store — SaldoReal
+# Rascunho da ficha da Play Store — Saldo Real
 
 ## Nome
-SaldoReal
+Saldo Real
 
 ## Descrição curta
 Controle gastos, compras, dívidas e acordos em um só lugar.
 
 ## Descrição completa
-SaldoReal é um aplicativo de organização financeira pessoal criado para facilitar o acompanhamento do dinheiro no dia a dia.
+Saldo Real é um aplicativo de organização financeira pessoal criado para facilitar o acompanhamento do dinheiro no dia a dia.
 
 Registre entradas e saídas, acompanhe o saldo disponível, organize contas pendentes, controle acordos e dívidas e use listas de compras integradas ao fluxo financeiro. Os relatórios ajudam a entender para onde o dinheiro está indo e o que ainda precisa ser pago.
 

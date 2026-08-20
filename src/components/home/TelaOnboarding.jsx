@@ -45,7 +45,7 @@ const TelaOnboarding = ({ onConcluir }) => {
       <Box sx={{ width: 96, height: 96, borderRadius: '28px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', mb: 4, boxShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>
         💜
       </Box>
-      <Typography sx={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', lineHeight: 1.1, mb: 1 }}>SaldoReal</Typography>
+      <Typography sx={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', lineHeight: 1.1, mb: 1 }}>Saldo Real</Typography>
       <Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem', mb: 5, maxWidth: 280, lineHeight: 1.5 }}>
         Seu assistente pessoal de compras e gastos.
       </Typography>

@@ -34,3 +34,12 @@ button, [role="button"] { touch-action: manipulation; }
   --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
 }
+
+
+/* beta.9 — safe areas e viewport dinâmico globais */
+html, body, #root { min-height: 100dvh; }
+body { min-height: 100dvh; }
+.app-screen { min-height: calc(100dvh - var(--app-safe-top) - var(--app-safe-bottom)); }
+@supports (padding: max(0px)) {
+  .safe-inline { padding-left: max(12px, var(--app-safe-left)); padding-right: max(12px, var(--app-safe-right)); }
+}

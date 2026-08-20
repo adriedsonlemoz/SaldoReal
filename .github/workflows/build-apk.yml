@@ -71,7 +71,7 @@ jobs:
             --splashBackgroundColor '#2D0B5E' \
             --splashBackgroundColorDark '#160B2A'
 
-      - name: Aplicar configuração Android do SaldoReal
+      - name: Aplicar configuração Android do Saldo Real
         run: node scripts/configure-android.mjs
 
       - name: Validar compatibilidade dos temas Android
@@ -116,7 +116,7 @@ jobs:
       - name: Publicar APK de teste
         uses: actions/upload-artifact@v7
         with:
-          name: saldoreal-beta8-4-debug-apk
+          name: saldoreal-beta9-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -124,7 +124,7 @@ jobs:
         if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         uses: actions/upload-artifact@v7
         with:
-          name: saldoreal-beta8-4-play-aab
+          name: saldoreal-beta9-play-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 

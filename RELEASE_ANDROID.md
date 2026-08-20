@@ -1,9 +1,9 @@
-# Release Android — SaldoReal
+# Release Android — Saldo Real
 
 ## Configuração desta versão
 - App ID: `com.saldoreal.app`
-- Version name: `1.0.0-beta.8.4`
-- Version code: `10`
+- Version name: `1.0.0-beta.9`
+- Version code: `12`
 - minSdk: 24
 - compileSdk/targetSdk: 36 (Android 16)
 - Capacitor: 8.5.0
@@ -45,11 +45,15 @@ Nunca coloque o `.jks`, senhas ou `keystore.properties` no Git.
 Execute o workflow **Android — APK de teste + AAB Play Store**.
 
 Artefatos esperados:
-- `saldoreal-beta8-1-debug-apk`: instalação/testes fora da Play Store;
-- `saldoreal-beta8-1-play-aab`: pacote assinado para o Play Console, quando os secrets estiverem configurados.
+- `saldoreal-beta9-debug-apk`: instalação/testes fora da Play Store;
+- `saldoreal-beta9-play-aab`: pacote assinado para o Play Console, quando os secrets estiverem configurados.
 
 ## 4. Play App Signing
 Para um app novo, use a Assinatura de Apps do Google Play. A chave deste documento funciona como **chave de upload**; a chave de assinatura de distribuição pode ser gerenciada pelo Google Play.
 
 ## 5. Lockfile
-A beta.8 migrou Capacitor 5 → 8. O `package-lock.json` antigo foi removido de propósito. Faça um `npm install` com Node 22 em um ambiente com acesso ao npm, valide os testes/build e então versione o novo lockfile antes do lançamento final.
+Use Node 22 e `npm ci` com o `package-lock.json` versionado. O workflow valida testes, build web, geração/sincronização Android, temas, lint e empacotamento.
+
+## Nome visível
+
+A fonte de verdade é `capacitor.config.json` (`appName: "Saldo Real"`). Após `npx cap add android` / `npx cap sync android`, `scripts/configure-android.mjs` sincroniza `app_name` e `title_activity_main` em `strings.xml` a partir dessa configuração. Não reutilize um nome hardcoded entre projetos.

@@ -1,4 +1,4 @@
-# 🧪 Testes Automatizados — SaldoReal
+# 🧪 Testes Automatizados — Saldo Real
 
 Este projeto tem dois tipos de testes que rodam no terminal e mostram pass/fail:
 
@@ -181,7 +181,7 @@ Esse teste protege a integração Lista de Compras → fluxo financeiro contra r
 
 ### Regra contábil protegida
 
-O SaldoReal passa a guardar duas referências para pagamentos:
+O Saldo Real passa a guardar duas referências para pagamentos:
 
 - **Fluxo real:** mês em que o dinheiro efetivamente entrou ou saiu.
 - **Competência:** mês ao qual a conta/parcela pertence.
@@ -221,3 +221,21 @@ Validar adicionalmente:
 - política de privacidade acessível em Configurações;
 - confirmação antes de restaurar backup;
 - workflow gerando APK debug e AAB release quando a chave de upload estiver configurada.
+
+
+## Validação da beta.9
+
+Além da suíte existente (112 testes unitários na beta.8.4), a beta.9 deve validar:
+
+- `npm ci` com Node 22;
+- `npm run test:unit`;
+- `npm run build`;
+- JSON de `package.json` e `capacitor.config.json`;
+- YAML do workflow GitHub Actions;
+- geração `npx cap add android` + `npx cap sync android`;
+- `node scripts/configure-android.mjs` e `node scripts/validate-android-theme.mjs`;
+- `./gradlew lintDebug --no-daemon` quando o SDK/Gradle estiver disponível;
+- `appName`, `app_name` e `android:label` resolvendo para **Saldo Real**;
+- ausência de regressão no banco/backup e funcionamento offline dos autocompletes.
+
+O resultado real de cada comando deve ser registrado no release/CI; falhas de ambiente não devem ser descritas como aprovação.

@@ -1,6 +1,6 @@
 {
   "appId": "com.saldoreal.app",
-  "appName": "SaldoReal",
+  "appName": "Saldo Real",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

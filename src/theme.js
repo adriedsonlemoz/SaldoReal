@@ -75,7 +75,11 @@ const theme = createTheme({
     } } },
     MuiAppBar: { styleOverrides: { root: { background: PAPER, boxShadow: '0 1px 0 #E9E2EF' } } },
     MuiChip: { styleOverrides: { root: { borderRadius: 10, fontWeight: 800, fontSize: '.72rem', minHeight: 28 } } },
-    MuiDialog: { styleOverrides: { paper: { borderRadius: 22, boxShadow: '0 24px 70px rgba(45,11,94,.18)' } } },
+    MuiDialog: { styleOverrides: {
+      paper: { borderRadius: 22, boxShadow: '0 24px 70px rgba(45,11,94,.18)', maxHeight: 'min(75dvh, calc(100dvh - var(--app-safe-top) - var(--app-safe-bottom) - 24px))' },
+      paperFullScreen: { borderRadius: 0, width: '100%', height: '100dvh', maxHeight: '100dvh', margin: 0 }
+    } },
+    MuiDialogContent: { styleOverrides: { root: { overscrollBehavior: 'contain' } } },
     MuiTextField: { styleOverrides: { root: {
       '& .MuiOutlinedInput-root': {
         minHeight: 52, borderRadius: 14, fontSize: '0.96rem', background: PAPER,

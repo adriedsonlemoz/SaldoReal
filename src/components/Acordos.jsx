@@ -114,9 +114,9 @@ const Acordos = ({ setRoute }) => {
           filter: 'blur(10px)', pointerEvents: 'none',
         }} />
 
-        <Box sx={{ px: 2.5, pt: 2, pb: 2, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ px: { xs: 1.5, sm: 2.2 }, pt: 1.35, pb: 1.4, position: 'relative', zIndex: 1 }}>
           {/* Título */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.05 }}>
             <Box>
               <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase' }}>
                 Livro Razão
@@ -187,6 +187,7 @@ const Acordos = ({ setRoute }) => {
           carregarDados={carregar}
           setAbaGeral={setAbaGeral}
           abrirEditar={abrirEditar}
+          abrirNovo={abrirNovo}
         />
       )}
       {abaGeral === 'simulador' && <Simulador acordos={acordos} />}
