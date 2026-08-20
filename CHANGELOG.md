@@ -1,6 +1,14 @@
 # Changelog
 
 
+## 1.0.0-beta.8.4 — Compatibilidade de temas Android
+
+- Corrige o Android Lint com `minSdk 24` sem elevar a versão mínima do sistema.
+- Move `windowLightNavigationBar` para recursos `values-v27`.
+- Move `enforceNavigationBarContrast` para recursos `values-v29`.
+- Adiciona validação automática dos temas antes do lint Android.
+- Incrementa o Android `versionCode` para 11.
+
 ## 1.0.0-beta.8.3 — Android CI com Java 21
 
 - Corrige a compilação Android do Capacitor 8 usando JDK 21 no GitHub Actions.

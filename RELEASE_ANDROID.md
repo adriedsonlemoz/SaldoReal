@@ -2,7 +2,7 @@
 
 ## Configuração desta versão
 - App ID: `com.saldoreal.app`
-- Version name: `1.0.0-beta.8.3`
+- Version name: `1.0.0-beta.8.4`
 - Version code: `10`
 - minSdk: 24
 - compileSdk/targetSdk: 36 (Android 16)

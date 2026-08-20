@@ -32,29 +32,66 @@ ensureColor('saldoreal_system_bar', '#2D0B5E');
 ensureColor('saldoreal_primary', '#7B2CBF');
 fs.writeFileSync(colorsPath, colors);
 
-// Mantém o tema coerente em Androids anteriores; Android 16 usa edge-to-edge.
-let styles = fs.readFileSync(stylesPath, 'utf8');
-const styleItems = [
-  ['android:statusBarColor', '@color/saldoreal_system_bar'],
-  ['android:navigationBarColor', '@color/saldoreal_system_bar'],
-  ['android:windowLightStatusBar', 'false'],
-  ['android:windowLightNavigationBar', 'false'],
-  ['android:windowDrawsSystemBarBackgrounds', 'true'],
-  ['android:enforceNavigationBarContrast', 'false'],
+// O minSdk do Capacitor 8 é 24. Atributos introduzidos depois da API 24
+// precisam ficar em resources versionados para o Android Lint e para o
+// carregamento correto do tema em aparelhos antigos.
+const baseStyleItems = [
+  ['android:statusBarColor', '@color/saldoreal_system_bar'],               // API 21
+  ['android:navigationBarColor', '@color/saldoreal_system_bar'],           // API 21
+  ['android:windowLightStatusBar', 'false'],                               // API 23
+  ['android:windowDrawsSystemBarBackgrounds', 'true'],                     // API 21
 ];
-const upsertItems = (body) => {
-  let out = body;
-  for (const [name, value] of styleItems) {
-    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(`<item\\s+name=["']${escaped}["'][^>]*>[^<]*<\\/item>`);
-    const line = `<item name="${name}">${value}</item>`;
-    out = re.test(out) ? out.replace(re, line) : `${out.trimEnd()}\n        ${line}\n    `;
+const api27StyleItems = [
+  ['android:windowLightNavigationBar', 'false'],                           // API 27
+];
+const api29StyleItems = [
+  ...api27StyleItems,
+  ['android:enforceNavigationBarContrast', 'false'],                       // API 29
+];
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const removeItems = (xml, names) => {
+  let out = xml;
+  for (const name of names) {
+    const escaped = escapeRegExp(name);
+    out = out.replace(new RegExp(`\\s*<item\\s+name=["']${escaped}["'][^>]*>[^<]*<\\/item>`, 'g'), '');
   }
   return out;
 };
-styles = styles.replace(/(<style\s+name=["']AppTheme[^"']*["'][^>]*>)([\s\S]*?)(<\/style>)/g,
-  (_, open, body, close) => `${open}${upsertItems(body)}${close}`);
+
+const applyItemsToAppThemes = (xml, items) => xml.replace(
+  /(<style\s+name=["']AppTheme[^"']*["'][^>]*>)([\s\S]*?)(<\/style>)/g,
+  (_, open, body, close) => {
+    let out = body;
+    for (const [name, value] of items) {
+      const escaped = escapeRegExp(name);
+      const re = new RegExp(`<item\\s+name=["']${escaped}["'][^>]*>[^<]*<\\/item>`);
+      const line = `<item name="${name}">${value}</item>`;
+      out = re.test(out) ? out.replace(re, line) : `${out.trimEnd()}\n        ${line}\n    `;
+    }
+    return `${open}${out}${close}`;
+  },
+);
+
+let styles = fs.readFileSync(stylesPath, 'utf8');
+const allManagedNames = [...baseStyleItems, ...api29StyleItems].map(([name]) => name);
+styles = removeItems(styles, allManagedNames);
+styles = applyItemsToAppThemes(styles, baseStyleItems);
 fs.writeFileSync(stylesPath, styles);
+
+// API 27–28: mantém todo o tema base e acrescenta somente o atributo disponível
+// a partir do Android 8.1.
+const valuesV27Dir = path.join(resRoot, 'values-v27');
+fs.mkdirSync(valuesV27Dir, { recursive: true });
+const stylesV27 = applyItemsToAppThemes(styles, api27StyleItems);
+fs.writeFileSync(path.join(valuesV27Dir, 'styles.xml'), stylesV27);
+
+// API 29+: a variante mais específica também precisa carregar o item da API 27.
+const valuesV29Dir = path.join(resRoot, 'values-v29');
+fs.mkdirSync(valuesV29Dir, { recursive: true });
+const stylesV29 = applyItemsToAppThemes(styles, api29StyleItems);
+fs.writeFileSync(path.join(valuesV29Dir, 'styles.xml'), stylesV29);
 
 // API 36 é exigida para novos envios a partir de 31/08/2026.
 let vars = fs.readFileSync(variablesPath, 'utf8');
@@ -68,9 +105,10 @@ setGradleVar('targetSdkVersion', '36');
 fs.writeFileSync(variablesPath, vars);
 
 // Versionamento Play Store.
+const versionCode = 11;
 let appGradle = fs.readFileSync(appGradlePath, 'utf8');
 appGradle = appGradle
-  .replace(/versionCode\s*(?:=\s*)?\d+/, 'versionCode 10')
+  .replace(/versionCode\s*(?:=\s*)?\d+/, `versionCode ${versionCode}`)
   .replace(/versionName\s*(?:=\s*)?["'][^"']+["']/, `versionName "${packageVersion}"`);
 
 // Assinatura opcional via android/keystore.properties, criada apenas no CI.
@@ -96,4 +134,4 @@ manifest = manifest.replace(/<application\b([^>]*)>/, (full, attrs) => {
 });
 fs.writeFileSync(manifestPath, manifest);
 
-console.log(`Android do SaldoReal preparado: API 36, versionCode 10, versionName ${packageVersion}, barras do sistema e hardening aplicados.`);
+console.log(`Android do SaldoReal preparado: API 36, minSdk 24, versionCode ${versionCode}, versionName ${packageVersion}, system bars compatíveis por nível de API e hardening aplicados.`);

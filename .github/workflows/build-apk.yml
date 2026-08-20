@@ -74,6 +74,9 @@ jobs:
       - name: Aplicar configuração Android do SaldoReal
         run: node scripts/configure-android.mjs
 
+      - name: Validar compatibilidade dos temas Android
+        run: node scripts/validate-android-theme.mjs
+
       - name: Preparar chave de upload para release
         if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
@@ -113,7 +116,7 @@ jobs:
       - name: Publicar APK de teste
         uses: actions/upload-artifact@v7
         with:
-          name: saldoreal-beta8-3-debug-apk
+          name: saldoreal-beta8-4-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -121,7 +124,7 @@ jobs:
         if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         uses: actions/upload-artifact@v7
         with:
-          name: saldoreal-beta8-3-play-aab
+          name: saldoreal-beta8-4-play-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 

@@ -76,6 +76,12 @@ const Sobre = ({ setRoute }) => {
 
   const changelog = [
     {
+      v: 'beta.8.4',
+      icon: '🤖',
+      title: 'Android pronto para APIs 24 a 36',
+      desc: 'Temas e barras do sistema foram separados por nível de API, mantendo compatibilidade a partir do Android 7 sem esconder erros do Android Lint.',
+    },
+    {
       v: 'beta.8.2',
       icon: '🚀',
       title: 'Preparação para publicação',
@@ -175,7 +181,7 @@ const Sobre = ({ setRoute }) => {
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 8.2" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 8.4" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>

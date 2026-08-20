@@ -1,4 +1,4 @@
-# Auditoria de pré-publicação — SaldoReal 1.0.0-beta.8.3
+# Auditoria de pré-publicação — SaldoReal 1.0.0-beta.8.4
 
 Data da auditoria: 20/08/2026.
 
@@ -6,7 +6,7 @@ Data da auditoria: 20/08/2026.
 
 - Capacitor 8.5.0 e Node 22.
 - Android com minSdk 24 e compileSdk/targetSdk 36.
-- Versionamento Android preparado para `versionCode 10` e `versionName 1.0.0-beta.8.3`.
+- Versionamento Android preparado para `versionCode 11` e `versionName 1.0.0-beta.8.4`.
 - Workflow do GitHub Actions preparado para testes unitários, build web, lint Android, APK debug e AAB release assinado.
 - Assinatura release via chave de upload armazenada somente em GitHub Secrets.
 - Ícone oficial preservado em `assets/icon.png`; recursos Android são gerados dele pelo `@capacitor/assets`.
