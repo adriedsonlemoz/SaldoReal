@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Snackbar from '@mui/material/Snackbar';
 import Chip from '@mui/material/Chip';
+import LinearProgress from '@mui/material/LinearProgress';
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
@@ -83,7 +84,11 @@ const Relatorio = ({ setRoute }) => {
   const copiarRelatorio = () => {
     if (!dados) return;
     let txt = `📊 RELATÓRIO — ${nomeMes.toUpperCase()}\n${'─'.repeat(38)}\n`;
-    txt += `Entradas: ${money(dados.totalEnt)}\nSaídas: ${money(dados.totalSai)}\nSaldo: ${money(dados.totalEnt - dados.totalSai)}\n\n`;
+    const aReceber = Math.max(0, dados.totalEnt - dados.totalEntPago);
+    const aPagar = Math.max(0, dados.totalSai - dados.totalSaiPago);
+    txt += `Entradas previstas: ${money(dados.totalEnt)}\nRecebidas: ${money(dados.totalEntPago)}\nA receber: ${money(aReceber)}\n`;
+    txt += `Saídas previstas: ${money(dados.totalSai)}\nPagas: ${money(dados.totalSaiPago)}\nA pagar: ${money(aPagar)}\n`;
+    txt += `Saldo previsto: ${money(dados.totalEnt - dados.totalSai)}\nFluxo realizado: ${money(dados.totalEntPago - dados.totalSaiPago)}\n\n`;
     if (dados.entradasPagas.length || dados.entradas.length) {
       txt += `🔺 ENTRADAS\n`;
       [...dados.entradasPagas.map(g => ({...g,_p:true})), ...dados.entradas.map(g => ({...g,_p:false}))].forEach(g => {
@@ -112,6 +117,28 @@ const Relatorio = ({ setRoute }) => {
 
   const saldo     = dados ? dados.totalEnt - dados.totalSai : 0;
   const saldoPago = dados ? dados.totalEntPago - dados.totalSaiPago : 0;
+
+  const indicadores = (() => {
+    if (!dados) return null;
+    const aReceber = Math.max(0, dados.totalEnt - dados.totalEntPago);
+    const aPagar = Math.max(0, dados.totalSai - dados.totalSaiPago);
+    const pctEntradas = dados.totalEnt > 0 ? Math.min(100, Math.round((dados.totalEntPago / dados.totalEnt) * 100)) : 0;
+    const pctSaidas = dados.totalSai > 0 ? Math.min(100, Math.round((dados.totalSaiPago / dados.totalSai) * 100)) : 0;
+    const saidas = [
+      ...dados.despesasPagas.map(i => ({ ...i, _pago: true })),
+      ...dados.despesas.map(i => ({ ...i, _pago: false })),
+      ...dados.acordosPagos.map(i => ({ ...i, _pago: true, categoria: 'Acordos/Dívidas', nome: i.empresa })),
+      ...dados.acordosPendentes.map(i => ({ ...i, _pago: false, categoria: 'Acordos/Dívidas', nome: i.empresa })),
+    ];
+    const valor = i => Number(i.valorFluxo ?? i.valor ?? i.valorParcela ?? 0);
+    const categorias = new Map();
+    saidas.forEach(i => categorias.set(i.categoria || 'Outros', (categorias.get(i.categoria || 'Outros') || 0) + valor(i)));
+    const topCategoria = [...categorias.entries()].sort((a, b) => b[1] - a[1])[0] || null;
+    const maiorSaida = [...saidas].sort((a, b) => valor(b) - valor(a))[0] || null;
+    const qtdPagos = dados.entradasPagas.length + dados.despesasPagas.length + dados.acordosPagos.length;
+    const qtdPendentes = dados.entradas.length + dados.despesas.length + dados.acordosPendentes.length;
+    return { aReceber, aPagar, pctEntradas, pctSaidas, topCategoria, maiorSaida, maiorSaidaValor: maiorSaida ? valor(maiorSaida) : 0, qtdPagos, qtdPendentes };
+  })();
 
   const SecaoLista = ({ titulo, itens, cor }) => (
     itens.length > 0 && (
@@ -202,6 +229,70 @@ const Relatorio = ({ setRoute }) => {
                 </Grid>
               ))}
             </Grid>
+          </Card>
+
+          {/* Realização e pendências */}
+          <Card sx={{ mb: 1.2, p: 1.35 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: .7, mb: 1.15 }}>
+              <CheckCircleRoundedIcon sx={{ color: 'primary.main', fontSize: '1.1rem' }} />
+              <Box>
+                <Typography sx={{ fontWeight: 900, fontSize: '.88rem' }}>Realização do mês</Typography>
+                <Typography sx={{ fontSize: '.68rem', color: 'text.secondary' }}>O que já entrou/saiu de verdade e o que ainda está pendente</Typography>
+              </Box>
+            </Box>
+
+            <Grid container spacing={.8} sx={{ mb: 1.25 }}>
+              {[
+                { label: 'Recebido', valor: dados.totalEntPago, cor: 'success.main' },
+                { label: 'A receber', valor: indicadores.aReceber, cor: 'primary.main' },
+                { label: 'Pago', valor: dados.totalSaiPago, cor: 'error.main' },
+                { label: 'A pagar', valor: indicadores.aPagar, cor: 'warning.main' },
+              ].map(item => (
+                <Grid item xs={6} key={item.label}>
+                  <Box sx={{ p: 1, borderRadius: '12px', border: '1px solid', borderColor: 'divider', bgcolor: 'rgba(123,44,191,.018)' }}>
+                    <Typography sx={{ fontSize: '.64rem', fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>{item.label}</Typography>
+                    <Typography sx={{ mt: .15, fontSize: '.9rem', fontWeight: 900, color: item.cor }}>{money(item.valor)}</Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Box sx={{ mb: 1.05 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: .45 }}>
+                <Typography sx={{ fontSize: '.69rem', fontWeight: 800, color: 'text.secondary' }}>Entradas realizadas</Typography>
+                <Typography sx={{ fontSize: '.69rem', fontWeight: 900, color: 'success.main' }}>{indicadores.pctEntradas}%</Typography>
+              </Box>
+              <LinearProgress variant="determinate" value={indicadores.pctEntradas} color="success" sx={{ height: 7, borderRadius: 99 }} />
+            </Box>
+            <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: .45 }}>
+                <Typography sx={{ fontSize: '.69rem', fontWeight: 800, color: 'text.secondary' }}>Saídas liquidadas</Typography>
+                <Typography sx={{ fontSize: '.69rem', fontWeight: 900, color: 'error.main' }}>{indicadores.pctSaidas}%</Typography>
+              </Box>
+              <LinearProgress variant="determinate" value={indicadores.pctSaidas} color="error" sx={{ height: 7, borderRadius: 99 }} />
+            </Box>
+          </Card>
+
+          {/* Destaques do período */}
+          <Card sx={{ mb: 1.2, p: 1.35 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: .7, mb: 1 }}>
+              <InsightsRoundedIcon sx={{ color: 'primary.main', fontSize: '1.1rem' }} />
+              <Typography sx={{ fontWeight: 900, fontSize: '.88rem' }}>Destaques do período</Typography>
+            </Box>
+            <Box sx={{ display: 'grid', gap: .8 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, p: .9, borderRadius: '11px', bgcolor: 'rgba(123,44,191,.035)' }}>
+                <Box><Typography sx={{ fontSize: '.64rem', color: 'text.secondary', fontWeight: 800 }}>MAIOR CATEGORIA DE SAÍDA</Typography><Typography sx={{ fontSize: '.8rem', fontWeight: 850 }}>{indicadores.topCategoria?.[0] || 'Sem saídas'}</Typography></Box>
+                <Typography sx={{ fontSize: '.82rem', fontWeight: 900, color: 'error.main', whiteSpace: 'nowrap' }}>{money(indicadores.topCategoria?.[1] || 0)}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, p: .9, borderRadius: '11px', bgcolor: 'rgba(123,44,191,.035)' }}>
+                <Box sx={{ minWidth: 0 }}><Typography sx={{ fontSize: '.64rem', color: 'text.secondary', fontWeight: 800 }}>MAIOR SAÍDA INDIVIDUAL</Typography><Typography sx={{ fontSize: '.8rem', fontWeight: 850, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{indicadores.maiorSaida?.nome || 'Sem saídas'}</Typography></Box>
+                <Typography sx={{ fontSize: '.82rem', fontWeight: 900, color: 'error.main', whiteSpace: 'nowrap' }}>{money(indicadores.maiorSaidaValor)}</Typography>
+              </Box>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: .8 }}>
+                <Box sx={{ p: .9, borderRadius: '11px', border: '1px solid', borderColor: 'divider', textAlign: 'center' }}><Typography sx={{ fontSize: '.64rem', color: 'text.secondary', fontWeight: 800 }}>LIQUIDADOS</Typography><Typography sx={{ fontSize: '1rem', fontWeight: 900, color: 'success.main' }}>{indicadores.qtdPagos}</Typography></Box>
+                <Box sx={{ p: .9, borderRadius: '11px', border: '1px solid', borderColor: 'divider', textAlign: 'center' }}><Typography sx={{ fontSize: '.64rem', color: 'text.secondary', fontWeight: 800 }}>PENDENTES</Typography><Typography sx={{ fontSize: '1rem', fontWeight: 900, color: 'warning.main' }}>{indicadores.qtdPendentes}</Typography></Box>
+              </Box>
+            </Box>
           </Card>
 
           <SecaoLista

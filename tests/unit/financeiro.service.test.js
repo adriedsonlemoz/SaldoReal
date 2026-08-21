@@ -204,3 +204,62 @@ describe('FinanceiroService — acordos integrados ao fluxo', () => {
     expect(relatorio.acordosPendentes[0]).toMatchObject({ parcelasDevidas: 2, valorFluxo: 200 });
   });
 });
+
+describe('FinanceiroService — renda configurada no fluxo', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 21, 12));
+    stores.acordos.toArray.mockResolvedValue([]);
+    stores.gastos.toArray.mockResolvedValue([]);
+    stores.movimentacoes.toArray.mockResolvedValue([]);
+    stores.configuracoes.get.mockImplementation(async (chave) => {
+      if (chave === 'renda') return { chave, valor: 3000 };
+      if (chave === 'diaPagamento') return { chave, valor: 25 };
+      return undefined;
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('mantém a renda do onboarding como prevista até existir recebimento real', async () => {
+    const relatorio = await FinanceiroService.dadosRelatorio(0);
+    expect(relatorio.entradas).toHaveLength(1);
+    expect(relatorio.entradas[0]).toMatchObject({ origem: 'renda', valor: 3000, dia: 25, virtual: true });
+    expect(relatorio.totalEnt).toBe(3000);
+    expect(relatorio.totalEntPago).toBe(0);
+  });
+
+  it('registra recebimento antecipado no razão com competência preservada', async () => {
+    await FinanceiroService.registrarRecebimentoRenda('08/2026', 2850, '2026-08-21');
+    expect(stores.movimentacoes.add).toHaveBeenCalledWith(expect.objectContaining({
+      tipo: 'entrada',
+      valor: 2850,
+      data: '2026-08-21',
+      mesFluxo: '08/2026',
+      competencia: '08/2026',
+      origem: 'renda',
+      chaveOrigem: 'renda-config:08/2026',
+    }));
+  });
+
+  it('permite editar o valor realmente recebido sem mudar a configuração mensal', async () => {
+    stores.movimentacoes.get.mockResolvedValue({
+      id: 44, origem: 'renda', valor: 3000, data: '2026-08-20', competencia: '08/2026', mesFluxo: '08/2026',
+    });
+    await FinanceiroService.atualizarRecebimentoRenda(44, { valor: 2925, data: '2026-08-21' });
+    expect(stores.movimentacoes.update).toHaveBeenCalledWith(44, expect.objectContaining({
+      valor: 2925, data: '2026-08-21', mesFluxo: '08/2026',
+    }));
+    expect(stores.configuracoes.put).not.toHaveBeenCalled();
+  });
+
+  it('remover renda configurada zera os próximos recebimentos sem apagar histórico', async () => {
+    await FinanceiroService.removerRendaConfigurada();
+    expect(stores.configuracoes.put).toHaveBeenCalledWith({ chave: 'renda', valor: 0 });
+    expect(stores.configuracoes.put).toHaveBeenCalledWith({ chave: 'diaPagamento', valor: null });
+    expect(stores.movimentacoes.delete).not.toHaveBeenCalled();
+  });
+});

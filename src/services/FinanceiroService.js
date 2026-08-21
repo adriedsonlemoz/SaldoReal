@@ -113,6 +113,9 @@ const FinanceiroService = {
   async setRenda(val) { return this.setConfig('renda', val); },
   async getDiaPagamento() { return this.getConfig('diaPagamento', null); },
   async setDiaPagamento(dia) { return this.setConfig('diaPagamento', dia); },
+  async removerRendaConfigurada() {
+    await Promise.all([this.setRenda(0), this.setDiaPagamento(null)]);
+  },
   async getCategoriasPersonalizadas(tipo = 'despesa') {
     const chave = tipo === 'entrada' ? 'categorias_entrada' : 'categorias_despesa';
     const categorias = await this.getConfig(chave, []);
@@ -371,17 +374,24 @@ const FinanceiroService = {
       }
     });
 
+    const rendaRecebidaNaCompetencia = movimentacoes.some(m =>
+      m.tipo === 'entrada' && m.origem === 'renda' && m.competencia === competencia
+    );
+
     return {
       gastos: gastosPendentes,
       movimentacoes: movimentosMes,
       acordos: acordosPendentes,
       sobraAnterior,
       mesAnoTarget: competencia,
+      rendaRecebidaNaCompetencia,
     };
   },
 
   async dadosRelatorio(mesOffset = 0) {
-    const { acordos, gastos, movimentacoes } = await this.carregarTudo();
+    const [{ acordos, gastos, movimentacoes }, rendaConfigurada, diaPagamento] = await Promise.all([
+      this.carregarTudo(), this.getRenda(), this.getDiaPagamento(),
+    ]);
     const mesAlvo = u.mesComOffset(mesOffset);
     const competencia = u.dateParaMesAno(mesAlvo);
     const alvoNum = mesNumero(competencia);
@@ -412,6 +422,23 @@ const FinanceiroService = {
       if (g.tipoOperacao === 'entrada') entradas.push(g);
       else despesas.push(g);
     });
+
+    // A renda informada no onboarding é uma previsão mensal. Enquanto não houver
+    // um lançamento real (ou uma entrada de salário criada manualmente), ela entra
+    // no relatório como prevista — nunca como recebida automaticamente.
+    const rendaBaseJaRepresentada = movimentacoes.some(m =>
+      m.tipo === 'entrada' && m.competencia === competencia && (m.origem === 'renda' || u.ehEntradaRendaBase(m))
+    ) || gastos.some(g =>
+      g.tipoOperacao === 'entrada' && u.ehEntradaRendaBase(g) && (g.mesAno === 'fixo' || g.mesAno === competencia)
+    );
+    if (n(rendaConfigurada) > 0 && diaPagamento && !rendaBaseJaRepresentada) {
+      const dataPrevista = u.dataVencimentoNoMes(diaPagamento, mesAlvo);
+      entradas.unshift({
+        id: `renda-prevista-${competencia}`, nome: '💼 Salário', valor: n(rendaConfigurada),
+        dia: dataPrevista.getDate(), categoria: 'Salário', tipoOperacao: 'entrada',
+        origem: 'renda', virtual: true,
+      });
+    }
 
     const acordoMap = new Map(acordos.map(a => [String(a.id), a]));
     const pagosAgrupados = new Map();
@@ -465,6 +492,40 @@ const FinanceiroService = {
       });
     }
     return resultado;
+  },
+
+  // ── RENDA CONFIGURADA / RECEBIMENTO ───────────────────────────────────────
+  async registrarRecebimentoRenda(competencia, valor = null, data = new Date()) {
+    const renda = valor == null ? n(await this.getRenda()) : n(valor);
+    if (renda <= 0) throw new Error('Informe um valor de recebimento maior que zero.');
+    const dataEfetiva = MovimentacaoService.dataValida(data);
+    const comp = /^\d{2}\/\d{4}$/.test(String(competencia || ''))
+      ? competencia
+      : u.dateParaMesAno(dataEfetiva);
+
+    return MovimentacaoService.upsert({
+      tipo: 'entrada', valor: renda, data: MovimentacaoService.isoLocal(dataEfetiva),
+      mesFluxo: u.dateParaMesAno(dataEfetiva), competencia: comp, categoria: 'Salário',
+      descricao: '💼 Salário', origem: 'renda', origemId: 'config:renda',
+      referenciaId: comp, chaveOrigem: `renda-config:${comp}`, status: 'efetivada',
+    });
+  },
+
+  async atualizarRecebimentoRenda(movimentacaoId, { valor, data }) {
+    const atual = await db.movimentacoes.get(movimentacaoId);
+    if (!atual || atual.origem !== 'renda') throw new Error('Recebimento de renda não encontrado.');
+    const valorNovo = n(valor);
+    if (valorNovo <= 0) throw new Error('Informe um valor maior que zero.');
+    const dataEfetiva = MovimentacaoService.dataValida(data || atual.data);
+    await db.movimentacoes.update(movimentacaoId, {
+      valor: valorNovo, data: MovimentacaoService.isoLocal(dataEfetiva),
+      mesFluxo: u.dateParaMesAno(dataEfetiva), atualizadoEm: new Date().toISOString(),
+    });
+  },
+
+  async apagarMovimentacao(id) {
+    if (!id) return;
+    await db.movimentacoes.delete(id);
   },
 
   // ── ESCRITA — GASTOS ─────────────────────────────────────────────────────

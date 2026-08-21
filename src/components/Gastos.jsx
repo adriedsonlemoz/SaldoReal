@@ -9,6 +9,7 @@ import Dialog     from '@mui/material/Dialog';
 import DialogTitle    from '@mui/material/DialogTitle';
 import DialogContent  from '@mui/material/DialogContent';
 import DialogActions  from '@mui/material/DialogActions';
+import TextField    from '@mui/material/TextField';
 import Snackbar   from '@mui/material/Snackbar';
 import Alert      from '@mui/material/Alert';
 import Chip       from '@mui/material/Chip';
@@ -29,6 +30,7 @@ import PaymentsRoundedIcon from '@mui/icons-material/PaymentsRounded';
 
 import FinanceiroUtils  from '../utils/financeiro';
 import FinanceiroService from '../services/FinanceiroService';
+import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../utils/moedaInput';
 
 const money = (v) => FinanceiroUtils.money(v);
 
@@ -62,9 +64,18 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
   const isMovimento = item.tipo === 'movimentacao';
   const isLista = item.origem === 'lista_compras';
   const isEntrada = item.operacao === 'entrada';
+  const isRendaVirtual = isVirtual && item.origem === 'renda';
+  const isRendaConfiguradaRecebida = isMovimento && item.origem === 'renda' && !item.entidadeId;
   const cor = isEntrada ? '#119C72' : '#E54862';
   const origemMeta = ORIGENS[item.origem] || ORIGENS.manual;
   const OrigemIcon = origemMeta.Icon;
+  const contexto = isRendaVirtual
+    ? `Previsto dia ${item.dia || '—'} · aguardando confirmação`
+    : isVirtual
+      ? 'Saldo acumulado'
+      : isMovimento
+        ? `${isEntrada ? 'Recebido' : 'Pago'} dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}`
+        : `Dia ${item.dia || '—'} · ${item.categoria || 'Geral'}`;
 
   return (
     <Box sx={{ p: 1.05, mb: .75, bgcolor: 'background.paper', border: '1px solid rgba(72,45,91,.08)', borderRadius: '15px', boxShadow: '0 4px 15px rgba(45,11,94,.035)', opacity: item.isPago && !isVirtual ? .78 : 1, position: 'relative', overflow: 'hidden', transition: 'all .16s ease' }}>
@@ -76,21 +87,42 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: .45, mt: .3, minWidth: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: .25, px: .5, py: .16, borderRadius: 99, bgcolor: `${origemMeta.color}0B`, color: origemMeta.color, flexShrink: 0 }}><OrigemIcon sx={{ fontSize: 12 }} /><Typography sx={{ fontSize: '.58rem', fontWeight: 900 }}>{origemMeta.label}</Typography></Box>
             <Typography sx={{ fontSize: '.63rem', color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {isVirtual ? 'Saldo acumulado' : isMovimento ? `Pago dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}` : `Dia ${item.dia || '—'} · ${item.categoria || 'Geral'}`}{item.parcelaText ? ` · ${item.parcelaText}` : ''}
+              {contexto}{item.parcelaText ? ` · ${item.parcelaText}` : ''}
             </Typography>
           </Box>
         </Box>
         <Typography sx={{ fontWeight: 900, fontSize: '.9rem', color: cor, lineHeight: 1, whiteSpace: 'nowrap', textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none' }}>{isEntrada ? '+' : '-'}{money(item.valor)}</Typography>
       </Box>
 
-      {!isVirtual && (
+      {(!isVirtual || isRendaVirtual) && (
         <Box sx={{ mt: .72, pt: .65, borderTop: '1px solid rgba(72,45,91,.055)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: .45 }}>
           {isAcordo ? <Button size="small" variant="text" onClick={() => setRoute('acordos')} startIcon={<OpenInNewRoundedIcon sx={{ fontSize: '16px !important' }} />} sx={{ minHeight: 36, px: .75, fontSize: '.66rem' }}>Abrir acordo</Button>
           : isLista ? <Button size="small" variant="text" onClick={() => setRoute('lista')} startIcon={<ShoppingCartRoundedIcon sx={{ fontSize: '16px !important' }} />} sx={{ minHeight: 36, px: .75, fontSize: '.66rem' }}>Abrir lista</Button>
           : <>
-            <ActionButton label={item.isPago ? `Desfazer pagamento de ${item.nome}` : `Marcar ${item.nome} como pago`} onClick={() => onPago(item)} color={item.isPago ? '#7B2CBF' : '#119C72'} bg={item.isPago ? 'rgba(123,44,191,.06)' : 'rgba(17,156,114,.09)'}>{item.isPago ? <UndoRoundedIcon sx={{ fontSize: 18 }} /> : <CheckRoundedIcon sx={{ fontSize: 19 }} />}</ActionButton>
+            {isRendaVirtual ? (
+              <Button size="small" variant="contained" color="success" onClick={() => onPago(item)}
+                startIcon={<CheckRoundedIcon sx={{ fontSize: '17px !important' }} />}
+                sx={{ minHeight: 38, px: 1.15, borderRadius: '11px', fontSize: '.68rem', fontWeight: 900, textTransform: 'none' }}>
+                Receber agora
+              </Button>
+            ) : (
+              <ActionButton
+                label={item.isPago ? `${isEntrada ? 'Desfazer recebimento' : 'Desfazer pagamento'} de ${item.nome}` : `${isEntrada ? 'Receber' : 'Marcar'} ${item.nome}${isEntrada ? ' agora' : ' como pago'}`}
+                onClick={() => onPago(item)}
+                color={item.isPago ? '#7B2CBF' : '#119C72'}
+                bg={item.isPago ? 'rgba(123,44,191,.06)' : 'rgba(17,156,114,.09)'}
+              >{item.isPago ? <UndoRoundedIcon sx={{ fontSize: 18 }} /> : <CheckRoundedIcon sx={{ fontSize: 19 }} />}</ActionButton>
+            )}
             <ActionButton label={`Editar ${item.nome}`} onClick={() => onEdit(item)}><EditRoundedIcon sx={{ fontSize: 17 }} /></ActionButton>
-            <ActionButton label={`Excluir ${item.nome}`} onClick={() => onDelete(isMovimento ? item.entidadeId : item.id, item.nome, 'gasto')} color="#E54862" bg="rgba(229,72,98,.06)"><DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} /></ActionButton>
+            <ActionButton
+              label={`Excluir ${item.nome}`}
+              onClick={() => onDelete(
+                isRendaVirtual ? 'renda_config' : (isRendaConfiguradaRecebida ? (item.movimentacaoId || item.id) : (isMovimento ? item.entidadeId : item.id)),
+                item.nome,
+                isRendaVirtual ? 'renda_config' : (isRendaConfiguradaRecebida ? 'movimentacao' : 'gasto'),
+              )}
+              color="#E54862" bg="rgba(229,72,98,.06)"
+            ><DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} /></ActionButton>
           </>}
         </Box>
       )}
@@ -124,14 +156,17 @@ const Gastos = ({ setRoute, setEditItem }) => {
   const [sobraAnterior,    setSobraAnterior]     = useState(0);
   const [rendaMensal,      setRendaMensal]       = useState(0);
   const [diaPagamento,     setDiaPagamento]      = useState(null);
+  const [rendaRecebidaNaCompetencia, setRendaRecebidaNaCompetencia] = useState(false);
   const [mesOffset,        setMesOffset]         = useState(0);
   const [toast,            setToast]             = useState({ open: false, texto: '', sev: 'success' });
   const [modalDelete,      setModalDelete]       = useState({ open: false, id: null, nome: '', tipo: 'gasto' });
   const [modalConfirmPag,  setModalConfirmPag]   = useState({ open: false, item: null });
+  const [modalRendaConfig,  setModalRendaConfig]  = useState({ open: false, valor: 0, dia: '' });
+  const [modalRecebimento,  setModalRecebimento]  = useState({ open: false, modo: 'receber', id: null, valor: 0, data: '', competencia: null });
   const [filtroOrigem,     setFiltroOrigem]      = useState('todas');
 
   const carregarTudo = async () => {
-    const [{ gastos, movimentacoes: movs, acordos, sobraAnterior: sobra }, renda, dia] = await Promise.all([
+    const [{ gastos, movimentacoes: movs, acordos, sobraAnterior: sobra, rendaRecebidaNaCompetencia: rendaRecebida }, renda, dia] = await Promise.all([
       FinanceiroService.dadosGastosMensais(mesOffset),
       FinanceiroService.getRenda(),
       FinanceiroService.getDiaPagamento(),
@@ -142,11 +177,29 @@ const Gastos = ({ setRoute, setEditItem }) => {
     setSobraAnterior(sobra);
     setRendaMensal(renda || 0);
     setDiaPagamento(dia || null);
+    setRendaRecebidaNaCompetencia(Boolean(rendaRecebida));
   };
 
   useEffect(() => { carregarTudo(); }, [mesOffset]);
 
+  const abrirRecebimentoRenda = (item, modo = 'receber') => {
+    const competencia = item.competencia || FinanceiroUtils.dateParaMesAno(FinanceiroUtils.mesComOffset(mesOffset));
+    const data = item.data || FinanceiroUtils.dateParaISOInput(new Date());
+    setModalRecebimento({
+      open: true,
+      modo,
+      id: modo === 'editar' ? (item.movimentacaoId || item.id) : null,
+      valor: Number(item.valor || rendaMensal || 0),
+      data,
+      competencia,
+    });
+  };
+
   const pedirConfirmacaoPagamento = (item) => {
+    if (item.tipo === 'virtual' && item.origem === 'renda') {
+      abrirRecebimentoRenda(item, 'receber');
+      return;
+    }
     if (!item.isPago) setModalConfirmPag({ open: true, item });
     else executarTogglePagamento(item);
   };
@@ -156,15 +209,74 @@ const Gastos = ({ setRoute, setEditItem }) => {
     try {
       const mesAnoTarget = FinanceiroUtils.dateParaMesAno(FinanceiroUtils.mesComOffset(mesOffset));
       await FinanceiroService.registrarPagamentoGasto(item, mesAnoTarget);
-      setToast({ open: true, texto: '✅ Atualizado!', sev: 'success' });
+      setToast({ open: true, texto: item?.operacao === 'entrada' ? '✅ Recebimento desfeito.' : '✅ Atualizado!', sev: 'success' });
       carregarTudo();
     } catch {
       setToast({ open: true, texto: '❌ Erro ao atualizar.', sev: 'error' });
     }
   };
 
+  const salvarRecebimentoRenda = async () => {
+    try {
+      if (Number(modalRecebimento.valor || 0) <= 0) {
+        setToast({ open: true, texto: '⚠️ Informe um valor maior que zero.', sev: 'warning' });
+        return;
+      }
+      if (modalRecebimento.modo === 'editar') {
+        await FinanceiroService.atualizarRecebimentoRenda(modalRecebimento.id, {
+          valor: modalRecebimento.valor,
+          data: modalRecebimento.data,
+        });
+        setToast({ open: true, texto: '✅ Recebimento atualizado.', sev: 'success' });
+      } else {
+        await FinanceiroService.registrarRecebimentoRenda(
+          modalRecebimento.competencia,
+          modalRecebimento.valor,
+          modalRecebimento.data,
+        );
+        setToast({ open: true, texto: '✅ Renda recebida e lançada nas contas.', sev: 'success' });
+      }
+      setModalRecebimento({ open: false, modo: 'receber', id: null, valor: 0, data: '', competencia: null });
+      carregarTudo();
+    } catch (e) {
+      console.error(e);
+      setToast({ open: true, texto: '❌ Não foi possível salvar o recebimento.', sev: 'error' });
+    }
+  };
+
+  const abrirEdicaoRenda = () => setModalRendaConfig({
+    open: true,
+    valor: Number(rendaMensal || 0),
+    dia: diaPagamento ? String(diaPagamento) : '',
+  });
+
+  const salvarConfigRenda = async () => {
+    const valor = Number(modalRendaConfig.valor || 0);
+    const dia = parseInt(modalRendaConfig.dia, 10);
+    if (valor <= 0 || dia < 1 || dia > 31) {
+      setToast({ open: true, texto: '⚠️ Informe valor e dia de recebimento válidos.', sev: 'warning' });
+      return;
+    }
+    try {
+      await Promise.all([FinanceiroService.setRenda(valor), FinanceiroService.setDiaPagamento(dia)]);
+      setModalRendaConfig({ open: false, valor: 0, dia: '' });
+      setToast({ open: true, texto: '✅ Renda mensal atualizada.', sev: 'success' });
+      carregarTudo();
+    } catch {
+      setToast({ open: true, texto: '❌ Não foi possível atualizar a renda.', sev: 'error' });
+    }
+  };
+
   const editarLancamento = async (item) => {
+    if (item.tipo === 'virtual' && item.origem === 'renda') {
+      abrirEdicaoRenda();
+      return;
+    }
     if (item.tipo === 'movimentacao') {
+      if (item.origem === 'renda' && !item.entidadeId) {
+        abrirRecebimentoRenda(item, 'editar');
+        return;
+      }
       const gasto = await FinanceiroService.carregarGasto(item.entidadeId || item.referenciaId);
       if (!gasto) {
         setToast({ open: true, texto: 'Este lançamento é gerenciado pela tela de origem.', sev: 'info' });
@@ -181,10 +293,22 @@ const Gastos = ({ setRoute, setEditItem }) => {
 
   const executarExclusao = async () => {
     const { id, tipo } = modalDelete;
-    if (id) {
-      tipo === 'acordo' ? await FinanceiroService.apagarAcordo(id) : await FinanceiroService.apagarGasto(id);
+    try {
+      if (tipo === 'renda_config') {
+        await FinanceiroService.removerRendaConfigurada();
+      } else if (id) {
+        if (tipo === 'acordo') await FinanceiroService.apagarAcordo(id);
+        else if (tipo === 'movimentacao') await FinanceiroService.apagarMovimentacao(id);
+        else await FinanceiroService.apagarGasto(id);
+      }
       carregarTudo();
-      setToast({ open: true, texto: '🗑️ Removido.', sev: 'info' });
+      setToast({
+        open: true,
+        texto: tipo === 'renda_config' ? '🗑️ Renda mensal removida. Os próximos meses ficaram zerados.' : '🗑️ Removido.',
+        sev: 'info',
+      });
+    } catch {
+      setToast({ open: true, texto: '❌ Não foi possível remover.', sev: 'error' });
     }
     setModalDelete({ open: false, id: null, nome: '', tipo: 'gasto' });
   };
@@ -195,25 +319,23 @@ const Gastos = ({ setRoute, setEditItem }) => {
     let res = { ent: 0, sai: 0, entPaga: 0, saiPaga: 0 };
     let listAbertos = [], listPagos = [];
 
-    const jaTemSalario = movimentacoes.some(m =>
+    const jaTemSalario = rendaRecebidaNaCompetencia || movimentacoes.some(m =>
       m.tipoOperacao === 'entrada' && (m.origem === 'renda' || FinanceiroUtils.ehEntradaRendaBase(m))
+    ) || gastosRegistrados.some(g =>
+      g.tipoOperacao === 'entrada' && FinanceiroUtils.ehEntradaRendaBase(g)
     );
 
     if (rendaMensal > 0 && diaPagamento && !jaTemSalario) {
-      const hoje = new Date();
-      const mesAtual = FinanceiroUtils.dateParaMesAno(hoje);
-      const alvoNum = FinanceiroUtils.mesAnoParaNum(mesAnoTarget);
-      const atualNum = FinanceiroUtils.mesAnoParaNum(mesAtual);
       const dataPagamento = FinanceiroUtils.dataVencimentoNoMes(diaPagamento, mesAlvo);
-      const isPago = alvoNum < atualNum ? true : alvoNum > atualNum ? false : FinanceiroUtils.diferencaDias(dataPagamento, hoje) <= 0;
       const salarioVirtual = {
         id: 'salario_virtual', nome: '💼 Salário', valor: rendaMensal,
-        tipoOperacao: 'entrada', operacao: 'entrada', isPago, dia: dataPagamento.getDate(),
-        categoria: 'Salário', tipo: 'virtual', origem: 'renda',
+        tipoOperacao: 'entrada', operacao: 'entrada', isPago: false, dia: dataPagamento.getDate(),
+        categoria: 'Salário', tipo: 'virtual', origem: 'renda', competencia: mesAnoTarget,
       };
+      // A renda configurada é previsão até o usuário confirmar o recebimento.
+      // Não existe mais baixa visual automática somente porque o dia chegou.
       res.ent += rendaMensal;
-      if (isPago) res.entPaga += rendaMensal;
-      isPago ? listPagos.push(salarioVirtual) : listAbertos.push(salarioVirtual);
+      listAbertos.push(salarioVirtual);
     }
 
     if (sobraAnterior > 0) {
@@ -255,7 +377,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
     listAbertos.sort((a, b) => (parseInt(a.dia) || 31) - (parseInt(b.dia) || 31));
     listPagos.sort((a, b) => (parseInt(a.dia) || 31) - (parseInt(b.dia) || 31));
     return { abertos: listAbertos, pagos: listPagos, resumo: res };
-  }, [gastosRegistrados, movimentacoes, acordosMensais, mesOffset, sobraAnterior, rendaMensal, diaPagamento, filtroOrigem]);
+  }, [gastosRegistrados, movimentacoes, acordosMensais, mesOffset, sobraAnterior, rendaMensal, diaPagamento, rendaRecebidaNaCompetencia, filtroOrigem]);
 
   const saldoReal   = resumo.entPaga - resumo.saiPaga;
   const nomeMes     = FinanceiroUtils.nomeMesOffset(mesOffset);
@@ -402,12 +524,72 @@ const Gastos = ({ setRoute, setEditItem }) => {
         </Box>
       )}
 
+      {/* ── MODAL RECEBER / EDITAR RENDA CONFIGURADA ─────────────────────── */}
+      <Dialog open={modalRecebimento.open}
+        onClose={() => setModalRecebimento({ open: false, modo: 'receber', id: null, valor: 0, data: '', competencia: null })}
+        fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: '20px' } }}>
+        <DialogTitle sx={{ fontWeight: 900, pb: .6, display: 'flex', alignItems: 'center', gap: .7 }}>
+          <SavingsRoundedIcon color="success" /> {modalRecebimento.modo === 'editar' ? 'Editar recebimento' : 'Receber renda agora'}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1.2 }}>
+          <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mb: 1.5, lineHeight: 1.45 }}>
+            {modalRecebimento.modo === 'editar'
+              ? 'Ajuste o valor realmente recebido ou a data em que o dinheiro entrou.'
+              : `Confirme o valor que entrou. Você pode receber antes do dia ${diaPagamento || 'configurado'} e o lançamento será registrado na data escolhida.`}
+          </Typography>
+          <TextField fullWidth label="Valor recebido"
+            value={formatMoedaInput(modalRecebimento.valor, { comSimbolo: true })}
+            onChange={e => setModalRecebimento(v => ({ ...v, valor: parseMoedaInput(e.target.value) }))}
+            inputProps={propsInputMoeda} sx={{ mb: 1.4 }} />
+          <TextField fullWidth type="date" label="Data do recebimento" value={modalRecebimento.data}
+            onChange={e => setModalRecebimento(v => ({ ...v, data: e.target.value }))}
+            InputLabelProps={{ shrink: true }} />
+          {modalRecebimento.competencia && (
+            <Typography sx={{ mt: 1, fontSize: '.68rem', color: 'text.secondary' }}>
+              Competência: {modalRecebimento.competencia}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+          <Button onClick={() => setModalRecebimento({ open: false, modo: 'receber', id: null, valor: 0, data: '', competencia: null })} color="inherit" sx={{ borderRadius: '12px' }}>Cancelar</Button>
+          <Button variant="contained" color="success" onClick={salvarRecebimentoRenda} sx={{ borderRadius: '12px', fontWeight: 850 }}>
+            {modalRecebimento.modo === 'editar' ? 'Salvar' : 'Confirmar recebimento'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ── MODAL EDITAR RENDA MENSAL ─────────────────────────────────────── */}
+      <Dialog open={modalRendaConfig.open}
+        onClose={() => setModalRendaConfig({ open: false, valor: 0, dia: '' })}
+        fullWidth maxWidth="xs" PaperProps={{ sx: { borderRadius: '20px' } }}>
+        <DialogTitle sx={{ fontWeight: 900, pb: .6 }}>Editar renda mensal</DialogTitle>
+        <DialogContent sx={{ pt: 1.2 }}>
+          <Typography sx={{ fontSize: '.78rem', color: 'text.secondary', mb: 1.5, lineHeight: 1.45 }}>
+            Esta é a previsão criada na configuração inicial. A alteração vale para os próximos recebimentos; lançamentos já recebidos continuam no histórico.
+          </Typography>
+          <TextField fullWidth label="Renda mensal"
+            value={formatMoedaInput(modalRendaConfig.valor, { comSimbolo: true })}
+            onChange={e => setModalRendaConfig(v => ({ ...v, valor: parseMoedaInput(e.target.value) }))}
+            inputProps={propsInputMoeda} sx={{ mb: 1.4 }} />
+          <TextField fullWidth label="Dia do recebimento (1–31)" value={modalRendaConfig.dia}
+            onChange={e => {
+              const valor = e.target.value.replace(/\D/g, '');
+              if (valor === '' || (parseInt(valor, 10) >= 1 && parseInt(valor, 10) <= 31))
+                setModalRendaConfig(v => ({ ...v, dia: valor }));
+            }} inputProps={{ inputMode: 'numeric', maxLength: 2 }} />
+        </DialogContent>
+        <DialogActions sx={{ px: 2, pb: 2, gap: 1 }}>
+          <Button onClick={() => setModalRendaConfig({ open: false, valor: 0, dia: '' })} color="inherit" sx={{ borderRadius: '12px' }}>Cancelar</Button>
+          <Button variant="contained" onClick={salvarConfigRenda} sx={{ borderRadius: '12px', fontWeight: 850 }}>Salvar</Button>
+        </DialogActions>
+      </Dialog>
+
       {/* ── MODAL CONFIRMAR PAGAMENTO ───────────────────────────────────── */}
       <Dialog open={modalConfirmPag.open}
         onClose={() => setModalConfirmPag({ open: false, item: null })}
         fullWidth maxWidth="xs"
         PaperProps={{ sx: { borderRadius: '20px' } }}>
-        <DialogTitle sx={{ fontWeight: 900, pb: .5, display: 'flex', alignItems: 'center', gap: .7 }}><PaymentsRoundedIcon color="success" /> Confirmar pagamento</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 900, pb: .5, display: 'flex', alignItems: 'center', gap: .7 }}><PaymentsRoundedIcon color="success" /> {modalConfirmPag.item?.operacao === 'entrada' ? 'Confirmar recebimento' : 'Confirmar pagamento'}</DialogTitle>
         <DialogContent sx={{ textAlign: 'center', pt: 1.5 }}>
           {modalConfirmPag.item && (
             <>
@@ -425,7 +607,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
                   sx={{ bgcolor: 'rgba(123,44,191,0.09)', color: '#7B2CBF', fontWeight: 800, mb: 1 }} />
               )}
               <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>
-                Deseja marcar como pago?
+                {modalConfirmPag.item.operacao === 'entrada' ? 'Deseja marcar como recebido?' : 'Deseja marcar como pago?'}
               </Typography>
             </>
           )}
@@ -448,13 +630,20 @@ const Gastos = ({ setRoute, setEditItem }) => {
         fullWidth maxWidth="xs"
         PaperProps={{ sx: { borderRadius: '20px' } }}>
         <DialogTitle sx={{ fontWeight: 800, color: 'error.main' }}>
-          ⚠️ Remover {modalDelete.tipo === 'acordo' ? 'acordo' : 'registro'}
+          ⚠️ Remover {modalDelete.tipo === 'acordo' ? 'acordo' : modalDelete.tipo === 'renda_config' ? 'renda mensal' : modalDelete.tipo === 'movimentacao' ? 'recebimento' : 'registro'}
         </DialogTitle>
         <DialogContent>
           {modalDelete.tipo === 'acordo' && (
             <Box sx={{ mb: 1.5, p: 1.2, bgcolor: 'rgba(245,158,11,0.08)', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.25)' }}>
               <Typography sx={{ fontSize: '0.82rem', color: 'warning.main', fontWeight: 600 }}>
                 ⚠️ Isso removerá o acordo e todo o histórico de pagamentos permanentemente.
+              </Typography>
+            </Box>
+          )}
+          {modalDelete.tipo === 'renda_config' && (
+            <Box sx={{ mb: 1.5, p: 1.2, bgcolor: 'rgba(245,158,11,0.08)', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.25)' }}>
+              <Typography sx={{ fontSize: '0.82rem', color: 'warning.main', fontWeight: 600 }}>
+                Isso zera a renda mensal configurada e remove a previsão dos próximos meses. Recebimentos já registrados permanecem no histórico.
               </Typography>
             </Box>
           )}
