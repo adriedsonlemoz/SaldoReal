@@ -360,6 +360,10 @@ const FinanceiroService = {
       if (liquidado) return false;
       if (g.mesAno === competencia) return true;
       return mesOffset === 0 && mesNumero(g.mesAno) < atualNum;
+    }).map(g => {
+      const mesVencimento = g.mesAno === 'fixo' ? mesAlvo : u.mesAnoParaDate(g.mesAno);
+      const dataVencimento = mesVencimento ? u.dataVencimentoNoMes(g.dia, mesVencimento) : null;
+      return { ...g, dataVencimento };
     });
 
     const acordosPendentes = [];
@@ -367,9 +371,11 @@ const FinanceiroService = {
       if (a.situacao !== 'acordo') return;
       const fluxo = fluxoAcordoNoMes(a, mesAlvo, movimentacoes);
       if (fluxo.valorPendente > 0) {
+        const proxima = u.proximaParcelaPendente(a);
         acordosPendentes.push({
           ...a, fluxoStatus: 'pendente', valorFluxo: fluxo.valorPendente,
           pagamentosMes: 0, parcelasDevidas: fluxo.parcelasDevidas,
+          dataVencimento: proxima?.data || null, parcelaVencimento: proxima?.numero || null,
         });
       }
     });
@@ -419,8 +425,13 @@ const FinanceiroService = {
       const pertence = g.mesAno === 'fixo' || g.mesAno === competencia ||
         (mesOffset === 0 && g.mesAno !== 'fixo' && mesNumero(g.mesAno) < atualNum);
       if (!pertence) return;
-      if (g.tipoOperacao === 'entrada') entradas.push(g);
-      else despesas.push(g);
+      const mesVencimento = g.mesAno === 'fixo' ? mesAlvo : u.mesAnoParaDate(g.mesAno);
+      const itemComPrazo = {
+        ...g,
+        dataVencimento: mesVencimento ? u.dataVencimentoNoMes(g.dia, mesVencimento) : null,
+      };
+      if (g.tipoOperacao === 'entrada') entradas.push(itemComPrazo);
+      else despesas.push(itemComPrazo);
     });
 
     // A renda informada no onboarding é uma previsão mensal. Enquanto não houver
@@ -436,7 +447,7 @@ const FinanceiroService = {
       entradas.unshift({
         id: `renda-prevista-${competencia}`, nome: '💼 Salário', valor: n(rendaConfigurada),
         dia: dataPrevista.getDate(), categoria: 'Salário', tipoOperacao: 'entrada',
-        origem: 'renda', virtual: true,
+        origem: 'renda', virtual: true, dataVencimento: dataPrevista,
       });
     }
 
@@ -463,7 +474,11 @@ const FinanceiroService = {
     acordos.forEach(a => {
       const fluxo = fluxoAcordoNoMes(a, mesAlvo, movimentacoes);
       if (fluxo.valorPendente > 0) {
-        acordosPendentes.push({ ...a, valorFluxo: fluxo.valorPendente, parcelasDevidas: fluxo.parcelasDevidas });
+        const proxima = u.proximaParcelaPendente(a);
+        acordosPendentes.push({
+          ...a, valorFluxo: fluxo.valorPendente, parcelasDevidas: fluxo.parcelasDevidas,
+          dataVencimento: proxima?.data || null, parcelaVencimento: proxima?.numero || null,
+        });
       }
     });
 

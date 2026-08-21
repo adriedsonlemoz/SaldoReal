@@ -249,7 +249,7 @@ const Sobre = ({ setRoute }) => {
                 ))}
               </Box>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button variant="contained" size="small" onClick={handleCopyLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', bgcolor: '#7B2CBF' }}>
+                <Button variant="contained" size="small" onClick={handleCopyLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', bgcolor: '#7B2CBF', color: '#fff' }}>
                   📋 Copiar log
                 </Button>
                 <Button variant="outlined" size="small" onClick={handleClearLog} sx={{ flex: 1, fontWeight: 700, fontFamily: 'monospace', fontSize: '0.75rem', color: '#EF4444', borderColor: '#EF4444' }}>

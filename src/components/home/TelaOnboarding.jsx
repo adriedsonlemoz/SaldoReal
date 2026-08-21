@@ -74,7 +74,7 @@ const TelaOnboarding = ({ onConcluir }) => {
         <Typography sx={{ fontWeight: 800, fontSize: '1.4rem', color: 'text.primary', mb: 0.5 }}>Como você se chama?</Typography>
         <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem', mb: 3 }}>Vamos personalizar sua experiência.</Typography>
         <TextField fullWidth label="Seu primeiro nome" value={nome} onChange={e => setNome(e.target.value)} onKeyDown={e => e.key === 'Enter' && nome.trim() && setStep(2)} autoFocus sx={{ mb: 3 }} />
-        <Button fullWidth variant="contained" disabled={!nome.trim()} onClick={() => setStep(2)} sx={{ py: 1.5, fontWeight: 700, borderRadius: '12px' }}>
+        <Button fullWidth variant="contained" disabled={!nome.trim()} onClick={() => setStep(2)} sx={{ py: 1.5, fontWeight: 700, borderRadius: '12px', color: '#fff' }}>
           Continuar →
         </Button>
         <Dots active={1} />
@@ -92,7 +92,7 @@ const TelaOnboarding = ({ onConcluir }) => {
         </Typography>
         <TextField fullWidth label="Renda mensal (R$)" value={inputRenda === '' ? '' : money(inputRenda)} onChange={handleRendaChange} inputProps={{ inputMode: 'numeric' }} sx={{ mb: 2 }} />
         <TextField fullWidth label="Dia do recebimento (1–31)" value={diaPagamento} onChange={e => { const v = e.target.value.replace(/\D/g,''); if (v === '' || (parseInt(v) >= 1 && parseInt(v) <= 31)) setDiaPagamento(v); }} inputProps={{ inputMode: 'numeric', maxLength: 2 }} helperText="Ex: 5 (recebe todo dia 5). Pode pular." sx={{ mb: 3 }} />
-        <Button fullWidth variant="contained" onClick={concluir} sx={{ py: 1.5, fontWeight: 700, borderRadius: '12px', mb: 1.5 }}>
+        <Button fullWidth variant="contained" onClick={concluir} sx={{ py: 1.5, fontWeight: 700, borderRadius: '12px', mb: 1.5, color: '#fff' }}>
           Entrar no app ✓
         </Button>
         <Button fullWidth variant="text" color="inherit" onClick={concluir} sx={{ fontWeight: 500, color: 'text.secondary', fontSize: '0.85rem' }}>

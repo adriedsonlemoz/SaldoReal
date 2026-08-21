@@ -40,6 +40,7 @@ import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
 import ViewWeekRoundedIcon from '@mui/icons-material/ViewWeekRounded';
 
 import FinanceiroService from '../services/FinanceiroService';
+import FinanceiroUtils from '../utils/financeiro';
 import { parseMoedaInput, formatMoedaInput, propsInputMoeda } from '../utils/moedaInput';
 
 // ── dados visuais de categorias ─────────────────────────────────────────────
@@ -340,19 +341,32 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
             label={editItem ? 'Data de vencimento' : 'Data / mês do lançamento'}
             corAtiva="#7B2CBF"
           />
-          {!editItem && form.recorrencia === 'unica' && form.dataVenc && (() => {
-            const { mesAno } = parseInputDate(form.dataVenc);
-            const hoje2 = new Date();
-            const mesAtual = `${String(hoje2.getMonth() + 1).padStart(2, '0')}/${hoje2.getFullYear()}`;
-            if (mesAno !== mesAtual) return (
+          {form.dataVenc && (() => {
+            const [y, m, d] = form.dataVenc.split('-').map(Number);
+            const selecionada = new Date(y, m - 1, d);
+            const dataExibida = !editItem && form.recorrencia === 'fixa'
+              ? FinanceiroUtils.proximoVencimentoMensal(d, new Date())
+              : selecionada;
+            const prefixo = editItem
+              ? (isEntrada ? 'Recebimento' : 'Vencimento')
+              : form.recorrencia === 'parcelada'
+                ? '1º vencimento'
+                : form.recorrencia === 'fixa'
+                  ? 'Próxima ocorrência'
+                  : (isEntrada ? 'Recebimento' : 'Vencimento');
+            return (
               <Box sx={{ mt: .7, p: .9, bgcolor: 'rgba(123,44,191,.045)', borderRadius: '11px', border: '1px solid rgba(123,44,191,.11)', display: 'flex', gap: .65, alignItems: 'center' }}>
-                <EventRoundedIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
-                <Typography sx={{ fontSize: '.7rem', fontWeight: 750, color: 'text.secondary' }}>
-                  Este lançamento será registrado em {mesAno}
-                </Typography>
+                <EventRoundedIcon sx={{ fontSize: '1rem', color: 'primary.main', flexShrink: 0 }} />
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography sx={{ fontSize: '.62rem', fontWeight: 900, color: 'primary.main', textTransform: 'uppercase', letterSpacing: '.35px' }}>
+                    {prefixo}
+                  </Typography>
+                  <Typography sx={{ fontSize: '.72rem', fontWeight: 800, color: 'text.secondary', lineHeight: 1.3 }}>
+                    {FinanceiroUtils.resumoPrazo(dataExibida)}
+                  </Typography>
+                </Box>
               </Box>
             );
-            return null;
           })()}
         </Box>
 
@@ -384,7 +398,7 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
           </Button>
           <Button fullWidth variant="contained" onClick={salvar}
             sx={{ fontWeight: 900, borderRadius: '12px', py: .9,
-              background: 'linear-gradient(135deg,#7B2CBF 0%,#C026D3 100%)',
+              background: 'linear-gradient(135deg,#7B2CBF 0%,#C026D3 100%)', color: '#fff',
               boxShadow: '0 8px 20px rgba(123,44,191,.2)', '&:hover': { opacity: .94 } }}>
             {editItem ? 'Atualizar' : 'Salvar'}
           </Button>

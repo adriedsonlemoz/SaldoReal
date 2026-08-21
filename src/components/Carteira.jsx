@@ -262,6 +262,10 @@ const Carteira = ({ acordos, carregarDados, abrirEditar, abrirNovo }) => {
                     <Grid container spacing={1} sx={{ mt: 1, borderTop: '1px dashed', borderColor: 'divider', pt: 1 }}>
                       <Grid item xs={6}><Typography variant="caption" color="textSecondary" display="block">Assinado em</Typography><Typography variant="body2" fontWeight="bold">{formatarData(modalView.acordo.dataAcordo)}</Typography></Grid>
                       <Grid item xs={6}><Typography variant="caption" color="textSecondary" display="block">Término Previsto</Typography><Typography variant="body2" fontWeight="bold" color="success.main">{calcularDataTermino(modalView.acordo)}</Typography></Grid>
+                      {FinanceiroUtils.proximaParcelaPendente(modalView.acordo) && (() => {
+                        const prox = FinanceiroUtils.proximaParcelaPendente(modalView.acordo);
+                        return <Grid item xs={12}><Typography variant="caption" color="textSecondary" display="block">Próximo vencimento</Typography><Typography variant="body2" fontWeight="bold" color="primary.main">{FinanceiroUtils.resumoPrazo(prox.data)} · parcela {prox.numero}</Typography></Grid>;
+                      })()}
                     </Grid>
                   </Card>
                 </>
@@ -413,6 +417,8 @@ const Carteira = ({ acordos, carregarDados, abrirEditar, abrirNovo }) => {
           const porcentagemProgresso = Math.round((acordo.parcelasPagas / acordo.parcelas) * 100) || 0;
           const isExpanded           = expandidos[acordo.id];
           const estaAdiantado        = valorDevidoMes(acordo, 0) === 0;
+          const proximaPendente      = FinanceiroUtils.proximaParcelaPendente(acordo);
+          const prazoProxima         = proximaPendente ? FinanceiroUtils.resumoPrazo(proximaPendente.data) : null;
 
           return (
             <Card key={acordo.id} sx={{
@@ -467,9 +473,9 @@ const Carteira = ({ acordos, carregarDados, abrirEditar, abrirNovo }) => {
                         <Box sx={{ width: `${porcentagemProgresso}%`, bgcolor: 'primary.main', height: '100%', transition: 'width 0.5s ease' }} />
                         <Typography sx={{ position: 'absolute', top: 0, left: 0, right: 0, textAlign: 'center', fontSize: '0.7rem', fontWeight: 900, color: '#fff', lineHeight: '18px', textShadow: '1px 1px 2px rgba(0,0,0,0.4)' }}>{porcentagemProgresso}%</Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed', borderColor: 'divider', pt: 1, mt: 1 }}>
+                      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', gap: .35, borderTop: '1px dashed', borderColor: 'divider', pt: 1, mt: 1 }}>
                         <Typography variant="body2" color="text.secondary">Término: <b>{calcularDataTermino(acordo)}</b></Typography>
-                        <Typography variant="body2" color="text.secondary">Vencimento: <b>Dia {acordo.vencimentoDia}</b></Typography>
+                        <Typography variant="body2" color="text.secondary">Próx. venc.: <b>{prazoProxima || `Dia ${acordo.vencimentoDia}`}</b></Typography>
                       </Box>
                       <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
                         <Button fullWidth variant="contained"

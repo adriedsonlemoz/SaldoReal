@@ -241,6 +241,32 @@ const FinanceiroUtils = {
     return qtd * Number(acordo?.valorParcela || 0);
   },
 
+  diaSemanaCurto(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '—';
+    const texto = new Intl.DateTimeFormat('pt-BR', { weekday: 'short' })
+      .format(date).replace('.', '');
+    return texto ? texto.charAt(0).toUpperCase() + texto.slice(1) : '—';
+  },
+
+  textoPrazoDias(diff) {
+    if (diff == null || !Number.isFinite(Number(diff))) return '';
+    const dias = Number(diff);
+    if (dias < 0) {
+      const atraso = Math.abs(dias);
+      return `${atraso} dia${atraso !== 1 ? 's' : ''} em atraso`;
+    }
+    if (dias === 0) return 'vence hoje';
+    if (dias === 1) return 'vence amanhã';
+    return `faltam ${dias} dias`;
+  },
+
+  resumoPrazo(dataAlvo, referencia = new Date()) {
+    if (!(dataAlvo instanceof Date) || Number.isNaN(dataAlvo.getTime())) return '—';
+    const diff = this.diferencaDias(dataAlvo, referencia);
+    const prazo = this.textoPrazoDias(diff);
+    return `${this.diaSemanaCurto(dataAlvo)}, ${this.formatarDataDate(dataAlvo)}${prazo ? ` · ${prazo}` : ''}`;
+  },
+
   nomeMesOffset(offset, curto = false) {
     if (offset === 0) return curto ? 'Este Mês' : 'ESTE MÊS';
     const nomes = curto

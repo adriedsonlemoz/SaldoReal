@@ -31,11 +31,11 @@ const CardHero = ({
   return (
     <Box sx={{
       position: 'relative', mb: .9, borderRadius: '22px', overflow: 'hidden',
-      background: 'linear-gradient(145deg, #1A0533 0%, #2D0B5E 48%, #5A1691 100%)',
-      boxShadow: '0 13px 34px rgba(62,18,109,.24)',
+      background: 'linear-gradient(145deg, #32105A 0%, #4A1C73 50%, #6B2C96 100%)',
+      boxShadow: '0 10px 28px rgba(62,18,109,.18)',
       border: '1px solid rgba(255,255,255,.08)',
     }}>
-      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(circle at 90% 12%, rgba(247,37,133,.28), transparent 34%), radial-gradient(circle at 12% 100%, rgba(157,78,221,.20), transparent 31%)' }} />
+      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(circle at 90% 12%, rgba(213,92,180,.18), transparent 36%), radial-gradient(circle at 12% 100%, rgba(190,143,222,.16), transparent 33%)' }} />
       <Box sx={{ px: 1.7, py: 1.35, position: 'relative', zIndex: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
           <Box sx={{ minWidth: 0 }}>

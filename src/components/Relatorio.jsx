@@ -140,6 +140,20 @@ const Relatorio = ({ setRoute }) => {
     return { aReceber, aPagar, pctEntradas, pctSaidas, topCategoria, maiorSaida, maiorSaidaValor: maiorSaida ? valor(maiorSaida) : 0, qtdPagos, qtdPendentes };
   })();
 
+  const detalheLinha = (item) => {
+    if (!item) return '';
+    const prazo = !item._pago && item.dataVencimento instanceof Date
+      ? FinanceiroUtils.resumoPrazo(item.dataVencimento)
+      : null;
+    if (item.empresa) {
+      const parcelas = item._pago
+        ? `${item.pagamentosMes || 1} pagamento(s) no mês`
+        : `${item.parcelasDevidas || 1} parcela(s) devida(s)`;
+      return `${prazo ? `Vence ${prazo}` : `Dia ${item.vencimentoDia}`} · ${parcelas}`;
+    }
+    return `${prazo ? `Vence ${prazo}` : `Dia ${item.dia}`} · ${item.categoria}`;
+  };
+
   const SecaoLista = ({ titulo, itens, cor }) => (
     itens.length > 0 && (
       <Card sx={{ mb: 1.1, overflow: 'hidden', border: `1px solid ${cor}18`, boxShadow: 'none' }}>
@@ -165,9 +179,7 @@ const Relatorio = ({ setRoute }) => {
                     })()}
                   </Box>
                   <Typography sx={{ fontSize: '0.7rem', color: 'text.secondary' }}>
-                    {item.empresa
-                      ? `Dia ${item.vencimentoDia} · ${item._pago ? `${item.pagamentosMes || 1} pagamento(s) no mês` : `${item.parcelasDevidas || 1} parcela(s) devida(s)`}`
-                      : `Dia ${item.dia} · ${item.categoria}`}
+                    {detalheLinha(item)}
                   </Typography>
                 </Box>
               </Box>

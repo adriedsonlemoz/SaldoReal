@@ -59,6 +59,7 @@ const theme = createTheme({
       contained: {
         '&.MuiButton-containedPrimary': {
           background: `linear-gradient(135deg, ${PURPLE} 0%, ${VIOLET} 100%)`,
+          color: '#fff',
           boxShadow: '0 6px 18px rgba(123,44,191,.20)',
           '&:hover': { boxShadow: '0 8px 22px rgba(123,44,191,.27)' },
         },

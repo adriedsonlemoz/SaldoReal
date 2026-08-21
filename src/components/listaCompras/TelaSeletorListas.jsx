@@ -89,7 +89,7 @@ const TelaSeletorListas = ({ listas, loading, onAbrirLista, onCriarLista, onExcl
         startIcon={<AddShoppingCartRoundedIcon />}
         sx={{
           minHeight: 46, mb: 1.35, borderRadius: '14px', fontWeight: 900,
-          background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)',
+          background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)', color: '#fff',
           boxShadow: '0 6px 18px rgba(123,44,191,.18)',
         }}
       >

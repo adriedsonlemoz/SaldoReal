@@ -69,13 +69,16 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
   const cor = isEntrada ? '#119C72' : '#E54862';
   const origemMeta = ORIGENS[item.origem] || ORIGENS.manual;
   const OrigemIcon = origemMeta.Icon;
+  const prazoVencimento = !item.isPago && item.dataVencimento instanceof Date
+    ? FinanceiroUtils.resumoPrazo(item.dataVencimento)
+    : null;
   const contexto = isRendaVirtual
-    ? `Previsto dia ${item.dia || '—'} · aguardando confirmação`
+    ? `${prazoVencimento ? `Previsto ${prazoVencimento}` : `Previsto dia ${item.dia || '—'}`} · aguardando confirmação`
     : isVirtual
       ? 'Saldo acumulado'
       : isMovimento
         ? `${isEntrada ? 'Recebido' : 'Pago'} dia ${item.dia || '—'} · ${item.categoria || 'Geral'}${item.competencia ? ` · Comp. ${item.competencia}` : ''}`
-        : `Dia ${item.dia || '—'} · ${item.categoria || 'Geral'}`;
+        : `${prazoVencimento ? `Vence ${prazoVencimento}` : `Dia ${item.dia || '—'}`} · ${item.categoria || 'Geral'}`;
 
   return (
     <Box sx={{ p: 1.05, mb: .75, bgcolor: 'background.paper', border: '1px solid rgba(72,45,91,.08)', borderRadius: '15px', boxShadow: '0 4px 15px rgba(45,11,94,.035)', opacity: item.isPago && !isVirtual ? .78 : 1, position: 'relative', overflow: 'hidden', transition: 'all .16s ease' }}>
@@ -86,7 +89,7 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           <Typography sx={{ fontWeight: 900, fontSize: '.82rem', lineHeight: 1.18, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: item.isPago && !isVirtual ? 'line-through' : 'none' }}>{item.nome}</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: .45, mt: .3, minWidth: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: .25, px: .5, py: .16, borderRadius: 99, bgcolor: `${origemMeta.color}0B`, color: origemMeta.color, flexShrink: 0 }}><OrigemIcon sx={{ fontSize: 12 }} /><Typography sx={{ fontSize: '.58rem', fontWeight: 900 }}>{origemMeta.label}</Typography></Box>
-            <Typography sx={{ fontSize: '.63rem', color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography sx={{ fontSize: '.63rem', color: 'text.secondary', lineHeight: 1.22, overflowWrap: 'anywhere' }}>
               {contexto}{item.parcelaText ? ` · ${item.parcelaText}` : ''}
             </Typography>
           </Box>
@@ -100,11 +103,12 @@ const ItemCard = ({ item, onPago, onEdit, onDelete, setRoute }) => {
           : isLista ? <Button size="small" variant="text" onClick={() => setRoute('lista')} startIcon={<ShoppingCartRoundedIcon sx={{ fontSize: '16px !important' }} />} sx={{ minHeight: 36, px: .75, fontSize: '.66rem' }}>Abrir lista</Button>
           : <>
             {isRendaVirtual ? (
-              <Button size="small" variant="contained" color="success" onClick={() => onPago(item)}
-                startIcon={<CheckRoundedIcon sx={{ fontSize: '17px !important' }} />}
-                sx={{ minHeight: 38, px: 1.15, borderRadius: '11px', fontSize: '.68rem', fontWeight: 900, textTransform: 'none' }}>
-                Receber agora
-              </Button>
+              <ActionButton
+                label={`Receber ${item.nome} agora`}
+                onClick={() => onPago(item)}
+                color="#119C72"
+                bg="rgba(17,156,114,.09)"
+              ><CheckRoundedIcon sx={{ fontSize: 19 }} /></ActionButton>
             ) : (
               <ActionButton
                 label={item.isPago ? `${isEntrada ? 'Desfazer recebimento' : 'Desfazer pagamento'} de ${item.nome}` : `${isEntrada ? 'Receber' : 'Marcar'} ${item.nome}${isEntrada ? ' agora' : ' como pago'}`}
@@ -330,7 +334,7 @@ const Gastos = ({ setRoute, setEditItem }) => {
       const salarioVirtual = {
         id: 'salario_virtual', nome: '💼 Salário', valor: rendaMensal,
         tipoOperacao: 'entrada', operacao: 'entrada', isPago: false, dia: dataPagamento.getDate(),
-        categoria: 'Salário', tipo: 'virtual', origem: 'renda', competencia: mesAnoTarget,
+        categoria: 'Salário', tipo: 'virtual', origem: 'renda', competencia: mesAnoTarget, dataVencimento: dataPagamento,
       };
       // A renda configurada é previsão até o usuário confirmar o recebimento.
       // Não existe mais baixa visual automática somente porque o dia chegou.

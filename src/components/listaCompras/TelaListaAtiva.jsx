@@ -295,7 +295,7 @@ const TelaListaAtiva = ({
           <Button
             variant="contained" onClick={confirmarPagamento} disabled={processando}
             startIcon={<PaymentsRoundedIcon />}
-            sx={{ background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)' }}
+            sx={{ background: 'linear-gradient(135deg,#7B2CBF 0%,#9D4EDD 100%)', color: '#fff' }}
           >
             {processando ? 'Registrando…' : 'Pagar e lançar'}
           </Button>
