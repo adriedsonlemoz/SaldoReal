@@ -16,7 +16,7 @@ const TelaHumor = ({ nome, onConcluir }) => {
     onConcluir(selecionado);
   };
 
-  const primeiroNome = nome.split(' ')[0];
+  const primeiroNome = String(nome || 'Usuário').trim().split(/\s+/)[0] || 'Usuário';
 
   return (
     <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: BG_GRADIENT, px: 3 }}>

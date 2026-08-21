@@ -38,7 +38,7 @@ const parcelasPagasAteMes = (acordo, mesAlvo) => {
 };
 
 const parcelasDevidasAteMes = (acordo, mesAlvo) => {
-  if (!acordo || acordo.situacao !== 'acordo') return 0;
+  if (!acordo || !['acordo', 'quitado'].includes(acordo.situacao)) return 0;
   const totais = Math.max(1, parseInt(acordo.parcelas) || 1);
   const esperadas = u.parcelasEsperadas(acordo, mesAlvo);
   if (esperadas <= 0) return 0;
@@ -68,20 +68,44 @@ const fluxoAcordoNoMes = (acordo, mesAlvo, movimentos = []) => {
   };
 };
 
+const movimentoPertenceAoGasto = (gasto, movimento) => {
+  if (gasto.origemItemLista && movimento.origem === 'lista_compras')
+    return String(movimento.origemId) === String(gasto.origemItemLista);
+  return String(movimento.entidadeId ?? movimento.referenciaId) === String(gasto.id);
+};
+
 const gastoLiquidadoNaCompetencia = (gasto, competencia, movimentos) =>
-  movimentos.some(m => {
-    if (m.competencia !== competencia) return false;
-    if (gasto.origemItemLista && m.origem === 'lista_compras')
-      return String(m.origemId) === String(gasto.origemItemLista);
-    return String(m.entidadeId ?? m.referenciaId) === String(gasto.id);
-  });
+  movimentos.some(m => m.competencia === competencia && movimentoPertenceAoGasto(gasto, m));
 
 const gastoTemMovimento = (gasto, movimentos) =>
-  movimentos.some(m => {
-    if (gasto.origemItemLista && m.origem === 'lista_compras')
-      return String(m.origemId) === String(gasto.origemItemLista);
-    return String(m.entidadeId ?? m.referenciaId) === String(gasto.id);
-  });
+  movimentos.some(m => movimentoPertenceAoGasto(gasto, m));
+
+// Responde à pergunta histórica: "esta conta já estava liquidada ao fim do mês
+// que estou consultando?". Um pagamento futuro não pode apagar uma pendência do passado.
+const gastoLiquidadoAteMes = (gasto, mesAlvo, movimentos) => {
+  const competencia = gasto.mesAno === 'fixo' ? u.dateParaMesAno(mesAlvo) : gasto.mesAno;
+  const alvoNum = mesNumero(u.dateParaMesAno(mesAlvo));
+  return movimentos.some(m =>
+    movimentoPertenceAoGasto(gasto, m) &&
+    m.competencia === competencia &&
+    mesNumero(m.mesFluxo || m.competencia) <= alvoNum
+  );
+};
+
+const primeiraParcelaDevidaAteMes = (acordo, mesAlvo) => {
+  if (!acordo || !['acordo', 'quitado'].includes(acordo.situacao)) return null;
+  const totais = Math.max(1, parseInt(acordo.parcelas) || 1);
+  const esperadas = u.parcelasEsperadas(acordo, mesAlvo);
+  const limite = Math.min(totais, Math.max(0, esperadas));
+  const pagas = parcelasPagasAteMes(acordo, mesAlvo);
+  for (let numero = 1; numero <= limite; numero += 1) {
+    if (!pagas.has(numero)) {
+      const data = u.dataVencimentoParcela(acordo, numero);
+      return data ? { numero, data } : null;
+    }
+  }
+  return null;
+};
 
 const movimentoParaItem = (m) => ({
   ...m,
@@ -115,6 +139,15 @@ const FinanceiroService = {
   async setDiaPagamento(dia) { return this.setConfig('diaPagamento', dia); },
   async removerRendaConfigurada() {
     await Promise.all([this.setRenda(0), this.setDiaPagamento(null)]);
+  },
+  async salvarHumor(nivel, rotulo) {
+    const valor = {
+      nivel: Number(nivel || 0),
+      rotulo: String(rotulo || ''),
+      data: new Date().toISOString(),
+    };
+    await this.setConfig('humorFinanceiro', valor);
+    return valor;
   },
   async getCategoriasPersonalizadas(tipo = 'despesa') {
     const chave = tipo === 'entrada' ? 'categorias_entrada' : 'categorias_despesa';
@@ -218,8 +251,10 @@ const FinanceiroService = {
   },
 
   async resumoSaldoDoMes() {
-    const [movimentos, renda, pendencias] = await Promise.all([
-      MovimentacaoService.listarMes(u.dateParaMesAno(new Date())),
+    const competenciaAtual = u.dateParaMesAno(new Date());
+    const [movimentos, todasMovimentacoes, renda, pendencias] = await Promise.all([
+      MovimentacaoService.listarMes(competenciaAtual),
+      this.carregarMovimentacoes(),
       this.getRenda(),
       this.debitoDoMes(),
     ]);
@@ -228,26 +263,37 @@ const FinanceiroService = {
     let rendaBaseRegistrada = 0;
     let despesasPagas = 0;
 
+    const rendaBaseConfirmada = todasMovimentacoes.some(m =>
+      m.tipo === 'entrada' && m.competencia === competenciaAtual &&
+      (m.origem === 'renda' || u.ehEntradaRendaBase(m))
+    );
+
     movimentos.forEach(m => {
       if (m.tipo === 'despesa') {
         despesasPagas += n(m.valor);
-      } else if (m.origem === 'renda' || u.ehEntradaRendaBase(m)) {
+      } else if (
+        m.competencia === competenciaAtual &&
+        (m.origem === 'renda' || u.ehEntradaRendaBase(m))
+      ) {
         rendaBaseRegistrada += n(m.valor);
       } else {
+        // Salário atrasado de outra competência recebido neste mês é caixa real,
+        // mas não substitui a renda prevista da competência atual.
         entradasExtrasPagas += n(m.valor);
       }
     });
 
-    const { rendaBase, receitaConsiderada, saldoDisponivel, saldoProjetado } = u.calcularResumoSaldo({
+    const { rendaBase, receitaRecebida, receitaConsiderada, saldoDisponivel, saldoProjetado } = u.calcularResumoSaldo({
       rendaConfigurada: renda,
       rendaBaseRegistrada,
+      rendaBaseConfirmada,
       entradasExtrasPagas,
       despesasPagas,
       pendencias,
     });
 
     return {
-      rendaBase, rendaBaseRegistrada, entradasExtrasPagas, receitaConsiderada,
+      rendaBase, rendaBaseRegistrada, entradasExtrasPagas, receitaRecebida, receitaConsiderada,
       despesasPagas, pendencias, saldoDisponivel, saldoProjetado,
     };
   },
@@ -257,9 +303,36 @@ const FinanceiroService = {
     return movimentos.reduce((s, m) => s + (m.tipo === 'entrada' ? n(m.valor) : -n(m.valor)), 0);
   },
 
+  async proximoRecebimentoRenda(referencia = new Date()) {
+    const [renda, diaPagamento, movimentacoes] = await Promise.all([
+      this.getRenda(), this.getDiaPagamento(), db.movimentacoes.toArray(),
+    ]);
+    const dia = parseInt(diaPagamento, 10);
+    if (n(renda) <= 0 || dia < 1 || dia > 31) return null;
+
+    const competenciasRecebidas = new Set(
+      movimentacoes
+        .filter(m => m.tipo === 'entrada' && m.origem === 'renda' && /^\d{2}\/\d{4}$/.test(String(m.competencia || '')))
+        .map(m => m.competencia),
+    );
+
+    // Mantém o recebimento do mês atual como atrasado até a confirmação real.
+    // Se já foi recebido antecipadamente, avança para a primeira competência livre.
+    for (let offset = 0; offset <= 12; offset += 1) {
+      const mes = new Date(referencia.getFullYear(), referencia.getMonth() + offset, 1);
+      const competencia = u.dateParaMesAno(mes);
+      if (competenciasRecebidas.has(competencia)) continue;
+      const data = u.dataVencimentoNoMes(dia, mes);
+      return { data, diff: u.diferencaDias(data, referencia), competencia };
+    }
+    return null;
+  },
+
   async dadosDashboard() {
-    const [alertas, resumo] = await Promise.all([this.alertasDeVencimento(30), this.resumoSaldoDoMes()]);
-    return { debito: resumo.pendencias, alertas, ...resumo };
+    const [alertas, resumo, proximoRecebimento] = await Promise.all([
+      this.alertasDeVencimento(30), this.resumoSaldoDoMes(), this.proximoRecebimentoRenda(),
+    ]);
+    return { debito: resumo.pendencias, alertas, proximoRecebimento, ...resumo };
   },
 
   // ── INSIGHTS ──────────────────────────────────────────────────────────────
@@ -354,10 +427,9 @@ const FinanceiroService = {
     const gastosPendentes = gastos.filter(g => {
       if (g.mesAno === 'fixo') {
         if (mesOffset < 0) return false;
-        return !gastoLiquidadoNaCompetencia(g, competencia, movimentacoes);
+        return !gastoLiquidadoAteMes(g, mesAlvo, movimentacoes);
       }
-      const liquidado = gastoTemMovimento(g, movimentacoes);
-      if (liquidado) return false;
+      if (gastoLiquidadoAteMes(g, mesAlvo, movimentacoes)) return false;
       if (g.mesAno === competencia) return true;
       return mesOffset === 0 && mesNumero(g.mesAno) < atualNum;
     }).map(g => {
@@ -368,20 +440,21 @@ const FinanceiroService = {
 
     const acordosPendentes = [];
     acordos.forEach(a => {
-      if (a.situacao !== 'acordo') return;
+      if (!['acordo', 'quitado'].includes(a.situacao)) return;
       const fluxo = fluxoAcordoNoMes(a, mesAlvo, movimentacoes);
       if (fluxo.valorPendente > 0) {
-        const proxima = u.proximaParcelaPendente(a);
+        const primeiraDevida = primeiraParcelaDevidaAteMes(a, mesAlvo);
         acordosPendentes.push({
           ...a, fluxoStatus: 'pendente', valorFluxo: fluxo.valorPendente,
           pagamentosMes: 0, parcelasDevidas: fluxo.parcelasDevidas,
-          dataVencimento: proxima?.data || null, parcelaVencimento: proxima?.numero || null,
+          dataVencimento: primeiraDevida?.data || null, parcelaVencimento: primeiraDevida?.numero || null,
         });
       }
     });
 
     const rendaRecebidaNaCompetencia = movimentacoes.some(m =>
-      m.tipo === 'entrada' && m.origem === 'renda' && m.competencia === competencia
+      m.tipo === 'entrada' && m.origem === 'renda' && m.competencia === competencia &&
+      mesNumero(m.mesFluxo || m.competencia) <= alvoNum
     );
 
     return {
@@ -418,9 +491,7 @@ const FinanceiroService = {
     });
 
     gastos.forEach(g => {
-      const liquidado = g.mesAno === 'fixo'
-        ? gastoLiquidadoNaCompetencia(g, competencia, movimentacoes)
-        : gastoTemMovimento(g, movimentacoes);
+      const liquidado = gastoLiquidadoAteMes(g, mesAlvo, movimentacoes);
       if (liquidado) return;
       const pertence = g.mesAno === 'fixo' || g.mesAno === competencia ||
         (mesOffset === 0 && g.mesAno !== 'fixo' && mesNumero(g.mesAno) < atualNum);
@@ -438,7 +509,9 @@ const FinanceiroService = {
     // um lançamento real (ou uma entrada de salário criada manualmente), ela entra
     // no relatório como prevista — nunca como recebida automaticamente.
     const rendaBaseJaRepresentada = movimentacoes.some(m =>
-      m.tipo === 'entrada' && m.competencia === competencia && (m.origem === 'renda' || u.ehEntradaRendaBase(m))
+      m.tipo === 'entrada' && m.competencia === competencia &&
+      mesNumero(m.mesFluxo || m.competencia) <= alvoNum &&
+      (m.origem === 'renda' || u.ehEntradaRendaBase(m))
     ) || gastos.some(g =>
       g.tipoOperacao === 'entrada' && u.ehEntradaRendaBase(g) && (g.mesAno === 'fixo' || g.mesAno === competencia)
     );
@@ -474,10 +547,10 @@ const FinanceiroService = {
     acordos.forEach(a => {
       const fluxo = fluxoAcordoNoMes(a, mesAlvo, movimentacoes);
       if (fluxo.valorPendente > 0) {
-        const proxima = u.proximaParcelaPendente(a);
+        const primeiraDevida = primeiraParcelaDevidaAteMes(a, mesAlvo);
         acordosPendentes.push({
           ...a, valorFluxo: fluxo.valorPendente, parcelasDevidas: fluxo.parcelasDevidas,
-          dataVencimento: proxima?.data || null, parcelaVencimento: proxima?.numero || null,
+          dataVencimento: primeiraDevida?.data || null, parcelaVencimento: primeiraDevida?.numero || null,
         });
       }
     });
@@ -681,12 +754,20 @@ const FinanceiroService = {
       if (novo.mesAno !== 'fixo') {
         const movs = await db.movimentacoes.toArray();
         const mov = movs.find(m => String(m.entidadeId ?? m.referenciaId) === String(id) && m.origem !== 'acordo');
-        if (mov) await db.movimentacoes.update(mov.id, {
-          descricao: novo.nome, valor: n(novo.valor), categoria: novo.categoria,
-          tipo: novo.tipoOperacao === 'entrada' ? 'entrada' : 'despesa',
-          origem: novo.tipoOperacao === 'entrada' && u.ehEntradaRendaBase(novo) ? 'renda' : (mov.origem === 'lista_compras' ? mov.origem : 'manual'),
-          atualizadoEm: new Date().toISOString(),
-        });
+        if (mov) {
+          const novaCompetencia = /^\d{2}\/\d{4}$/.test(String(novo.mesAno || '')) ? novo.mesAno : mov.competencia;
+          const novaOrigem = novo.tipoOperacao === 'entrada' && u.ehEntradaRendaBase(novo)
+            ? 'renda'
+            : (mov.origem === 'lista_compras' ? mov.origem : 'manual');
+          await db.movimentacoes.update(mov.id, {
+            descricao: novo.nome, valor: n(novo.valor), categoria: novo.categoria,
+            tipo: novo.tipoOperacao === 'entrada' ? 'entrada' : 'despesa',
+            origem: novaOrigem,
+            competencia: novaCompetencia,
+            chaveOrigem: mov.origem === 'lista_compras' ? mov.chaveOrigem : `gasto:${id}:${novaCompetencia}`,
+            atualizadoEm: new Date().toISOString(),
+          });
+        }
       }
     });
   },

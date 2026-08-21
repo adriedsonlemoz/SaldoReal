@@ -1,7 +1,7 @@
 # 🛒 Saldo Real
 
 **Slogan:** O controle do seu bolso dentro do carrinho.  
-**Versão:** 1.0.0-beta.9
+**Versão:** 1.0.0-beta.10
 
 ## Sobre
 
@@ -45,7 +45,7 @@ O identificador Android foi padronizado para `com.saldoreal.app`. Se você já i
 
 ## Pré-publicação Google Play
 
-A beta.9 mantém a camada Android para API 36, AAB release, assinatura segura via GitHub Secrets, política de privacidade e safe areas do Android 16. Consulte `PLAY_STORE_CHECKLIST.md` e `RELEASE_ANDROID.md` antes de enviar à loja.
+A beta.10 mantém a camada Android para API 36, AAB release, assinatura segura via GitHub Secrets, política de privacidade e safe areas do Android 16. Consulte `PLAY_STORE_CHECKLIST.md` e `RELEASE_ANDROID.md` antes de enviar à loja.
 
 ## Nome do aplicativo no Android
 

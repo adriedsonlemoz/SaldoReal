@@ -125,7 +125,7 @@ setGradleVar('targetSdkVersion', '36');
 fs.writeFileSync(variablesPath, vars);
 
 // Versionamento Play Store.
-const versionCode = 12;
+const versionCode = 13;
 let appGradle = fs.readFileSync(appGradlePath, 'utf8');
 appGradle = appGradle
   .replace(/versionCode\s*(?:=\s*)?\d+/, `versionCode ${versionCode}`)

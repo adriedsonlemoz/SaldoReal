@@ -263,3 +263,132 @@ describe('FinanceiroService — renda configurada no fluxo', () => {
     expect(stores.movimentacoes.delete).not.toHaveBeenCalled();
   });
 });
+
+describe('FinanceiroService — correções históricas e de competência', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 21, 12));
+    stores.acordos.toArray.mockResolvedValue([]);
+    stores.gastos.toArray.mockResolvedValue([]);
+    stores.movimentacoes.toArray.mockResolvedValue([]);
+    stores.configuracoes.get.mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('pagamento feito em agosto não apaga a pendência que existia em julho', async () => {
+    stores.gastos.toArray.mockResolvedValue([{
+      id: 10, tipoOperacao: 'despesa', nome: 'Conta antiga', mesAno: '07/2026', dia: 15,
+      valor: 120, pago: true, categoria: 'Contas',
+    }]);
+    stores.movimentacoes.toArray.mockResolvedValue([{
+      id: 90, tipo: 'despesa', origem: 'manual', entidadeId: 10, referenciaId: 10,
+      competencia: '07/2026', mesFluxo: '08/2026', valor: 120, data: '2026-08-02',
+    }]);
+
+    const fluxoJulho = await FinanceiroService.dadosGastosMensais(-1);
+    const relatorioJulho = await FinanceiroService.dadosRelatorio(-1);
+
+    expect(fluxoJulho.gastos).toHaveLength(1);
+    expect(relatorioJulho.despesas).toHaveLength(1);
+    expect(relatorioJulho.despesasPagas).toHaveLength(0);
+  });
+
+  it('acordo quitado depois continua aparecendo como pendente no mês histórico correto', async () => {
+    stores.acordos.toArray.mockResolvedValue([{
+      id: 20, situacao: 'quitado', empresa: 'Banco', vencimentoMesAno: '2026-07', vencimentoDia: 10,
+      parcelas: 1, parcelasPagas: 1, valorParcela: 100,
+      historicoPagamentos: [{ pagamentoId: 'p1', parcela: 1, data: '05/08/2026', valorPago: 100, competencia: '07/2026' }],
+    }]);
+    stores.movimentacoes.toArray.mockResolvedValue([{
+      id: 91, tipo: 'despesa', origem: 'acordo', origemId: 20, referenciaId: 'p1',
+      competencia: '07/2026', mesFluxo: '08/2026', valor: 100, data: '2026-08-05',
+    }]);
+
+    const relatorioJulho = await FinanceiroService.dadosRelatorio(-1);
+    expect(relatorioJulho.acordosPendentes).toHaveLength(1);
+    expect(relatorioJulho.acordosPendentes[0]).toMatchObject({
+      parcelasDevidas: 1,
+      parcelaVencimento: 1,
+    });
+    expect(relatorioJulho.acordosPendentes[0].dataVencimento.getDate()).toBe(10);
+    expect(relatorioJulho.acordosPendentes[0].dataVencimento.getMonth()).toBe(6);
+  });
+
+  it('ao editar mês de conta liquidada, atualiza a competência sem alterar o mês real do pagamento', async () => {
+    stores.gastos.get.mockResolvedValue({
+      id: 30, tipoOperacao: 'despesa', nome: 'Conta', mesAno: '08/2026', dia: 20,
+      valor: 50, categoria: 'Contas', pago: true,
+    });
+    stores.movimentacoes.toArray.mockResolvedValue([{
+      id: 92, tipo: 'despesa', origem: 'manual', entidadeId: 30, referenciaId: 30,
+      competencia: '08/2026', mesFluxo: '08/2026', chaveOrigem: 'gasto:30:08/2026',
+      valor: 50, data: '2026-08-18',
+    }]);
+
+    await FinanceiroService.atualizarGasto(30, {
+      nome: 'Conta', valor: 50, dia: 5, categoria: 'Contas', tipoOperacao: 'despesa', mesAno: '09/2026',
+    });
+
+    expect(stores.movimentacoes.update).toHaveBeenCalledWith(92, expect.objectContaining({
+      competencia: '09/2026',
+      chaveOrigem: 'gasto:30:09/2026',
+    }));
+    const patch = stores.movimentacoes.update.mock.calls.find(([id]) => id === 92)?.[1];
+    expect(patch).not.toHaveProperty('mesFluxo');
+  });
+});
+
+describe('FinanceiroService — próximo recebimento confirmado pelo razão', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    stores.configuracoes.get.mockImplementation(async (chave) => {
+      if (chave === 'renda') return { chave, valor: 600 };
+      if (chave === 'diaPagamento') return { chave, valor: 31 };
+      return undefined;
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('mantém o recebimento do mês atual atrasado até existir confirmação', async () => {
+    vi.setSystemTime(new Date(2026, 8, 2, 12));
+    stores.configuracoes.get.mockImplementation(async (chave) => {
+      if (chave === 'renda') return { chave, valor: 600 };
+      if (chave === 'diaPagamento') return { chave, valor: 1 };
+      return undefined;
+    });
+    stores.movimentacoes.toArray.mockResolvedValue([]);
+    const proximo = await FinanceiroService.proximoRecebimentoRenda(new Date(2026, 8, 2, 12));
+    expect(proximo.competencia).toBe('09/2026');
+    expect(proximo.diff).toBe(-1);
+  });
+
+  it('depois de receber a competência atual, avança para o mês seguinte', async () => {
+    vi.setSystemTime(new Date(2026, 7, 21, 12));
+    stores.movimentacoes.toArray.mockResolvedValue([{
+      id: 1, tipo: 'entrada', origem: 'renda', competencia: '08/2026', mesFluxo: '08/2026', valor: 600,
+    }]);
+    const proximo = await FinanceiroService.proximoRecebimentoRenda(new Date(2026, 7, 21, 12));
+    expect(proximo.competencia).toBe('09/2026');
+    // Dia 31 em setembro é ajustado para 30.
+    expect(proximo.data.getDate()).toBe(30);
+  });
+
+  it('salário atrasado de agosto recebido em setembro não esconde a competência de setembro', async () => {
+    vi.setSystemTime(new Date(2026, 8, 5, 12));
+    stores.movimentacoes.toArray.mockResolvedValue([{
+      id: 2, tipo: 'entrada', origem: 'renda', competencia: '08/2026', mesFluxo: '09/2026', valor: 600,
+    }]);
+    const proximo = await FinanceiroService.proximoRecebimentoRenda(new Date(2026, 8, 5, 12));
+    expect(proximo.competencia).toBe('09/2026');
+    expect(proximo.data.getDate()).toBe(30);
+  });
+});
+

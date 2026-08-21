@@ -28,7 +28,7 @@ const gravarLog = (entrada) => {
 const Sobre = ({ setRoute }) => {
     const [toast, setToast]             = useState({ open: false, message: '', severity: 'success' });
   const [logErros, setLogErros]       = useState([]);
-  const [versaoAberta, setVersaoAberta] = useState('beta.9');
+  const [versaoAberta, setVersaoAberta] = useState('beta.10');
   const [mostrarHistorico, setMostrarHistorico] = useState(false);
 
   const recarregarLogs = useCallback(() => setLogErros(lerLogs()), []);
@@ -77,6 +77,12 @@ const Sobre = ({ setRoute }) => {
   };
 
   const changelog = [
+    {
+      v: 'beta.10',
+      icon: '🛠️',
+      title: 'Fluxo financeiro e vencimentos corrigidos',
+      desc: 'Recebimento antecipado com confirmação real, edição e exclusão de renda, relatórios ampliados, prazos com dia da semana e dias restantes, saldo disponível separado do projetado e correções em contas fixas, competências, acordos e histórico financeiro.',
+    },
     {
       v: 'beta.9',
       icon: '✨',
@@ -189,7 +195,7 @@ const Sobre = ({ setRoute }) => {
           <Typography sx={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', mt: 0.3 }}>Seu assistente pessoal de compras e gastos</Typography>
         </Box>
         <Box sx={{ p: 2.5, textAlign: 'center' }}>
-          <Chip label="Beta 9" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
+          <Chip label="Beta 10" sx={{ bgcolor: 'rgba(123,44,191,0.10)', color: '#6A23A7', border: '1px solid rgba(123,44,191,0.20)', fontWeight: 700, mb: 1.5 }} />
           <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary', lineHeight: 1.6 }}>
             Um app simples e poderoso para você organizar dívidas, controlar gastos, acompanhar entradas e sair no azul todo mês. Tudo salvo no seu dispositivo, sem precisar de internet.
           </Typography>
@@ -204,7 +210,7 @@ const Sobre = ({ setRoute }) => {
         </Box>
         <Box sx={{ p: 1.2 }}>
           {(mostrarHistorico ? changelog : changelog.slice(0, 5)).map((item, idx) => {
-            const aberta = versaoAberta === `${item.v}-${idx}` || (idx === 0 && versaoAberta === 'beta.9');
+            const aberta = versaoAberta === `${item.v}-${idx}` || (idx === 0 && versaoAberta === 'beta.10');
             const chave = `${item.v}-${idx}`;
             return <Box key={chave} sx={{ borderBottom: idx < (mostrarHistorico ? changelog.length : Math.min(5, changelog.length)) - 1 ? '1px solid' : 0, borderColor: 'divider' }}>
               <Button fullWidth color="inherit" onClick={() => setVersaoAberta(aberta ? '' : chave)} sx={{ justifyContent: 'space-between', textAlign: 'left', px: .8, py: 1, minHeight: 48 }}>

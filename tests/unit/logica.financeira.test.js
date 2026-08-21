@@ -316,6 +316,7 @@ describe('resumo do dashboard — renda, pagos e pendências', () => {
       pendencias: 700,
     })).toEqual({
       rendaBase: 3000,
+      receitaRecebida: 3000,
       receitaConsiderada: 3000,
       saldoDisponivel: 2500,
       saldoProjetado: 1800,
@@ -324,11 +325,35 @@ describe('resumo do dashboard — renda, pagos e pendências', () => {
 
   it('soma entradas extras à renda base', () => {
     expect(resumo({ renda: 3000, entradasExtras: 400, despesasPagas: 900, pendencias: 500 }))
-      .toEqual({ rendaBase: 3000, receitaConsiderada: 3400, saldoDisponivel: 2500, saldoProjetado: 2000 });
+      .toEqual({ rendaBase: 3000, receitaRecebida: 400, receitaConsiderada: 3400, saldoDisponivel: -500, saldoProjetado: 2000 });
   });
 
   it('separa saldo disponível do saldo projetado após pendências', () => {
     expect(resumo({ renda: 2000, despesasPagas: 600, pendencias: 900 }))
-      .toEqual({ rendaBase: 2000, receitaConsiderada: 2000, saldoDisponivel: 1400, saldoProjetado: 500 });
+      .toEqual({ rendaBase: 2000, receitaRecebida: 0, receitaConsiderada: 2000, saldoDisponivel: -600, saldoProjetado: 500 });
+  });
+
+
+  it('não trata renda apenas configurada como dinheiro disponível', () => {
+    expect(resumo({ renda: 600, despesasPagas: 25 })).toMatchObject({
+      receitaRecebida: 0,
+      saldoDisponivel: -25,
+      saldoProjetado: 575,
+    });
+  });
+
+
+  it('salário atrasado recebido no mês não substitui a renda prevista da competência atual', () => {
+    expect(u.calcularResumoSaldo({
+      rendaConfigurada: 600,
+      rendaBaseRegistrada: 0,
+      rendaBaseConfirmada: false,
+      entradasExtrasPagas: 600,
+    })).toMatchObject({
+      receitaRecebida: 600,
+      receitaConsiderada: 1200,
+      saldoDisponivel: 600,
+      saldoProjetado: 1200,
+    });
   });
 });

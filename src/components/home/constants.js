@@ -16,3 +16,11 @@ export const insightColors = {
 };
 
 export const BG_GRADIENT = 'linear-gradient(160deg, #7B2CBF 0%, #9D4EDD 50%, #F72585 100%)';
+
+export const HUMORES = [
+  { nivel: 1, emoji: '😟', rotulo: 'Preocupado', cor: '#9F1239' },
+  { nivel: 2, emoji: '😕', rotulo: 'Apertado', cor: '#B45309' },
+  { nivel: 3, emoji: '😐', rotulo: 'Neutro', cor: '#64748B' },
+  { nivel: 4, emoji: '🙂', rotulo: 'Tranquilo', cor: '#0F766E' },
+  { nivel: 5, emoji: '😄', rotulo: 'Confiante', cor: '#087A58' },
+];

@@ -155,9 +155,13 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
   // pré-preenche ao editar
   useEffect(() => {
     if (editItem) {
-      // reconstrói a data a partir do dia + mesAno guardados
+      // Reconstrói a data sem trocar o vencimento por "hoje".
+      // Em contas fixas, usa a próxima ocorrência do dia salvo apenas para exibição;
+      // o registro continua recorrente (mesAno='fixo').
       let dataVenc = hoje;
-      if (editItem.dia && /^\d{2}\/\d{4}$/.test(String(editItem.mesAno || ''))) {
+      if (editItem.dia && editItem.mesAno === 'fixo') {
+        dataVenc = toInputDate(FinanceiroUtils.proximoVencimentoMensal(editItem.dia, new Date()));
+      } else if (editItem.dia && /^\d{2}\/\d{4}$/.test(String(editItem.mesAno || ''))) {
         const [m, y] = String(editItem.mesAno).split('/');
         const maxDia = new Date(Number(y), Number(m), 0).getDate();
         const diaSeguro = Math.min(Math.max(Number(editItem.dia) || 1, 1), maxDia);
@@ -206,19 +210,26 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
       setToast({ open: true, texto: '⚠️ Nome e valor são obrigatórios!' });
       return;
     }
+    if (!form.dataVenc) {
+      setToast({ open: true, texto: '⚠️ Informe a data do lançamento.' });
+      return;
+    }
 
     const { dia, mesAno: mesAnoSelecionado } = parseInputDate(form.dataVenc);
 
     try {
       if (editItem && editItem.id) {
-        // Na edição, preservamos o mesAno original e atualizamos só o dia
-        await FinanceiroService.atualizarGasto(editItem.id, {
+        const atualizacao = {
           nome:          form.nome,
           valor:         form.valor,
           dia,
           categoria:     form.categoria,
           tipoOperacao:  form.tipo,
-        });
+        };
+        // Lançamentos únicos/parcelas podem mudar de mês na edição. Contas fixas
+        // preservam mesAno='fixo' e usam somente o novo dia mensal.
+        if (editItem.mesAno !== 'fixo' && mesAnoSelecionado) atualizacao.mesAno = mesAnoSelecionado;
+        await FinanceiroService.atualizarGasto(editItem.id, atualizacao);
         setToast({ open: true, texto: '✅ Registro atualizado!' });
       } else {
         // Criação — usa a data escolhida para derivar o mesAno das parcelas
@@ -344,15 +355,15 @@ const NovaConta = ({ setRoute, editItem, setEditItem }) => {
           {form.dataVenc && (() => {
             const [y, m, d] = form.dataVenc.split('-').map(Number);
             const selecionada = new Date(y, m - 1, d);
-            const dataExibida = !editItem && form.recorrencia === 'fixa'
+            const dataExibida = form.recorrencia === 'fixa'
               ? FinanceiroUtils.proximoVencimentoMensal(d, new Date())
               : selecionada;
-            const prefixo = editItem
-              ? (isEntrada ? 'Recebimento' : 'Vencimento')
-              : form.recorrencia === 'parcelada'
-                ? '1º vencimento'
-                : form.recorrencia === 'fixa'
-                  ? 'Próxima ocorrência'
+            const prefixo = form.recorrencia === 'fixa'
+              ? 'Próxima ocorrência'
+              : editItem
+                ? (isEntrada ? 'Recebimento' : 'Vencimento')
+                : form.recorrencia === 'parcelada'
+                  ? '1º vencimento'
                   : (isEntrada ? 'Recebimento' : 'Vencimento');
             return (
               <Box sx={{ mt: .7, p: .9, bgcolor: 'rgba(123,44,191,.045)', borderRadius: '11px', border: '1px solid rgba(123,44,191,.11)', display: 'flex', gap: .65, alignItems: 'center' }}>

@@ -324,9 +324,11 @@ const Gastos = ({ setRoute, setEditItem }) => {
     let listAbertos = [], listPagos = [];
 
     const jaTemSalario = rendaRecebidaNaCompetencia || movimentacoes.some(m =>
-      m.tipoOperacao === 'entrada' && (m.origem === 'renda' || FinanceiroUtils.ehEntradaRendaBase(m))
+      m.tipoOperacao === 'entrada' && m.competencia === mesAnoTarget &&
+      (m.origem === 'renda' || FinanceiroUtils.ehEntradaRendaBase(m))
     ) || gastosRegistrados.some(g =>
-      g.tipoOperacao === 'entrada' && FinanceiroUtils.ehEntradaRendaBase(g)
+      g.tipoOperacao === 'entrada' && FinanceiroUtils.ehEntradaRendaBase(g) &&
+      (g.mesAno === 'fixo' || g.mesAno === mesAnoTarget)
     );
 
     if (rendaMensal > 0 && diaPagamento && !jaTemSalario) {

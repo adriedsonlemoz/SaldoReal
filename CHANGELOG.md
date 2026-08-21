@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0-beta.10 — Fluxo de renda, vencimentos e correções financeiras
+
+- Renda mensal configurada passa a permanecer pendente até confirmação do recebimento, com opção de receber antecipadamente.
+- Recebimentos de renda podem ser editados ou excluídos sem apagar indevidamente o histórico de outros meses.
+- Configuração da renda mensal pode ser editada ou removida, sem confundir previsão futura com movimentação já recebida.
+- Relatórios foram ampliados com valores realizados e previstos, pendências, saldo previsto, fluxo realizado e indicadores de realização.
+- Lançamentos pendentes exibem data, dia da semana e quantidade de dias até o vencimento ou atraso; o cadastro mostra uma prévia do prazo.
+- Ação “Receber agora” foi compactada para o mesmo padrão visual das demais ações financeiras e o card principal da Home recebeu contraste mais suave.
+- Corrigida a edição de contas fixas para preservar o vencimento original quando apenas outros campos são alterados.
+- Corrigida a edição de lançamentos para permitir mudança real de mês/ano, em vez de alterar somente o dia.
+- Corrigida a competência da renda para que salário atrasado recebido em outro mês não esconda a previsão da competência seguinte.
+- Corrigido o histórico de meses anteriores para que pagamentos futuros não removam retroativamente pendências que existiam naquele período.
+- Corrigida a data exibida para parcelas de acordos em consultas históricas.
+- Próximo recebimento da Home passa a considerar se a renda da competência já foi efetivamente recebida e avança corretamente após antecipação.
+- Saldo disponível passa a representar somente fluxo efetivamente realizado; renda ainda não recebida permanece no saldo projetado.
+- Tela de humor teve referências internas inválidas removidas/corrigidas para não quebrar caso volte a ser utilizada.
+- Versão do app sincronizada em `package.json`, lockfile, Android (`versionCode 13`), documentação e tela Sobre.
+
 ## 1.0.0-beta.9 — UX Android, recebimentos e autocompletes
 
 - Corrige o nome visível do Android para **Saldo Real** usando `capacitor.config.json` como fonte de verdade e sincronização de `strings.xml` no script Android.

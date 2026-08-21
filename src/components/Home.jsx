@@ -174,6 +174,7 @@ const Home = ({ setRoute }) => {
   const [saldoResumo,    setSaldoResumo]    = useState({
     saldoDisponivel: 0, saldoProjetado: 0, despesasPagas: 0, receitaConsiderada: 0,
   });
+  const [proximoRecebimento, setProximoRecebimento] = useState(null);
   const [percentual,     setPercentual]     = useState(0);
   const [alertas,        setAlertas]        = useState([]);
   const [insight,        setInsight]        = useState(null);
@@ -184,13 +185,8 @@ const Home = ({ setRoute }) => {
 
   const alertasUrgentes = useMemo(() => alertas.filter(a => a.atrasado || a.diff <= 2), [alertas]);
 
-  // Próximo recebimento configurado pelo usuário, com dia seguro em meses curtos.
-  const proximoRecebimento = useMemo(() => {
-    if (!diaPagamento) return null;
-    const hoje = new Date();
-    const data = FinanceiroUtils.proximoVencimentoMensal(diaPagamento, hoje);
-    return { data, diff: FinanceiroUtils.diferencaDias(data, hoje) };
-  }, [diaPagamento]);
+  // Vem do razão: um recebimento só avança para o mês seguinte depois que a
+  // competência atual foi realmente confirmada, inclusive quando foi antecipada.
   const diasParaPagamento = proximoRecebimento?.diff ?? null;
 
   useEffect(() => {
@@ -222,6 +218,7 @@ const Home = ({ setRoute }) => {
         despesasPagas: dashboard.despesasPagas,
         receitaConsiderada: dashboard.receitaConsiderada,
       });
+      setProximoRecebimento(dashboard.proximoRecebimento || null);
       setAlertas(dashboard.alertas);
       setPercentual(pct);
       setInsight(ins);
@@ -235,7 +232,7 @@ const Home = ({ setRoute }) => {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onFocus);
     };
-  }, [usuario, renda, carregando]);
+  }, [usuario, renda, diaPagamento, carregando]);
 
   if (carregando) return (
     <Box sx={{ minHeight: 'calc(100dvh - 62px - var(--app-safe-bottom))', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>

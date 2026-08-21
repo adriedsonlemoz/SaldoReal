@@ -22,18 +22,26 @@ const FinanceiroUtils = {
   calcularResumoSaldo({
     rendaConfigurada = 0,
     rendaBaseRegistrada = 0,
+    rendaBaseConfirmada = Number(rendaBaseRegistrada || 0) > 0,
     entradasExtrasPagas = 0,
     despesasPagas = 0,
     pendencias = 0,
   } = {}) {
-    const rendaBase = Number(rendaBaseRegistrada || 0) > 0
-      ? Number(rendaBaseRegistrada || 0)
+    const rendaRecebida = Number(rendaBaseRegistrada || 0);
+    const extrasRecebidos = Number(entradasExtrasPagas || 0);
+    const despesasEfetivadas = Number(despesasPagas || 0);
+    const rendaBase = rendaBaseConfirmada
+      ? rendaRecebida
       : Number(rendaConfigurada || 0);
-    const receitaConsiderada = rendaBase + Number(entradasExtrasPagas || 0);
-    const saldoDisponivel = receitaConsiderada - Number(despesasPagas || 0);
-    const saldoProjetado = saldoDisponivel - Number(pendencias || 0);
 
-    return { rendaBase, receitaConsiderada, saldoDisponivel, saldoProjetado };
+    // "Disponível" representa somente dinheiro que realmente entrou no razão.
+    // A renda configurada ainda não recebida participa apenas da projeção.
+    const receitaRecebida = rendaRecebida + extrasRecebidos;
+    const receitaConsiderada = rendaBase + extrasRecebidos;
+    const saldoDisponivel = receitaRecebida - despesasEfetivadas;
+    const saldoProjetado = receitaConsiderada - despesasEfetivadas - Number(pendencias || 0);
+
+    return { rendaBase, receitaRecebida, receitaConsiderada, saldoDisponivel, saldoProjetado };
   },
 
   // ── Datas ─────────────────────────────────────────────────────────────────
@@ -205,7 +213,7 @@ const FinanceiroUtils = {
   },
 
   quantidadeParcelasDevidasAteMes(acordo, mesAlvo) {
-    if (!acordo || acordo.situacao !== 'acordo') return 0;
+    if (!acordo || !['acordo', 'quitado'].includes(acordo.situacao)) return 0;
     const totais = Math.max(1, parseInt(acordo.parcelas) || 1);
     const esperadas = this.parcelasEsperadas(acordo, mesAlvo);
     if (esperadas <= 0) return 0;

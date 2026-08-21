@@ -239,3 +239,20 @@ Além da suíte existente (112 testes unitários na beta.8.4), a beta.9 deve val
 - ausência de regressão no banco/backup e funcionamento offline dos autocompletes.
 
 O resultado real de cada comando deve ser registrado no release/CI; falhas de ambiente não devem ser descritas como aprovação.
+
+
+## Regressões da beta.10
+
+Além da validação geral de release, a beta.10 deve proteger estes cenários:
+
+- editar uma conta fixa sem alterar a data e confirmar que o dia de vencimento permanece o mesmo;
+- editar uma conta para outro mês/ano e confirmar que a competência completa é atualizada;
+- receber antecipadamente a renda do mês e verificar a movimentação real, a Home e o próximo recebimento;
+- receber em um mês uma renda atrasada de competência anterior sem esconder a previsão da competência atual;
+- consultar um mês histórico antes/depois de um pagamento futuro e confirmar que a situação daquele mês não é reescrita;
+- consultar acordos históricos e confirmar que valor e vencimento pertencem à mesma parcela;
+- validar dias restantes, dia da semana, atraso e prévia de vencimento em lançamentos;
+- confirmar que saldo disponível usa somente entradas/saídas realizadas e que renda pendente entra apenas no projetado;
+- abrir a tela Sobre e confirmar `Beta 10`;
+- gerar Android e confirmar `versionCode 13` / `versionName 1.0.0-beta.10`.
+
